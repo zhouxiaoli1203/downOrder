@@ -1,12 +1,14 @@
 <template>
-  <div>
-      下单次数剩余：1000次
+  <div class="connonBg main">
+      <div class="center">
+        order
+      </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'header',
+  name: 'order',
   data () {
     return {
     }

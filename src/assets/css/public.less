@@ -1,0 +1,56 @@
+//侧边导航栏
+.navLeft{
+    .navMenu{
+        padding-top: 24px;
+    }
+    .el-menu{
+        border: none;
+    }
+    .el-menu-item.is-active{
+        background: #3551DF;
+    }
+
+    .el-menu-item{
+        height: 68px;
+        line-height: 68px;
+        text-align: center;
+        padding-left: 0 !important;
+    }
+    .el-menu-item.is-active{
+        color: #fff;
+    }
+
+    .el-menu-item [class^=el-icon-]{
+        margin-right: 10px;
+    }
+}
+// 弹框公用样式
+.publicPorp{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border-radius: 8px;
+    z-index: 113;
+}
+
+// 修改密码
+.passwordPorp{
+    .el-form-item__label{
+        color: #333;
+    }
+    .el-input__inner{
+        background: #F2F3F8;
+        border: none;
+        height: 32px;
+        line-height: 32px;
+    }
+    .el-button--primary{
+        margin-top: 52px;
+        width: 100%;
+        height: 48px;
+        background: #3551DF;
+        border-radius: 10px;
+        border: none;
+    }
+}

@@ -1,0 +1,46 @@
+.navLeft .navMenu {
+  padding-top: 24px;
+}
+.navLeft .el-menu {
+  border: none;
+}
+.navLeft .el-menu-item.is-active {
+  background: #3551DF;
+}
+.navLeft .el-menu-item {
+  height: 68px;
+  line-height: 68px;
+  text-align: center;
+  padding-left: 0 !important;
+}
+.navLeft .el-menu-item.is-active {
+  color: #fff;
+}
+.navLeft .el-menu-item [class^=el-icon-] {
+  margin-right: 10px;
+}
+.publicPorp {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  z-index: 113;
+}
+.passwordPorp .el-form-item__label {
+  color: #333;
+}
+.passwordPorp .el-input__inner {
+  background: #F2F3F8;
+  border: none;
+  height: 32px;
+  line-height: 32px;
+}
+.passwordPorp .el-button--primary {
+  margin-top: 52px;
+  width: 100%;
+  height: 48px;
+  background: #3551DF;
+  border-radius: 10px;
+  border: none;
+}
