@@ -44,3 +44,112 @@
   border-radius: 10px;
   border: none;
 }
+.crumbsHeader {
+  margin-bottom: 24px;
+}
+.crumbsHeader .crumbs span {
+  cursor: pointer;
+}
+.skuInfos .el-col-24 {
+  padding: 0 !important;
+}
+.skuInfos .el-row {
+  margin: 0 !important;
+}
+.skuInfos .el-radio.is-bordered {
+  background: #fff;
+}
+.skuInfos .el-radio__inner {
+  display: none;
+}
+.skuInfos .el-radio.is-bordered.is-checked {
+  background: #3551DF !important;
+  border-color: #3551DF;
+}
+.skuInfos .el-radio__input.is-checked + .el-radio__label {
+  color: #fff;
+}
+.skuInfos .el-radio--medium.is-bordered {
+  width: 100px;
+  text-align: center;
+  padding: 10px 22px 0 10px;
+}
+.skuInfos .num .el-input__inner {
+  text-align: center;
+}
+.skuInfos .uploadBox {
+  padding: 0 !important;
+}
+.skuInfos .el-upload-dragger {
+  background: none;
+  width: 62px;
+  height: 62px;
+}
+.skuInfos .el-upload-dragger p {
+  font-size: 12px;
+  line-height: 4px;
+  color: #666;
+}
+.skuInfos .el-upload-dragger .el-icon-upload {
+  font-size: 20px;
+  line-height: normal;
+  margin: 0;
+}
+.deliveryType .el-radio.is-bordered {
+  background: #F0F0F0;
+}
+.deliveryType .el-radio__inner {
+  display: none;
+}
+.deliveryType .el-radio.is-bordered.is-checked {
+  background: #3551DF !important;
+  border-color: #3551DF;
+}
+.deliveryType .el-radio__input.is-checked + .el-radio__label {
+  color: #fff;
+}
+.deliveryType .el-radio--medium.is-bordered {
+  width: 100px;
+  text-align: center;
+  padding: 10px 22px 0 10px;
+}
+.uploadSection .buzhou {
+  padding-left: 85px;
+  margin-bottom: 32px;
+}
+.uploadSection .el-step.is-horizontal {
+  position: relative;
+  flex-basis: 38% !important;
+}
+.uploadSection .el-step__description {
+  display: none;
+}
+.uploadSection .el-step__main {
+  position: absolute;
+  top: -7px;
+  left: 32px;
+  width: 64px;
+}
+.uploadSection .el-step.is-horizontal .el-step__line {
+  left: 103px;
+  margin-right: 10px !important;
+}
+.uploadSection .el-step__title.is-success {
+  color: #3551DF;
+}
+.uploadSection .el-step__head.is-success {
+  color: #3551DF;
+  border-color: #3551DF;
+}
+.rodioBox .el-radio__inner {
+  width: 20px;
+  height: 20px;
+}
+.rodioBox .el-radio__input.is-checked .el-radio__inner {
+  border-color: #3551DF;
+  background: #3551DF;
+}
+.rodioBox .el-radio__inner::after {
+  width: 6px;
+  height: 6px;
+}

@@ -3,7 +3,7 @@
       <div class="center">
         <ul>
           <template v-for="item in list">
-            <li class="cursor_p" @click="downOrder(item.id)">
+            <li class="cursor_p" @click="downOrder(item.name)">
               <div class="img">
                 <img :src="item.img" alt="">
               </div>
@@ -55,12 +55,12 @@ export default {
     }
   },
   methods:{
-    downOrder(id){
+    downOrder(name){
       this.$router.push({  
           path: '/index/downOrder',   
           name: 'downOrder',  
           query: {  
-            id:id,
+            name:name,
           }
       })  
     }

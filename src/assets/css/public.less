@@ -54,3 +54,138 @@
         border: none;
     }
 }
+
+// 面包屑
+.crumbsHeader{
+    margin-bottom: 24px;
+    .crumbs{
+        span{
+            cursor: pointer;
+        }    
+    }
+}
+
+// 下单页面样式
+.skuInfos{
+    .el-col-24{
+        padding: 0 !important;
+    }
+    .el-row{
+        margin: 0 !important;
+    }
+    .el-radio.is-bordered{
+        background: #fff;
+    }
+    .el-radio__inner{
+        display: none;
+    }
+    .el-radio.is-bordered.is-checked{
+        background: #3551DF !important;
+        border-color: #3551DF;
+    }
+    .el-radio__input.is-checked+.el-radio__label{
+        color: #fff;
+    }
+    .el-radio--medium.is-bordered{
+        width: 100px;
+        text-align: center;
+        padding: 10px 22px 0 10px;
+    }
+
+    .num{
+        .el-input__inner{
+            text-align: center;
+        }
+    }
+    .uploadBox {
+        padding: 0 !important;
+    }
+
+    .el-upload-dragger{
+        background: none;
+        width: 62px;
+        height: 62px;
+        p{
+            font-size: 12px;
+            line-height: 4px;
+            color: #666;
+        }
+    }
+
+    .el-upload-dragger .el-icon-upload{
+        font-size: 20px;
+        line-height: normal;
+        margin: 0;
+    }
+}
+
+.deliveryType{
+    .el-radio.is-bordered{
+        background: #F0F0F0;
+    }
+    .el-radio__inner{
+        display: none;
+    }
+    .el-radio.is-bordered.is-checked{
+        background: #3551DF !important;
+        border-color: #3551DF;
+    }
+    .el-radio__input.is-checked+.el-radio__label{
+        color: #fff;
+    }
+    .el-radio--medium.is-bordered{
+        width: 100px;
+        text-align: center;
+        padding: 10px 22px 0 10px;
+    }
+}
+
+// 步骤条
+.uploadSection{
+    .buzhou{
+        padding-left: 85px;
+        margin-bottom: 32px;
+    }
+    .el-step.is-horizontal{
+        position: relative;
+        flex-basis: 38% !important;
+    }
+    .el-step__description{
+        display: none;
+    }
+    .el-step__main{
+        position: absolute;
+        top: -7px;
+        left: 32px;
+        width: 64px;
+    }
+    .el-step.is-horizontal .el-step__line{
+        left: 103px;
+        margin-right: 10px !important;
+    }
+
+    .el-step__title.is-success{
+        color: #3551DF;
+    }
+    .el-step__head.is-success{
+        color: #3551DF;
+        border-color: #3551DF;
+    }
+    
+}
+
+// 单选框
+.rodioBox{
+    .el-radio__inner{
+        width: 20px;
+        height: 20px;
+    }
+    .el-radio__input.is-checked .el-radio__inner{
+        border-color: #3551DF;
+        background: #3551DF;
+    }
+    .el-radio__inner::after{
+        width: 6px;
+        height: 6px;
+    }
+}
