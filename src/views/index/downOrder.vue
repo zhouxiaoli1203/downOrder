@@ -11,18 +11,14 @@
           <section class="orderCont">
             <el-form :model="orderForm" :rules="orderFormRules" ref="orderForm" label-width="80px" class="demo-ruleForm">
               <div class="skuInfos">
-                <el-row :gutter="10">
+                <el-row>
                   <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="skuInfosLI">
                     <el-form-item label="产品文件">
                       <el-col :span="4" class="uploadBox">
-                        <el-upload
-                          class="upload-demo"
-                          drag
-                          action="https://jsonplaceholder.typicode.com/posts/"
-                          multiple>
-                          <i class="el-icon-upload"></i>
+                        <div class="upFile" @click="buzhouPorp = true">
+                          <img :src="file" alt="">
                           <p>上传文件</p>
-                        </el-upload>
+                        </div>
                       </el-col>
                       <el-col :span="11">
                         <el-dropdown>
@@ -139,10 +135,14 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-form-item>
-                <el-button type="primary" @click="submitForm('orderForm')">立即创建</el-button>
-                <el-button @click="resetForm('orderForm')">重置</el-button>
-              </el-form-item>
+              <el-row class="orderButton">
+                <el-col>
+                  <el-form-item>
+                    <button @click.prevent="resetForm('orderForm')">清除全部</button>
+                    <button type="primary" @click.prevent="submitForm('orderForm')">提交订单</button>
+                  </el-form-item>
+                </el-col>
+              </el-row>
             </el-form>
           </section>
           <section class="lookCont">
@@ -151,8 +151,8 @@
         </div>
       </div>
       <!-- 弹框 -->
-      <section class="uploadSection publicPorp">
-        <div class="close">
+      <section class="uploadSection publicPorp" v-show="buzhouPorp">
+        <div class="close" @click="Close">
           <i class="el-icon-close"></i>
         </div>
         <div class="buzhou">
@@ -163,24 +163,128 @@
           </el-steps>
         </div>
         <div class="uploadcont">
-          <section class="cont">
+          <section class="choicesection" v-if="buzhou==1">
+            <div class="choiceBox">
+              <el-upload
+                class="upload-demo"
+                drag
+                action="https://jsonplaceholder.typicode.com/posts/"
+                multiple>
+                <img :src="file" alt="">
+                <p>上传文件</p>
+              </el-upload>
+            </div>
+            <div class="choiceBox" @click="shejiqiClick(2.2)">
+              <img :src="shejiqi" alt="">
+              <p>上传文件</p>
+            </div>
+          </section>
+          <section class="cont" v-if="buzhou==2.2">
             <h5>2021-03-21</h5>
             <ul>
               <li>
                 <p class="rodioBox">
-                  <el-radio v-model="radio" label="1" @class="radioPublic"><br></el-radio>
+                  <el-radio v-model="radio" label="1"><br></el-radio>
+                </p>
+                <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
+              </li>
+               <li>
+                <p class="rodioBox">
+                  <el-radio v-model="radio" label="1"><br></el-radio>
                 </p>
                 <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
               </li>
             </ul>
           </section>
-          <div class="btn">
-              <button @click.prevent="next">上一步</button>
+          <section class="cont" v-if="buzhou==2.1">
+            <ul>
+              <li>
+                <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
+              </li>
+            </ul>
+          </section>
+          <section class="complete" v-if="buzhou==3">
+            <img :src="complete" alt="">
+            <span>上传完成</span>
+          </section>
+          <div class="btn" v-if="active==1">
+              <button class="close" @click.prevent="Close">取消</button>
+              <button @click.prevent="firstNext">下一步</button>
+          </div>
+          <div class="btn" v-if="active==2">
+              <button @click.prevent="lastStep">上一步</button>
               <button @click.prevent="next">下一步</button>
+          </div>
+          <div class="btn" v-if="active==3">
+              <button @click.prevent="lastStep">上一步</button>
+              <button @click.prevent="">完成</button>
           </div>
         </div>
       </section>
-      <div class="mask"></div>
+      <div class="mask" v-show="buzhouPorp"></div>
+
+      <!-- 确认订单弹框 -->
+      <section class="orderTruePorp publicPorp" v-show="orderTruePorp">
+        <h3>商品详情</h3>
+        <ul class="orderTrue">
+          <li>
+            <span class="tit">产品文件</span>
+            <div  class="info">
+              <span class="titname">禁止烧麦…</span>
+            </div>
+          </li>
+          <li>
+            <span class="tit">字体颜色</span>
+            <div class="info">
+              <span class="name">白色</span>
+            </div>
+          </li>
+          <li>
+            <span class="tit">产品尺寸</span>
+            <div class="info">
+              <span class="name">长60cm*宽500cm</span>
+              <p>禁止焚烧麦秸杆禁止焚烧麦秸杆禁止焚烧麦秸杆</p>
+            </div>
+          </li>
+          <li>
+            <span class="tit">产品数量</span>
+            <div class="info">
+              <span class="name">200</span>
+            </div>
+          </li>
+        </ul>
+        <ul class="orderTrue">
+          <li>
+            <span class="tit">订单来源</span>
+            <div  class="info">
+              <span class="name">淘宝</span>
+            </div>
+          </li>
+          <li>
+            <span class="tit">客户姓名</span>
+            <div class="info">
+              <span class="name">白色</span>
+            </div>
+          </li>
+          <li>
+            <span class="tit">联系方式</span>
+            <div class="info">
+              <span class="name">长60cm*宽500cm</span>
+            </div>
+          </li>
+          <li>
+            <span class="tit">配送方式</span>
+            <div class="info">
+              <span class="name">200</span>
+            </div>
+          </li>
+        </ul>
+        <div class="orderButton trueorderButton">
+           <button @click.prevent="resetForm('orderForm')">清除全部</button>
+            <button type="primary" @click.prevent="submitForm('orderForm')">提交订单</button>
+        </div>
+      </section>
+      <div class="mask" v-show="orderTruePorp"></div>
   </div>
 </template>
 
@@ -191,7 +295,7 @@ export default {
   data () {
     return {
       radio:'1',
-      active: 0,
+      active: 1,
       options: regionData,
       crumbsName:'',
       orderForm:{
@@ -226,7 +330,12 @@ export default {
         infoheight: [{required: true, message: '请输入高(单位：mm)', trigger: 'blur'}],
         inforemark: [{required: true, message: '请输入订单具体信息', trigger: 'blur'}],
       },
-      
+      file:require('../../assets/img/file.png'),
+      shejiqi:require('../../assets/img/shejiqi.png'),
+      complete:require('../../assets/img/complete.png'),
+      buzhou:1,
+      buzhouPorp:false,
+      orderTruePorp:false
     }
   },
   mounted(){
@@ -235,7 +344,8 @@ export default {
   },
   methods:{
     next() {
-        if (this.active++ > 2) this.active = 0;
+        this.active++
+        this.buzhou = 3
       },
     // 点击面包屑
     pathIndex(){
@@ -285,6 +395,24 @@ export default {
       // this.city = this.CodeToText[val[1]]
       // this.dist = this.CodeToText[val[2]]
     }, 
+    // 点击设计器
+    shejiqiClick(val){
+      this.buzhou = val
+      this.active++
+    },
+    // 关闭登录注册弹框
+    Close(){
+      console.log(111)
+      this.buzhouPorp=false
+    },
+    // 第一步
+    firstNext(){
+      this.$message('请选择一种方式上传文件');
+    },
+    // 上一步
+    lastStep(){
+      this.active--
+    }
   
   }
 }
@@ -311,6 +439,29 @@ export default {
         padding: 24px !important;
         background: #F5F6F9;
         border-radius: 10px;
+      }
+
+      .uploadBox {
+        .upFile{
+          width: 62px;
+          height: 62px;
+          border: 1px dashed #CDCEE1;
+          line-height: normal;
+          display: flex;
+          flex-flow: column;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          img{
+            width: 22px;
+            height: 22px;
+          }
+          p{
+            font-size: 12px;
+            color: #666;
+            line-height: normal;
+          }
+        }
       }
       .line{
         text-align: center;
@@ -344,11 +495,32 @@ export default {
         margin-right: 19px;
       }
     }
+
   }
   .lookCont{
     width: 45%;
     background: #F5F6F9;
     height: 500px;
+  }
+
+  .orderButton{
+    text-align: center;
+    button{
+      width: 124px;
+      height: 32px;
+      background: #DBDBDB;
+      border-radius: 4px;
+      text-align: center;
+      line-height: 32px;
+    }
+    button:nth-child(2){
+      background: #3551DF;
+      color: #fff;
+      margin-left: 32px;
+    }
+  }
+  .trueorderButton{
+    margin-top: 32px;
   }
 
   // 选择文件步骤条
@@ -369,9 +541,6 @@ export default {
       }
     }
 
-    .buzhou{
-
-    }
 
     .uploadcont{
       position: relative;
@@ -401,6 +570,55 @@ export default {
         }
       }
     }
+    .choicesection{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 105px;
+
+      .choiceBox{
+        width: 62px;
+        height: 62px;
+        text-align: center;
+
+        img{
+          width: 22px;
+          height: 22px;
+        }
+        p{
+          font-size: 12px;
+          color: #666;
+        }
+      }
+      .choiceBox:nth-child(2){
+        background: #E6E9F8;
+        border-radius: 8px;
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        margin-left: 100px;
+        p{
+          color: #3551DF;
+          margin-top: 3px;
+        }
+      }
+      
+    }
+
+    .complete{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 118px;
+
+      img{
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+      }
+    }
+
 
     .btn{
       position: absolute;
@@ -418,6 +636,60 @@ export default {
       }
       button:first-child{
         margin-right: 80px;
+      }
+      .close{
+        background: #DBDBDB;
+        color: #333;
+      }
+    }
+  }
+
+  // 确认订单弹框
+  .orderTruePorp{
+    width: 624px;
+    height: 800px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 31px 0px rgba(0, 0, 0, 0.13);
+    border-radius: 10px;
+    padding: 24px;
+
+    h3{
+      font-size: 16px;
+    }
+
+    .orderTrue{
+      padding-top: 24px;
+      border-bottom: 1px solid #CBCFE3;
+      li{
+        display: flex;
+        margin-bottom: 24px;
+        .titname{
+          background: #DBDBE2;
+          border-radius: 10px;
+          padding: 8px 4px;
+          font-size: 12px;
+        }
+        .tit{
+          color: #666;
+          width: 88px;
+        }
+
+        .info{
+          flex: 1;
+        }
+
+        .name{
+          margin-bottom: 8px;
+          display: inline-block;
+        }
+        p{
+          background: #F8F8FA;
+          border-radius: 10px;
+          width: 100%;
+          padding: 8px;
+          color: #666;
+          line-height: 20px;
+        }
       }
     }
   }
