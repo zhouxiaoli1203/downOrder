@@ -13,43 +13,38 @@
               <div class="skuInfos">
                 <el-row>
                   <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="skuInfosLI">
-                    <el-form-item label="产品文件">
-                      <el-col :span="4" class="uploadBox">
-                        <div class="upFile" @click="buzhouPorp = true">
-                          <img :src="file" alt="">
-                          <p>上传文件</p>
-                        </div>
-                      </el-col>
-                      <el-col :span="11">
-                        <el-dropdown>
-                          <el-button type="primary">
-                            更多菜单<i class="el-icon-arrow-down el-icon--right"></i>
-                          </el-button>
-                          <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item>黄金糕</el-dropdown-item>
-                            <el-dropdown-item>狮子头</el-dropdown-item>
-                            <el-dropdown-item>螺蛳粉</el-dropdown-item>
-                            <el-dropdown-item>双皮奶</el-dropdown-item>
-                            <el-dropdown-item>蚵仔煎</el-dropdown-item>
-                          </el-dropdown-menu>
-                        </el-dropdown>
-                      </el-col>
+                    <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
+                      <el-row type="flex" class="row-bg" justify="space-between">
+                        <el-col :span="20" class="uploadBox">
+                          <div class="upFile" @click="fileUpload(index)">
+                            <img :src="file" alt="">
+                            <p>上传文件</p>
+                          </div>
+                          <div v-if="item.name!=''" class="fileDiv">
+                            <input type="text"  readonly v-model="item.name">
+                            <img :src="delImg" alt="" @click="shanchuFile(index)">
+                          </div>
+                        </el-col>
+                        <el-col :span="2" class="iconClose" >
+                          <i class="el-icon-close" v-if="index!=0"  @click="deleteLadder(index)"></i>
+                        </el-col>
+                      </el-row>
                     </el-form-item>
                     <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor">
                       <el-radio-group v-model="item.fontColor" size="medium">
-                        <el-radio border label="白色"></el-radio>
-                        <el-radio border label="黄色"></el-radio>
+                        <el-radio border label="白色">白色</el-radio>
+                        <el-radio border label="黄色">黄色</el-radio>
                       </el-radio-group>
                     </el-form-item>
                     <el-form-item label="产品尺寸" required>
                       <el-row>
-                        <el-col :span="6">
+                        <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.width`" :rules="skuInfosGroupRules.infowidth">
                             <el-input v-model="item.width" placeholder="宽（mm）"></el-input>
                           </el-form-item>
                         </el-col>
                         <el-col class="line" :span="2">X</el-col>
-                        <el-col :span="6">
+                        <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
                             <el-input v-model="item.height" placeholder="高（mm）"></el-input>
                           </el-form-item>
@@ -79,7 +74,7 @@
                 <el-input v-model="orderForm.title" placeholder="请输入订单标题"></el-input>
               </el-form-item>
               <el-form-item label="订单来源" prop="source">
-                <el-select v-model="orderForm.source" placeholder="请选择订单来源" style="width:100%">
+                <el-select v-model="orderForm.source" placeholder="请选择订单来源" style="width:100%" @change="sourceChange">
                   <el-option label="淘宝" value="1"></el-option>
                   <el-option label="京东" value="2"></el-option>
                   <el-option label="PDD" value="3"></el-option>
@@ -93,20 +88,17 @@
                 <el-input v-model="orderForm.receiptMobile" placeholder="请输入客户联系方式"></el-input>
               </el-form-item>
               <el-form-item label="配送方式" class="deliveryType">
-                <el-radio-group v-model="orderForm.deliveryType" size="medium">
-                  <el-radio border label="邮寄"></el-radio>
-                  <el-radio border label="同城配送"></el-radio>
-                  <el-radio border label="自提"></el-radio>
+                <el-radio-group v-model="orderForm.deliveryType" size="medium" @change="deliveryTypeChange">
+                  <el-radio border label="1">邮寄</el-radio>
+                  <el-radio border label="2">同城配送</el-radio>
+                  <el-radio border label="3">自提</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-row>
+              <el-row v-if="orderForm.deliveryType!=3">
                 <el-col>
-                  <el-form-item label="物流公司" prop="source">
-                    <el-select v-model="orderForm.source" placeholder="请选择物流公司" style="width:100%">
-                      <el-option label="淘宝" value="1"></el-option>
-                      <el-option label="京东" value="2"></el-option>
-                      <el-option label="PDD" value="3"></el-option>
-                      <el-option label="线下" value="4"></el-option>
+                  <el-form-item label="物流公司" prop="waybillCode">
+                    <el-select v-model="orderForm.waybillCode" placeholder="请选择物流公司" style="width:100%"  @change="waybillCodeChange">
+                      <el-option v-for="item in wuliuList" :key="item.value" :label="item.name" :value="item.code"></el-option>
                     </el-select>
                   </el-form-item>
                   <el-form-item label="地址信息" prop="receiptAddress">
@@ -123,14 +115,11 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-row>
+              <el-row v-else>
                 <el-col>
-                  <el-form-item label="自提地址" prop="source">
-                    <el-select v-model="orderForm.source" placeholder="请选择自提地址" style="width:100%">
-                      <el-option label="淘宝" value="1"></el-option>
-                      <el-option label="京东" value="2"></el-option>
-                      <el-option label="PDD" value="3"></el-option>
-                      <el-option label="线下" value="4"></el-option>
+                  <el-form-item label="自提地址" prop="pickUpAddress">
+                    <el-select v-model="orderForm.pickUpAddress" placeholder="请选择自提地址" style="width:100%">
+                      <el-option label="淮北·NO0001店：安徽省淮北市相山区古城路（二马路）与洪山路交叉口红绿灯路口68-5号" value="淮北·NO0001店：安徽省淮北市相山区古城路（二马路）与洪山路交叉口红绿灯路口68"></el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
@@ -163,47 +152,51 @@
           </el-steps>
         </div>
         <div class="uploadcont">
-          <section class="choicesection" v-if="buzhou==1">
+          <section class="choicesection" v-if="active==1">
             <div class="choiceBox">
               <el-upload
                 class="upload-demo"
                 drag
-                action="https://jsonplaceholder.typicode.com/posts/"
-                multiple>
+                action=""
+                :show-file-list="false"
+                :before-upload="beforeAvatarUpload"
+                >
                 <img :src="file" alt="">
                 <p>上传文件</p>
               </el-upload>
             </div>
-            <div class="choiceBox" @click="shejiqiClick(2.2)">
+            <div class="choiceBox" @click="shejiqiClick(2)">
               <img :src="shejiqi" alt="">
               <p>上传文件</p>
             </div>
           </section>
-          <section class="cont" v-if="buzhou==2.2">
-            <h5>2021-03-21</h5>
-            <ul>
-              <li>
-                <p class="rodioBox">
-                  <el-radio v-model="radio" label="1"><br></el-radio>
-                </p>
-                <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
-              </li>
-               <li>
-                <p class="rodioBox">
-                  <el-radio v-model="radio" label="1"><br></el-radio>
-                </p>
-                <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
-              </li>
-            </ul>
-          </section>
-          <section class="cont" v-if="buzhou==2.1">
-            <ul>
-              <li>
-                <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
-              </li>
-            </ul>
-          </section>
-          <section class="complete" v-if="buzhou==3">
+          <div v-if="active==2">
+            <section class="cont" v-if="buzhou==2">
+              <h5>2021-03-21</h5>
+              <ul>
+                <li>
+                  <p class="rodioBox">
+                    <el-radio v-model="radio" label="1"><br></el-radio>
+                  </p>
+                  <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
+                </li>
+                <li>
+                  <p class="rodioBox">
+                    <el-radio v-model="radio" label="1"><br></el-radio>
+                  </p>
+                  <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
+                </li>
+              </ul>
+            </section>
+            <section class="cont" v-if="buzhou==1">
+              <ul>
+                <li v-for="item in localList">
+                  <span>{{item}}</span>
+                </li>
+              </ul>
+            </section>
+          </div>
+          <section class="complete" v-if="active==3">
             <img :src="complete" alt="">
             <span>上传完成</span>
           </section>
@@ -217,39 +210,39 @@
           </div>
           <div class="btn" v-if="active==3">
               <button @click.prevent="lastStep">上一步</button>
-              <button @click.prevent="">完成</button>
+              <button @click.prevent="finishBtn">完成</button>
           </div>
         </div>
       </section>
-      <div class="mask" v-show="buzhouPorp"></div>
+ 
 
-      <!-- 确认订单弹框 -->
+     <!-- 确认订单弹框 -->
       <section class="orderTruePorp publicPorp" v-show="orderTruePorp">
         <h3>商品详情</h3>
-        <ul class="orderTrue">
+        <ul class="orderTrue" v-for="item in orderForm.skuInfos">
           <li>
             <span class="tit">产品文件</span>
             <div  class="info">
-              <span class="titname">禁止烧麦…</span>
+              <span class="titname">{{item.name}}</span>
             </div>
           </li>
           <li>
             <span class="tit">字体颜色</span>
             <div class="info">
-              <span class="name">白色</span>
+              <span class="name">{{item.fontColor}}</span>
             </div>
           </li>
           <li>
             <span class="tit">产品尺寸</span>
             <div class="info">
-              <span class="name">长60cm*宽500cm</span>
-              <p>禁止焚烧麦秸杆禁止焚烧麦秸杆禁止焚烧麦秸杆</p>
+              <span class="name">宽{{item.width}}mm*高{{item.height}}mm</span>
+              <p>{{item.remark}}</p>
             </div>
           </li>
           <li>
             <span class="tit">产品数量</span>
             <div class="info">
-              <span class="name">200</span>
+              <span class="name">{{item.num}}</span>
             </div>
           </li>
         </ul>
@@ -257,34 +250,49 @@
           <li>
             <span class="tit">订单来源</span>
             <div  class="info">
-              <span class="name">淘宝</span>
+              <span class="name">{{orderForm.sourceName}}</span>
             </div>
           </li>
           <li>
             <span class="tit">客户姓名</span>
             <div class="info">
-              <span class="name">白色</span>
+              <span class="name">{{orderForm.receiptName}}</span>
             </div>
           </li>
           <li>
             <span class="tit">联系方式</span>
             <div class="info">
-              <span class="name">长60cm*宽500cm</span>
+              <span class="name">{{orderForm.receiptMobile}}</span>
             </div>
           </li>
           <li>
             <span class="tit">配送方式</span>
             <div class="info">
-              <span class="name">200</span>
+              <span class="name">{{orderForm.deliveryTypeName}}</span>
+              <span class="ziti" v-if="orderForm.deliveryType==3">（{{orderForm.pickUpAddress}}）</span>
             </div>
           </li>
+          <template  v-if="orderForm.deliveryType!=3">
+            <li>
+              <span class="tit">物流公司</span>
+              <div class="info">
+                <span class="name">{{orderForm.waybillCodeName}}</span>
+              </div>
+            </li>
+            <li>
+              <span class="tit">配送地址</span>
+              <div class="info">
+                <span class="name">{{orderForm.Address+orderForm.receiptDetailAddress}}</span>
+              </div>
+            </li>
+          </template>
         </ul>
         <div class="orderButton trueorderButton">
-           <button @click.prevent="resetForm('orderForm')">清除全部</button>
-            <button type="primary" @click.prevent="submitForm('orderForm')">提交订单</button>
+          <button @click.prevent="orderTrueClose">取消</button>
+          <button type="primary" @click.prevent="submitForm('orderForm')">提交订单</button>
         </div>
       </section>
-      <div class="mask" v-show="orderTruePorp"></div>
+      <div class="mask" v-show="publicPorp"></div>
   </div>
 </template>
 
@@ -293,29 +301,91 @@ import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlu
 export default {
   name: 'downOrder',
   data () {
+    var widthHeight = (rule,value,callback) => {
+      if(value){
+        console.log(value)
+         value = String(value)
+        let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
+        let num = Number(values)  //将字符串转换为数
+        if(isNaN(num)){  //判断是否是非数字
+          callback(new Error('尺寸必须为数字'));
+        }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
+          callback(new Error('尺寸必须为数字类型'));
+        }else{
+          console.log(value.length)
+          if(value % 1 === 0){
+            callback();
+          }else{
+            callback(new Error('尺寸不能包含小数点'));
+          }
+        }
+      }else{
+        callback(new Error('请输入尺寸'));
+      }
+    };
+    var numRule = (rule,value,callback) => {
+      if(value){
+        console.log(value)
+        value = String(value)
+        let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
+        let num = Number(values)  //将字符串转换为数
+        if(isNaN(num)){  //判断是否是非数字
+          callback(new Error('数量必须为数字'));
+        }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
+          callback(new Error('数量必须为数字类型'));
+        }else{
+          if(value>0){
+            callback();
+          }else{
+            callback(new Error('数量必须大于0'));
+          }
+        }
+      }else{
+        callback(new Error('请输入数量'));
+      }
+    };
+    var receiptMobileRule = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入联系人电话'));
+      } else {
+        let mobile = /^1(3|4|5|6|7|8|9)\d{9}$/; //最新16手机正则
+        if (!mobile.test(value)) {
+          return callback(
+            new Error("手机号格式不正确")
+          );
+        } 
+        callback();        
+      }
+    };
     return {
       radio:'1',
       active: 1,
       options: regionData,
+      CodeToText,
       crumbsName:'',
       orderForm:{
         skuInfos:[
           {
             productCode:'',
-            fontColor:'',
-            height:'',
+            fontColor:'白色',
+            height:200,
             num: 1,
             remark: '',
-            width:''
+            width:100,
+            name:'',//文件的名字
           }
         ],
         title:'',
         source:'', //订单来源，
+        sourceName:'',
         receiptName:'', //客户姓名
         receiptMobile:'',
-        deliveryType:'', //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
+        deliveryType:'1', //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
+        deliveryTypeName:'邮寄',
         waybillCode:'', //物流公司
-        receiptAddress:'', //收货人的地址 （省＋市＋区）
+        waybillCodeName:'',
+        receiptAddress:'', //收货人的地址 （省＋市＋区） //这是是省市区的码
+        Address:'', //省市区码转换过的文字,下订单的时候用这个
         receiptDetailAddress:'', //收货人详情地址
         pickUpAddress:'', //自提点
       },
@@ -323,51 +393,182 @@ export default {
         title: [
           { required: true, message: '请输入订单标题', trigger: 'blur' }
         ],
+        source: [
+          { required: true, message: '请选择订单来源', trigger: 'change' }
+        ],
+        receiptName: [
+          { required: true, message: '请输入客户姓名', trigger: 'blur' }
+        ],
+        receiptMobile: [
+          { required: true, validator: receiptMobileRule, trigger: 'blur' }
+        ],
+        waybillCode: [
+          { required: true, message: '请选择物流公司', trigger: 'change' }
+        ],
+        receiptAddress: [
+          { required: true, message: '请选择省市区', trigger: 'change' }
+        ],
+        pickUpAddress: [
+          { required: true, message: '请选择自提地址', trigger: 'change' }
+        ],
+        receiptDetailAddress: [
+          { required: true, message: '请输入详情地址', trigger: 'blur' }
+        ],
       },
       skuInfosGroupRules: {
-        infofontColor: [{required: true, message: '请选择字体颜色', trigger: 'blur'}],
-        infowidth: [{required: true, message: '请输入宽(单位：mm)', trigger: 'blur'}],
-        infoheight: [{required: true, message: '请输入高(单位：mm)', trigger: 'blur'}],
+        infoname: [{required: true,  message: '请上传文件',  trigger: 'blur'}],
+        infowidth: [{required: true,  validator: widthHeight,  trigger: 'blur'}],
+        infoheight: [{required: true, validator: widthHeight, trigger: 'blur'}],
         inforemark: [{required: true, message: '请输入订单具体信息', trigger: 'blur'}],
+        infonum: [{required: true, validator: numRule, trigger: 'blur'}],
       },
+      delImg:require('../../assets/img/delImg.png'),
       file:require('../../assets/img/file.png'),
       shejiqi:require('../../assets/img/shejiqi.png'),
       complete:require('../../assets/img/complete.png'),
-      buzhou:1,
+      buzhou:1, //1.本地上传，2.设计器上传
       buzhouPorp:false,
-      orderTruePorp:false
+      orderTruePorp:false, //订单确认
+      publicPorp:false, //遮罩层
+      wuliuList:[],
+      localList:[],
+      sort:0,
+      wenjianNanme:'',
+      wenjianCode:'',
+      customerId:0,
     }
+  },
+  created(){
+    let userInfo = this.$store.getters.getUserInfo
+    this.customerId = userInfo.id
   },
   mounted(){
     this.crumbsName = this.$route.query.name
-
+    // 获取物流公司
+    this.listExpressCompany()
+    
   },
   methods:{
-    next() {
-        this.active++
-        this.buzhou = 3
-      },
+    // 上传文件
+    beforeAvatarUpload(file) {
+      this.localList = [] //上传之前先清空
+      let name = file.name
+      console.log(name)
+      let param = new FormData(); // 创建form对象
+      param.append("file",file);
+      param.append("name",name); 
+      this.$post('post','http://ga.timan.vip:8090/production/upload',param,'upload'
+      ).then((res) => {
+        if (res.code == 200) {
+          let { localList } = this
+          this.active =2
+          this.buzhou = 1
+          this.wenjianNanme = name
+          localList.push(name)
+          this.wenjianCode  = res.data
+        }
+      })
+    },
+    // 点击上传
+    fileUpload(val){
+      console.log(val)
+      this.buzhouPorp = true
+      this.publicPorp = true
+      this.sort = val
+    },
+    // 下一步
+    next() {this.active++},
     // 点击面包屑
+    // 完后上传
+    finishBtn(){
+      let { sort, wenjianNanme, wenjianCode } = this
+      this.orderForm.skuInfos[sort].name = wenjianNanme
+      this.orderForm.skuInfos[sort].productCode = wenjianCode
+      this.buzhou = 1 //1.本地上传，2.设计器上传
+      this.buzhouPorp = false
+      this.publicPorp = false
+      this.active = 1
+      this.wenjianNanme=''
+      this.wenjianCode=''
+    },
     pathIndex(){
       console.log(111)
       this.$router.go(-1)
     },
+    // 移除整个产品
     deleteLadder(index){
-      if(this.form.productGroup.length>1){
-        this.form.productGroup.splice(index,1);
+      this.confirm_pop("确定移除该产品吗？").then(res=>{
+        if(this.orderForm.skuInfos.length>1){
+          this.orderForm.skuInfos.splice(index,1);
+        }
+      })
+    },
+    // 删除某个产品中的文件
+    shanchuFile(val){
+      this.confirm_pop("确定删除该文件吗？").then(res=>{
+        this.orderForm.skuInfos[val].name = ''
+        this.orderForm.skuInfos[val].productCode = ''
+      })
+    },
+    // 选择订单来源
+    sourceChange(val){
+      console.log(val)
+      if(val==1){
+        this.orderForm.sourceName = '淘宝'
       }
+      if(val==2){
+        this.orderForm.sourceName = '京东'
+      }
+      if(val==3){
+        this.orderForm.sourceName = 'PDD'
+      }
+      if(val==4){
+        this.orderForm.sourceName = '线下'
+      }
+    },
+    // 邮寄方式
+    deliveryTypeChange(val){
+      if(val==1){
+        this.orderForm.deliveryTypeName = '邮寄'
+      }
+      if(val==2){
+        this.orderForm.deliveryTypeName = '同城配送'
+      }
+      if(val==3){
+        this.orderForm.deliveryTypeName = '自提'  
+
+        //如果是自提 物流公司 省市区 详情地址为空 否则 自提地址为空
+        this.orderForm.waybillCode='' // 物流的code
+        this.orderForm.waybillCodeName='' // 物流的名字
+        this.orderForm.receiptDetailAddress='' // 详细地址
+        this.orderForm.receiptAddress='' // 省市区码
+        this.orderForm.Address='' // 省市区码
+
+      }else{
+        this.orderForm.pickUpAddress = '' //自提地址 
+      }
+
+    },
+    // 物流公司
+    waybillCodeChange(name){
+      console.log(name)
+      this.wuliuList.forEach((item,index)=>{
+        if(name==item.code){
+          this.orderForm.waybillCodeName= item.name
+        }
+      })
     },
     // 添加产品
     addLadder(){
-      console.log(111)
       this.orderForm.skuInfos.push(
         {
           productCode:'',
-          fontColor:'',
-          height: 0,
+          fontColor:'白色',
+          height: '',
           num: 1,
           remark: '',
-          width: 0
+          width: '',
+          name:'',
         }
       );
     },
@@ -375,15 +576,13 @@ export default {
       console.log(formName)
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
-          this.submitFormAction();
+          this.orderOk()
+          this.orderTruePorp = true
+          this.publicPorp = true//遮罩层
         } else {
           this.$message.error("验证不通过");
         }
       });
-    },
-    submitFormAction()
-    {
-      this.$message.success("提交成功");
     },
     resetForm(formName)
     {
@@ -391,19 +590,23 @@ export default {
       this.form.productGroup = [{num:"",price:""}];
     },
     cityChange(val){ //选择收货地址
-      // this.prov = this.CodeToText[val[0]]
-      // this.city = this.CodeToText[val[1]]
-      // this.dist = this.CodeToText[val[2]]
+      this.orderForm.Address = this.CodeToText[val[0]] + this.CodeToText[val[1]] + this.CodeToText[val[2]]
     }, 
     // 点击设计器
     shejiqiClick(val){
-      this.buzhou = val
       this.active++
+      this.buzhou = val
     },
-    // 关闭登录注册弹框
+    // 关闭上传弹框
     Close(){
       console.log(111)
       this.buzhouPorp=false
+      this.publicPorp=false
+    },
+    // 关闭确认订单弹框
+    orderTrueClose(){
+      this.publicPorp=false
+      this.orderTruePorp=false//订单确认
     },
     // 第一步
     firstNext(){
@@ -412,8 +615,59 @@ export default {
     // 上一步
     lastStep(){
       this.active--
+    },
+    // 提交订单请求
+    orderSubmit(){
+      this.$post("post",this.baseUrl+"/loginByPassword",data).then((res)=>{
+        if(res.code == 200){
+          localStorage.setItem("token", res.data);
+          console.log(localStorage);
+            this.$router.replace({  //核心语句
+              path:'/index',   //跳转的路径
+              // query:{           //路由传参时push和query搭配使用 ，作用时传递参数
+              //     token:res.data
+              // }
+          })
+        }
+      });
+    },
+    // 获取物流
+    listExpressCompany(){
+      this.$post('get',this.baseUrl + '/order/listExpressCompany',
+      ).then((res) => {
+        if (res.code == 200) {
+          this.wuliuList = res.data
+        }
+       
+      })
+    },
+    stepsss(val){
+      console.log(val)
+    },
+    orderOk(){
+      let { orderForm,customerId } = this
+      let data = {
+        customerId,
+        deliveryType:orderForm.deliveryType,
+        pickUpAddress:orderForm.pickUpAddress,
+        receiptAddress:orderForm.Address,
+        receiptDetailAddress:orderForm.receiptDetailAddress,
+        receiptMobile:orderForm.receiptMobile,
+        receiptName:orderForm.receiptName,
+        skuId:1,
+        skuInfos:orderForm.skuInfos,
+        source:orderForm.source,
+        waybillCode:orderForm.waybillCode
+      }
+      console.log(data);
+      this.$post('post',this.baseUrl + '/order/submit',data
+      ).then((res) => {
+        if (res.code == 200) {
+
+        }
+      })
     }
-  
+    
   }
 }
 </script>
@@ -442,7 +696,10 @@ export default {
       }
 
       .uploadBox {
+        display: flex;
+        align-items: center;
         .upFile{
+          margin-right: 20px;
           width: 62px;
           height: 62px;
           border: 1px dashed #CDCEE1;
@@ -461,6 +718,46 @@ export default {
             color: #666;
             line-height: normal;
           }
+        }
+
+        .fileDiv{
+          line-height: normal;
+          width: 88px;
+          height: 32px;
+          background: #E7E8F4;
+          border-radius: 10px;
+          padding: 0 5px;
+          position: relative;
+          // p{
+          //   display: -webkit-box;
+          //   -webkit-box-orient: vertical;
+          //   -webkit-line-clamp: 1;
+          //   overflow: hidden;
+          //   line-height: 32px;
+          //   font-size: 12px;
+          // }
+          input{
+            font-size: 12px;
+            line-height: 32px;
+            width: 100%;
+            height: 100%;
+          }
+          img{
+            position: absolute;
+            right: -5px;
+            top: -5px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+          }
+        }
+      }
+      .iconClose{
+        text-align: right;
+        i{
+          font-size: 25px;
+          color: #999;
+          cursor: pointer;
         }
       }
       .line{
@@ -647,7 +944,8 @@ export default {
   // 确认订单弹框
   .orderTruePorp{
     width: 624px;
-    height: 800px;
+    max-height: 800px;
+    overflow-y: scroll;
     background: #FFFFFF;
     box-shadow: 0px 4px 31px 0px rgba(0, 0, 0, 0.13);
     border-radius: 10px;
@@ -681,6 +979,9 @@ export default {
         .name{
           margin-bottom: 8px;
           display: inline-block;
+        }
+        .ziti{
+          color: #3551DF;
         }
         p{
           background: #F8F8FA;

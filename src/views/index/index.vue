@@ -27,13 +27,13 @@ export default {
           id:1,
         },
         {
-          name:'印刷',
-          img:require('../../assets/img/yinshu.png'),
+          name:'打印资料',
+          img:require('../../assets/img/dayin.png'),
           id:2,
         },
         {
-          name:'打印',
-          img:require('../../assets/img/dayin.png'),
+          name:'印刷',
+          img:require('../../assets/img/yinshu.png'),
           id:3,
         },
         {

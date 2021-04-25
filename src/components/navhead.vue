@@ -12,20 +12,24 @@
           <span>40</span>
         </div>
         <div class="info">
-          <p @click="passwordPorp = true">奋斗的阿花 &nbsp/</p>
-          <span class="cursor_p">&nbsp退出</span>
+          <p @click="passwordPorp = true">{{info.nickname}} &nbsp/</p>
+          <span class="cursor_p" @click="loginOut">&nbsp退出</span>
         </div>
       </div>
     </div>
     <!-- 修改密码弹出层 -->
     <section class="publicPorp passwordPorp"  v-show="passwordPorp">
-      <h2>修改密码</h2>
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-ruleForm" :hide-required-asterisk="true">
+      <h2 v-show="unEdit">修改密码</h2>
+      <div class="eidt-complete t_a_c" v-show="!unEdit">
+          <img src="@/assets/img/duigou.png" alt="" width="44px" height="44px">
+          <div style="margin-top:16px;">修改完成</div>
+      </div>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-ruleForm" :hide-required-asterisk="true" v-show="unEdit" style="width: 394px;">
         <el-form-item label="原密码" prop="oldPassword">
-          <el-input v-model="ruleForm.name" placeholder="请输入原密码"></el-input>
+          <el-input v-model="ruleForm.oldPassword" placeholder="请输入原密码"></el-input>
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="ruleForm.name" placeholder="请输入新密码"></el-input>
+          <el-input v-model="ruleForm.newPassword" placeholder="请输入新密码"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click.passive="submitForm('ruleForm')" v-button>修改</el-button>
@@ -55,26 +59,64 @@ export default {
           { required: true, message: '请输入新密码', trigger: 'blur' },
         ],
       },
-      passwordPorp:false
+      passwordPorp: false,
+      unEdit:true,
+      info:'',
     }
+  },
+  created(){
+    this.userInfo()
   },
   methods: {
     submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          } else {
-            console.log('error submit!!');
-            return false;
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let data = {
+            newPassword: this.ruleForm.newPassword,
+            oldPassword: this.ruleForm.oldPassword,
           }
-        });
+          this.$post('post',this.baseUrl + '/customer/updatePassword',
+            data
+          ).then((res) => {
+            if (res.code == 200) {
+              this.$refs[formName].resetFields();
+              this.unEdit = false;
+            }
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
+
+    // 获取用户信息
+    userInfo(){
+      this.$post('get',this.baseUrl + '/customer/userInfo',
+      ).then((res) => {
+        if (res.code == 200) {
+          this.info = res.data
+          this.$store.commit('setUserInfo',res.data)
+        }
+      })
+    },
+
+    // 退出登录
+    loginOut(){
+      this.confirm_pop("确认退出登录？").then(res=>{
+        localStorage.removeItem('token');
+        this.$router.replace('/');
+      })
+    },
+
+
     resetForm(formName) {
-        this.$refs[formName].resetFields();
+      this.$refs[formName].resetFields();
     },
     // 关闭登录注册弹框
     LognClose(){
       this.passwordPorp=false
+      this.unEdit=true
     },
   }
 }
@@ -165,8 +207,10 @@ export default {
   .passwordPorp{
     padding: 24px 33px;
     background: #fff;
-    width: 460px;
-    height: 420px;
+    min-width: 242px;
+    max-width: 460px;
+    max-height: 420px;
+
 
     h2{
       font-size: 24px;
