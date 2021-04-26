@@ -48,37 +48,53 @@
       </div>
     </div>
     <div class="center">
-      <div class="table-content">
-        <ul class="list-items">
-          <li class="list-card" v-for="x in 12" @click="goDetail">
-            <div class="head">
-              <h3>这里是订单标题这…</h3>
-              <span class="yixiadan">已下单</span>
-            </div>
-            <div class="content">
-              <p>创建：2021-01-21 13:22</p>
-              <p>发货：2021-01-21 13:22</p>
-            </div>
-            <div class="footer">
-              <span class="fl status blue">打印资料</span>
-              <span class="fr icon">
-                <i class="el-icon-arrow-right"></i>
-              </span>
-            </div>
-          </li>
-        </ul>
-      </div>
-       <div class="pageblock">
-        <el-pagination
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage4"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
-          layout="sizes, prev, pager, next"
-          :total="1000">
-        </el-pagination>
+      <section v-if="orderList!=''">
+        <div class="table-content">
+          <ul class="list-items">
+            <li class="list-card" v-for="item in orderList" @click="goDetail(item.id,item.orderAttr.title)">
+              <div class="head">
+                <h3>{{item.orderAttr.title}}</h3>
+                <span class="yixiadan" v-if="item.status==0">待生产</span>
+                <span class="yixiadan" v-if="item.status==1" style="color:#FF8F1C">已驳回</span>
+                <span class="yixiadan" v-if="item.status==2">待生产</span>
+                <span class="yixiadan" v-if="item.status==3">生产中</span>
+                <span class="yixiadan" v-if="item.status==4">生产完成</span>
+                <span class="yixiadan" v-if="item.status==5" style="color:#3551DF">已发货</span>
+                <span class="yixiadan" v-if="item.status==6" style="color:#394250">退单中</span>
+                <span class="yixiadan" v-if="item.status==7" style="color:#394250">已退单</span>
+                <span class="yixiadan" v-if="item.status==8" style="color:#FF3333">请求返厂</span>
+                <span class="yixiadan" v-if="item.status==9" style="color:#FF3333">返厂中</span>
+              </div>
+              <div class="content">
+                <p>创建：{{item.createTime}}</p>
+                <p v-if="item.deliveryTime!=null">发货：{{item.deliveryTime}}</p>
+              </div>
+              <div class="footer">
+                <span class="fl status red" v-if="item.orderAttr.goodsName=='条幅'">{{item.orderAttr.goodsName}}</span>
+                <span class="fl status blue" v-if="item.orderAttr.goodsName=='打印'">{{item.orderAttr.goodsName}}</span>
+                <span class="fr icon">
+                  <i class="el-icon-arrow-right"></i>
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="pageblock">
+          <el-pagination
+            background
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page.sync="currentPage4"
+            :page-sizes="[100, 200, 300, 400]"
+            :page-size="100"
+            layout="sizes, prev, pager, next"
+            :total="1000">
+          </el-pagination>
+        </div>
+      </section>
+      <div class="noCont" v-else>
+        <img :src="noOrder" alt="">
+        <p>暂无订单</p>
       </div>
     </div>
   </div>
@@ -94,7 +110,10 @@ export default {
       value1:"",
       exportDate:"",
       form:{desc:""},
-      currentPage4: 4
+      currentPage4: 4,
+      orderList:[],
+      noOrder:require('../../assets/img/noOrder.png'),
+
     }
   },
     components: {},
@@ -133,15 +152,14 @@ export default {
         this_.exportVisible = true;
         this_.exportDate = "";
     },
-    goDetail(){
-         this.$router.push({
-        //核心语句
-        path: '/index/order/detail', //跳转的路径
+
+    goDetail(id,title){
+      this.$router.push({
+        path: '/order/detail', //跳转的路径
         query: {
-            from:"order",
-            id:""
-          //路由传参时push和query搭配使用 ，作用时传递参数
-        },
+          id:id,
+          title:title
+        }
       })
     }
   },
@@ -152,6 +170,7 @@ export default {
 <style lang='less' scoped>
   .center{
     height: 96.5%;
+    position: relative;
   }
   .search-head {
     height: 32px;

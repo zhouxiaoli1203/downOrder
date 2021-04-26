@@ -248,6 +248,12 @@
         </ul>
         <ul class="orderTrue">
           <li>
+            <span class="tit">订单标题</span>
+            <div  class="info">
+              <span class="name">{{orderForm.title}}</span>
+            </div>
+          </li>
+          <li>
             <span class="tit">订单来源</span>
             <div  class="info">
               <span class="name">{{orderForm.sourceName}}</span>
@@ -289,7 +295,7 @@
         </ul>
         <div class="orderButton trueorderButton">
           <button @click.prevent="orderTrueClose">取消</button>
-          <button type="primary" @click.prevent="submitForm('orderForm')">提交订单</button>
+          <button type="primary" @click.prevent="submitOrder">提交订单</button>
         </div>
       </section>
       <div class="mask" v-show="publicPorp"></div>
@@ -368,10 +374,10 @@ export default {
           {
             productCode:'',
             fontColor:'白色',
-            height:200,
+            height:'',
             num: 1,
             remark: '',
-            width:100,
+            width:'',
             name:'',//文件的名字
           }
         ],
@@ -436,19 +442,132 @@ export default {
       wenjianNanme:'',
       wenjianCode:'',
       customerId:0,
+      skuId:0,
+      orderId:0,
     }
   },
   created(){
     let userInfo = this.$store.getters.getUserInfo
-    this.customerId = userInfo.id
+    this.customerId = userInfo.id //用户的id
+    this.skuId = this.$route.query.id //产品的id
+    let dingdanid = this.$route.query.orderId //订单的id
+    this.crumbsName = this.$route.query.name
+    if(dingdanid){
+      this.getByIdInfo(dingdanid)
+      this.orderId = dingdanid
+    }
   },
   mounted(){
-    this.crumbsName = this.$route.query.name
     // 获取物流公司
     this.listExpressCompany()
-    
   },
   methods:{
+    // 获取订单信息
+    getByIdInfo(orderId){
+        let { orderForm } = this
+        this.orderForm.skuInfos=[]
+        this.$post('post',this.baseUrl + '/order/getById',{
+          orderId
+        }).then((res) => {
+          if (res.code == 200) {
+            let data = res.data
+            console.log(data.orderSkus)
+            data.orderSkus.forEach((item,index)=>{
+              let info ={
+                productCode:item.crafts.productCode,
+                fontColor:item.crafts.fontColor,
+                height:item.crafts.height,
+                num:item.num,
+                remark:item.crafts.remark,
+                width:item.crafts.width,
+                name:item.crafts.productName,//文件的名字
+              }
+              orderForm.skuInfos.push(info)
+            })
+
+            let source = data.source
+            let deliveryType = data.orderAttr.deliveryType
+
+
+            orderForm.title=data.orderAttr.title
+            orderForm.source=data.source//订单来源，
+
+            if(source==1){
+              orderForm.sourceName = '淘宝'
+            }
+            if(source==2){
+              orderForm.sourceName = '京东'
+            }
+            if(source==3){
+              orderForm.sourceName = 'PDD'
+            }
+            if(source==4){
+              orderForm.sourceName = '线下'
+            }
+
+            orderForm.receiptName = data.orderAttr.receiptName //客户姓名
+            orderForm.receiptMobile = data.orderAttr.receiptMobile
+            orderForm.deliveryType = data.orderAttr.deliveryType //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
+            if(deliveryType==1){
+              orderForm.deliveryTypeName = '邮寄'
+            }
+            if(deliveryType==2){
+              orderForm.deliveryTypeName = '同城配送'
+            }
+            if(deliveryType==3){
+              orderForm.deliveryTypeName = '自提'  
+              //如果是自提 物流公司 省市区 详情地址为空 否则 自提地址为空
+              orderForm.waybillCode='' // 物流的code
+              orderForm.waybillCodeName='' // 物流的名字
+              orderForm.receiptDetailAddress='' // 详细地址
+              orderForm.receiptAddress='' // 省市区码
+              orderForm.Address='' // 省市区
+
+              orderForm.pickUpAddress = data.orderAttr.pickUpAddress //自提地址 
+            }else{
+              
+              orderForm.waybillCode = data.orderAttr.waybillCode// 物流的code
+              orderForm.waybillCodeName= // 物流的名字
+              orderForm.receiptDetailAddress = data.orderAttr.receiptDetailAddress// 详细地址
+
+              let ss = data.orderAttr.receiptAddress
+              console.log(ss)
+              let hrefUrl =  ss.split('省')[0]
+              console.log(hrefUrl)
+
+                // let prov = TextToCode[data.prov]
+                // let provCode = prov.code
+
+                // let city = TextToCode[data.prov] [data.city]
+                // let cityCode = city.code
+
+                // let dist = TextToCode[data.orderAttr.receiptAddress]
+                // let distCode = dist.code
+                // console.log(dist)
+              // orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
+              
+              orderForm.Address = data.orderAttr.receiptAddress// 省市区
+
+
+              orderForm.pickUpAddress = '' //自提地址 
+            }
+
+
+
+
+
+
+            // orderForm.waybillCode='' //物流公司
+            // orderForm.waybillCodeName=''
+            // orderForm.receiptAddress='' //收货人的地址 （省＋市＋区） //这是是省市区的码
+            // orderForm.Address='' //省市区码转换过的文字,下订单的时候用这个
+            // orderForm.receiptDetailAddress='' //收货人详情地址
+            // orderForm.pickUpAddress='' //自提点
+
+            
+          }
+        })
+    },
     // 上传文件
     beforeAvatarUpload(file) {
       this.localList = [] //上传之前先清空
@@ -572,20 +691,19 @@ export default {
         }
       );
     },
+    // 订单提交验证
     submitForm(formName){
       console.log(formName)
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
-          this.orderOk()
           this.orderTruePorp = true
           this.publicPorp = true//遮罩层
         } else {
-          this.$message.error("验证不通过");
         }
       });
     },
-    resetForm(formName)
-    {
+    // 全部清除
+    resetForm(formName){
       this.$refs[formName].resetFields();
       this.form.productGroup = [{num:"",price:""}];
     },
@@ -616,21 +734,6 @@ export default {
     lastStep(){
       this.active--
     },
-    // 提交订单请求
-    orderSubmit(){
-      this.$post("post",this.baseUrl+"/loginByPassword",data).then((res)=>{
-        if(res.code == 200){
-          localStorage.setItem("token", res.data);
-          console.log(localStorage);
-            this.$router.replace({  //核心语句
-              path:'/index',   //跳转的路径
-              // query:{           //路由传参时push和query搭配使用 ，作用时传递参数
-              //     token:res.data
-              // }
-          })
-        }
-      });
-    },
     // 获取物流
     listExpressCompany(){
       this.$post('get',this.baseUrl + '/order/listExpressCompany',
@@ -641,11 +744,9 @@ export default {
        
       })
     },
-    stepsss(val){
-      console.log(val)
-    },
-    orderOk(){
-      let { orderForm,customerId } = this
+    // 订单确定弹框提交
+    submitOrder(){
+      let { orderForm,customerId,skuId } = this
       let data = {
         customerId,
         deliveryType:orderForm.deliveryType,
@@ -654,16 +755,25 @@ export default {
         receiptDetailAddress:orderForm.receiptDetailAddress,
         receiptMobile:orderForm.receiptMobile,
         receiptName:orderForm.receiptName,
-        skuId:1,
+        skuId,
+        title:orderForm.title,
         skuInfos:orderForm.skuInfos,
         source:orderForm.source,
         waybillCode:orderForm.waybillCode
       }
-      console.log(data);
       this.$post('post',this.baseUrl + '/order/submit',data
       ).then((res) => {
         if (res.code == 200) {
-
+          this.$message({
+            message:res.msg,
+            type: 'success'
+          });
+          setTimeout(this.$router.replace('/order'),500)
+        }else{
+          this.$message({
+            message:res.msg,
+            type: 'warning'
+          });
         }
       })
     }
@@ -863,6 +973,11 @@ export default {
             line-height: 32px;
             flex: 1;
             padding: 0 16px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
           }
         }
       }
@@ -966,6 +1081,10 @@ export default {
           border-radius: 10px;
           padding: 8px 4px;
           font-size: 12px;
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .tit{
           color: #666;
@@ -974,6 +1093,7 @@ export default {
 
         .info{
           flex: 1;
+          overflow: hidden;
         }
 
         .name{

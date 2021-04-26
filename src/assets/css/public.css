@@ -228,3 +228,42 @@
 .yhc-date .el-date-editor .el-range__close-icon {
   line-height: 26px;
 }
+.applyReturnPorp .el-upload-list--picture-card .el-upload-list__item {
+  width: 41px;
+  height: 41px;
+}
+.applyReturnPorp .el-upload-list--picture-card .el-upload-list__item-status-label {
+  display: none !important;
+}
+.applyReturnPorp .el-upload--picture-card {
+  width: 41px;
+  height: 41px;
+  line-height: 41px;
+}
+.applyReturnPorp .el-upload--picture-card i {
+  font-size: 20px;
+}
+.applyReturnPorp .info .el-textarea__inner {
+  height: 105px;
+  background-color: #F2F3F8;
+  border: none;
+  padding: 0;
+}
+.noCont {
+  position: absolute;
+  text-align: center;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.noCont img {
+  width: 112px;
+  height: 112px;
+  display: inline-block;
+}
+.noCont p {
+  font-size: 88px;
+  color: #E1E4F3;
+  margin-top: 22px;
+  text-align: center;
+}
