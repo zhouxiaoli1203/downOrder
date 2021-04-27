@@ -11,7 +11,7 @@
           <section class="orderCont">
             <el-form :model="orderForm" :rules="orderFormRules" ref="orderForm" label-width="80px" class="demo-ruleForm">
               <div class="skuInfos">
-                <el-row>
+                <el-row v-if="orderForm.skuInfos">
                   <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="skuInfosLI">
                     <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
                       <el-row type="flex" class="row-bg" justify="space-between">
@@ -371,16 +371,18 @@ export default {
       crumbsName:'',
       orderForm:{
         skuInfos:[
-          {
-            productCode:'',
-            fontColor:'白色',
-            height:'',
-            num: 1,
-            remark: '',
-            width:'',
-            name:'',//文件的名字
-          }
         ],
+        //  skuInfos:[
+        //   {
+        //     productCode:'',
+        //     fontColor:'白色',
+        //     height:'',
+        //     num: 1,
+        //     remark: '',
+        //     width:'',
+        //     name:'',//文件的名字
+        //   }
+        // ],
         title:'',
         source:'', //订单来源，
         sourceName:'',
@@ -447,31 +449,50 @@ export default {
     }
   },
   created(){
+    this.listExpressCompany()   // 获取物流公司
     let userInfo = this.$store.getters.getUserInfo
     this.customerId = userInfo.id //用户的id
     this.skuId = this.$route.query.id //产品的id
-    let dingdanid = this.$route.query.orderId //订单的id
     this.crumbsName = this.$route.query.name
-    if(dingdanid){
-      this.getByIdInfo(dingdanid)
-      this.orderId = dingdanid
-    }
   },
   mounted(){
-    // 获取物流公司
-    this.listExpressCompany()
   },
   methods:{
+    // 获取物流
+    listExpressCompany(){
+      this.$post('get',this.baseUrl + '/order/listExpressCompany',
+      ).then((res) => {
+        if (res.code == 200) {
+          this.wuliuList = res.data
+          let dingdanid = this.$route.query.orderId //订单的id
+          if(dingdanid){
+            this.orderId = dingdanid
+            this.getByIdInfo(dingdanid) // 获取订单的信息
+          }else{
+            this.orderForm.skuInfos.push(
+              {
+                productCode:'',
+                fontColor:'白色',
+                height: '',
+                num: 1,
+                remark: '',
+                width: '',
+                name:'',
+              }
+            );
+          }
+        }
+       
+      })
+    },
     // 获取订单信息
     getByIdInfo(orderId){
         let { orderForm } = this
-        this.orderForm.skuInfos=[]
         this.$post('post',this.baseUrl + '/order/getById',{
           orderId
         }).then((res) => {
           if (res.code == 200) {
             let data = res.data
-            console.log(data.orderSkus)
             data.orderSkus.forEach((item,index)=>{
               let info ={
                 productCode:item.crafts.productCode,
@@ -522,49 +543,42 @@ export default {
               orderForm.receiptDetailAddress='' // 详细地址
               orderForm.receiptAddress='' // 省市区码
               orderForm.Address='' // 省市区
-
               orderForm.pickUpAddress = data.orderAttr.pickUpAddress //自提地址 
             }else{
-              
-              orderForm.waybillCode = data.orderAttr.waybillCode// 物流的code
-              orderForm.waybillCodeName= // 物流的名字
+              let wuliuCode = data.orderAttr.waybillCode
+              orderForm.waybillCode = wuliuCode// 物流的code
+
+              console.log(this.wuliuList)
+              this.wuliuList.forEach((item,index)=>{
+                if(wuliuCode==item.code){
+                  console.log(item.name)
+                   orderForm.waybillCodeName= item.name   // 物流的名字
+                }
+              })
+
               orderForm.receiptDetailAddress = data.orderAttr.receiptDetailAddress// 详细地址
 
-              let ss = data.orderAttr.receiptAddress
-              console.log(ss)
-              let hrefUrl =  ss.split('省')[0]
-              console.log(hrefUrl)
+              let dizhi = data.orderAttr.receiptAddress
+              var reg = /.+?(省|市|自治区|自治州|县|区)/g;
 
-                // let prov = TextToCode[data.prov]
-                // let provCode = prov.code
+              let addressInfo  = dizhi.match(reg)
 
-                // let city = TextToCode[data.prov] [data.city]
-                // let cityCode = city.code
+              let prov = TextToCode[addressInfo[0]]
+              let provCode = prov.code
+  
+              let city = TextToCode[addressInfo[0]] [addressInfo[1]]
+              let cityCode = city.code
+    
 
-                // let dist = TextToCode[data.orderAttr.receiptAddress]
-                // let distCode = dist.code
-                // console.log(dist)
-              // orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
+              let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
+              let distCode = dist.code
+  
+              orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
               
               orderForm.Address = data.orderAttr.receiptAddress// 省市区
 
-
               orderForm.pickUpAddress = '' //自提地址 
-            }
-
-
-
-
-
-
-            // orderForm.waybillCode='' //物流公司
-            // orderForm.waybillCodeName=''
-            // orderForm.receiptAddress='' //收货人的地址 （省＋市＋区） //这是是省市区的码
-            // orderForm.Address='' //省市区码转换过的文字,下订单的时候用这个
-            // orderForm.receiptDetailAddress='' //收货人详情地址
-            // orderForm.pickUpAddress='' //自提点
-
-            
+            }            
           }
         })
     },
@@ -734,16 +748,6 @@ export default {
     lastStep(){
       this.active--
     },
-    // 获取物流
-    listExpressCompany(){
-      this.$post('get',this.baseUrl + '/order/listExpressCompany',
-      ).then((res) => {
-        if (res.code == 200) {
-          this.wuliuList = res.data
-        }
-       
-      })
-    },
     // 订单确定弹框提交
     submitOrder(){
       let { orderForm,customerId,skuId } = this
@@ -778,7 +782,7 @@ export default {
       })
     }
     
-  }
+  },
 }
 </script>
 
@@ -1059,7 +1063,7 @@ export default {
   // 确认订单弹框
   .orderTruePorp{
     width: 624px;
-    max-height: 800px;
+    max-height: 80%;
     overflow-y: scroll;
     background: #FFFFFF;
     box-shadow: 0px 4px 31px 0px rgba(0, 0, 0, 0.13);

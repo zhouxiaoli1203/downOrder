@@ -7,7 +7,7 @@
               <span>{{crumbsName}}</span>
           </div>
         </div>
-        <div>
+        <div class="orderinfoBox">
             <section class="detailSection orderinfo">
                 <h3>订单信息</h3>
                 <ul>
@@ -23,20 +23,23 @@
                             <p>{{info.orderCode}}</p>
                         </div>
                     </li>
-                    <li>
+                    <li class="orderStaus">
                         <span class="lable">订单状态</span>
                         <div class="info">
-                            <p v-if="info.status==0">待生产</p>
+                            <p v-if="info.status==0">认领中</p>
                             <p v-if="info.status==1">已驳回</p>
                             <p v-if="info.status==2">待生产</p>
                             <p v-if="info.status==3">生产中</p>
                             <p v-if="info.status==4">生产完成</p>
-                            <p v-if="info.status==5">已发货</p>
+                            <p v-if="info.status==5">已发货 ({{info.expressCompanyName}})</p>
                             <p v-if="info.status==6">退单中</p>
                             <p v-if="info.status==7">已退单</p>
                             <p v-if="info.status==8">请求返厂</p>
                             <p v-if="info.status==9">返厂中</p>
-                            <img src="" alt="">
+                            <el-tooltip class="item" effect="dark" :content="info.operationLogs[0].remark" placement="left-end" v-if="info.status==1 && info.operationLogs[0].remark!=null">
+                                <img :src="tips" alt="" >
+                            </el-tooltip>
+                            <img :src="wenben" alt="" v-if="info.status==5" @click="copyText">
                         </div>
                     </li>
                     <li>
@@ -140,34 +143,17 @@
             </section>
         </div>
         <div class="btnBox">
-            <div class="btn" v-if="info.status==2 || info.status==0">
-                <span @click="downOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id)" class="downOrder">再来一单</span>
-                <span @click="orderCancel" class="tuidan">退单</span>
+            <div class="btn">
+                <span @click="downOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id)" class="downOrder" v-if="info.status!=1">再来一单</span>
+                <span @click="editOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id)" class="bianji" v-if="info.status==1">编辑订单</span>
+                <span @click="orderCancel" class="tuidan" v-if="info.status==0">退单</span>
+                <span @click="orderCancel" class="tuidan" v-if="info.status==2">退单</span>
+                <span @click="orderCancel" class="tuidan" v-if="info.status==3">退单</span>
+                <span @click="backOrderapplyReturn" class="fanchang" v-if="info.status==5">返厂</span>
+                <span @click="" class="quxiao" v-if="info.status==6">取消退单</span>    
             </div>
-            <div class="btn" v-if="info.status==1">
-                <span @click="downOrder" class="bianji">编辑订单</span>
-            </div>
-            <div class="btn" v-if="info.status==3">
-                <span @click="downOrder" class="downOrder">再来一单</span>
-                <span @click="orderCancel" class="tuidan">退单</span>
-            </div>
-            <div class="btn" v-if="info.status==6">
-                <span @click="downOrder" class="downOrder">再来一单</span>
-                <span @click="" class="quxiao">取消退单</span>
-            </div>
-            <div class="btn" v-if="info.status==7">
-                <span @click="downOrder" class="downOrder">再来一单</span>
-            </div>
-            <div class="btn" v-if="info.status==5">
-                <span @click="downOrder" class="downOrder">再来一单</span>
-                <span @click="backOrderapplyReturn" class="fanchang">返厂</span>
-            </div>
-            <div class="btn" v-if="info.status==8">
-                <span @click="downOrder" class="downOrder">再来一单</span>
-            </div>
-            <div class="btn" v-if="info.status==9">
-                <span @click="downOrder" class="downOrder">再来一单</span>
-            </div>
+            
+     
         </div>
     </div>
     <!-- 弹框 -->
@@ -228,6 +214,9 @@ export default {
         picsList:[],
         upDEL:require('../../assets/img/upDEL.png'),
         crumbsName:'',
+        tips:require('../../assets/img/tips.png'),
+        wenben:require('../../assets/img/wenben.png'),
+        danhao:'',
     }
   },
   created(){
@@ -242,27 +231,44 @@ export default {
     getByIdInfo(orderId){
         this.$post('post',this.baseUrl + '/order/getById',{
             orderId
-        }
-        ).then((res) => {
+        }).then((res) => {
             if (res.code == 200) {
                 this.info = res.data
+                if(res.data.status==5){
+                    this.danhao = res.data.expressCode
+                }
             }
         })
     },
+    // 再来一单
     downOrder(id,name,orderId){
-        this.$router.push({
-            path: '/index/downOrder', //跳转的路径
-            query: {
-                id:id,
-                name:name,
-                orderId:orderId
-            }
+        this.confirm_pop("是否再一次下单").then(res=>{
+            this.$router.push({
+                path: '/index/downOrder', //跳转的路径
+                query: {
+                    id:id,
+                    name:name,
+                    orderId:orderId
+                }
+            })
         })
     },
-
+    // 编辑订单
+    editOrder(id,name,orderId){
+        this.confirm_pop("是否对该订单进行编辑？").then(res=>{
+            this.$router.push({
+                path: '/index/downOrder', //跳转的路径
+                query: {
+                    id:id,
+                    name:name,
+                    orderId:orderId
+                }
+            })
+        })
+    },
     // 退单
     orderCancel(){
-        this.confirm_pop("确认要取消该订单？").then(res=>{
+        this.confirm_pop("是否退该订单？").then(res=>{
             this.$post('post', this.baseUrl + '/order/cancel',{
                 orderId:this.orderId
             }).then((res) => {
@@ -322,9 +328,11 @@ export default {
             orderId,
             pics
         }
-        this.$post('post',this.baseUrl + '//backOrder/applyReturn',data
+        this.$post('post',this.baseUrl + '/backOrder/applyReturn',data
         ).then((res) => {
             if (res.code == 200) {
+                this.publicPorp = false
+                this.applyReturnPorp = false
                 this.getByIdInfo(orderId)
                 this.$message({
                     message:res.msg,
@@ -332,6 +340,7 @@ export default {
                 });
                 this.fileList=[]
                 this.picsList=[]
+                this.description=''
             }
         })
     },
@@ -342,10 +351,29 @@ export default {
         this.fileList=[]
         this.picsList=[]
     },
+    // 跳转
     pathIndex(){
       console.log(111)
       this.$router.go(-1)
     },
+    // 复制单号
+    copyText(){ 
+        const input = document.createElement("input");
+        input.setAttribute("readonly", "readonly");
+        input.setAttribute("value", this.danhao);
+        document.body.appendChild(input);
+        input.select();
+        input.setSelectionRange(0, 9999);
+        if (document.execCommand("copy")) {
+            document.execCommand("copy");
+            this.$message({
+                message: '复制成功',
+                type: 'success'
+            });
+
+        }
+        document.body.removeChild(input);
+    }
   }
 }
 </script>
@@ -379,6 +407,7 @@ export default {
             display: flex;
             align-items: center ;
             flex-wrap: wrap;
+            
             li{
                 display: flex;
                 align-items: center;
@@ -407,6 +436,17 @@ export default {
                     margin-right: 10px;
                     width: 68px;
                     display: inline-block;
+                }
+            }
+
+            .orderStaus{
+                .info{
+                    justify-content: space-between;
+                    img{
+                        width: 16px;
+                        height: 16px;
+                        cursor: pointer;
+                    }
                 }
             }
             
@@ -477,7 +517,7 @@ export default {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 100px 0 48px;
+            padding: 0 0 48px;
 
             span{
                 cursor: pointer;
@@ -504,6 +544,9 @@ export default {
                 background: #D3D3D3;
             }
         }
+    }
+    .orderinfoBox{
+        padding-bottom: 100px;
     }
 
     // 返厂弹框
