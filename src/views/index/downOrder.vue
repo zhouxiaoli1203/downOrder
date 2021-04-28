@@ -313,7 +313,7 @@
         </ul>
         <div class="orderButton trueorderButton">
           <button @click.prevent="orderTrueClose">取消</button>
-          <button type="primary" @click.prevent="submitOrder">提交订单</button>
+          <button type="primary" @click.prevent="submitOrder" v-button>提交订单</button>
         </div>
       </section>
       <div class="mask" v-show="publicPorp"></div>
@@ -738,18 +738,20 @@ export default {
     },
     // 全部清除
     resetForm(formName){
-      this.$refs[formName].resetFields();
-      this.orderForm.skuInfos = [
-        {
-          productCode:'',
-          fontColor:'白色',
-          height: '',
-          num: 1,
-          remark: '',
-          width: '',
-          name:'',
-        }
-      ];
+      this.confirm_pop("确定要全部清空吗？").then(res=>{
+        this.$refs[formName].resetFields();
+        this.orderForm.skuInfos = [
+          {
+            productCode:'',
+            fontColor:'白色',
+            height: '',
+            num: 1,
+            remark: '',
+            width: '',
+            name:'',
+          }
+        ];
+      })
     },
     cityChange(val){ //选择收货地址
       this.orderForm.Address = this.CodeToText[val[0]] + this.CodeToText[val[1]] + this.CodeToText[val[2]]
@@ -798,6 +800,10 @@ export default {
       let url 
       if(typesName!=1){
         url = '/order/submit'
+
+        localStorage.removeItem('orderInfo');
+        this.$store.state.orderInfo = '';
+
       }else{
         url = '/order/update'
         this.$set(data,'orderId',orderId)
@@ -811,7 +817,9 @@ export default {
             message:res.msg,
             type: 'success'
           });
-          setTimeout(this.$router.replace('/order'),500)
+          setTimeout(()=>{
+           this.$router.replace('/order')
+          },500)
         }else{
           this.$message({
             message:res.msg,
@@ -968,7 +976,7 @@ export default {
       .magnifier{
         position: absolute;
         bottom: 11px;
-        right: 110px;
+        right: 31%;
         z-index: 11;
 
         i{

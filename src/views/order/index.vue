@@ -57,8 +57,8 @@
     </div>
 
 
-      <section v-if="orderList!=''" class="contBOX">
-        <div class="table-content">
+      <section class="contBOX">
+        <div class="table-content" v-if="orderList!=''">
           <ul class="list-items">
             <li class="list-card" v-for="item in orderList" @click="goDetail(item.id,item.orderAttr.title)">
               <div class="head">
@@ -88,7 +88,13 @@
             </li>
           </ul>
         </div>
-        <div class="pageblock">
+
+        <div class="noCont" v-else>
+          <img :src="noOrder" alt="">
+          <p>暂无订单</p>
+        </div>
+
+        <div class="pageblock" v-if="orderList!=''">
           <el-pagination
             background
             :current-page.sync="orderInfo.pageNum"
@@ -99,10 +105,6 @@
           </el-pagination>
         </div>
       </section>
-      <div class="noCont" v-else>
-        <img :src="noOrder" alt="">
-        <p>暂无订单</p>
-      </div>
     </div>
   </div>
 </template>

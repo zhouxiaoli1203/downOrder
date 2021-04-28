@@ -4,7 +4,7 @@
       <!-- <div class="downNum">下单次数剩余：1000次</div> -->
       <div class="headLeft">
         <!-- <span class="down cursor_p">条幅设计器下载</span> -->
-        <div class="img cursor_p" v-clickoutside="handleClose">
+        <!-- <div class="img cursor_p" v-clickoutside="handleClose">
           <img :src="headOrder" alt=""  @click="checkpop = !checkpop">
           <div class="rizhiBox" v-show="checkpop">
             <div class="top">
@@ -20,7 +20,7 @@
               </ul>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- <div class="img cursor_p">
           <img :src="headNoctice" alt="">
           <span>40</span>
@@ -255,7 +255,7 @@ export default {
     width: 378px;
     background: #FFFFFF;
     top: 32px;
-    z-index: 1;
+    z-index: 12;
     box-shadow: 0 0 40px 0 #ddd;
     left: 50%;
     transform: translate(-50%,0);

@@ -20,13 +20,18 @@
                     <li>
                         <span class="lable">订单编号</span>
                         <div class="info">
-                            <p>{{info.orderCode}}</p>
+                            <el-tooltip class="item" effect="dark" :content="info.orderCode" placement="left-end">
+                                 <p>{{info.orderCode}}</p>
+                            </el-tooltip>
+                           
                         </div>
+                       
                     </li>
                     <li class="orderStaus">
                         <span class="lable">订单状态</span>
                         <div class="info">
-                            <p >{{info.status | yhc_status}}</p>
+                            <p >{{info.status | yhc_status}} <span v-if="info.status==5">（{{info.expressCompanyName}}）</span></p>
+                            
                             <el-tooltip class="item" effect="dark" :content="info.operationLogs[0].remark" placement="left-end" v-if="info.status==1 && info.operationLogs[0].remark!=null">
                                 <img :src="tips" alt="" >
                             </el-tooltip>
@@ -66,8 +71,10 @@
                     <li class="fileBox">
                         <span class="lable">产品文件{{index+1}}</span>
                         <div class="info">
-                            <p>{{item.crafts.productName}}</p>
-                            <span class="look">查看</span>
+                            <el-tooltip class="item" effect="dark" :content="item.crafts.productName" placement="left-end">
+                                <p>{{item.crafts.productName}}</p>
+                            </el-tooltip>
+                            <span class="look" @click="lookUrl">查看</span>
                             <span class="xiazai" @click="downloadUrl(item.crafts.productCode)">下载</span>
                         </div>
                     </li>
@@ -104,13 +111,17 @@
                     <li v-if="info.orderAttr.deliveryType!=3">
                         <span class="lable">配送地址</span>
                         <div class="info">
-                            <p>{{info.orderAttr.receiptAddress+info.orderAttr.receiptDetailAddress}}</p>
+                            <el-tooltip class="item" effect="dark" :content="info.orderAttr.receiptAddress+info.orderAttr.receiptDetailAddress" placement="left-end">
+                                <p>{{info.orderAttr.receiptAddress+info.orderAttr.receiptDetailAddress}}</p>
+                            </el-tooltip>
                         </div>
                     </li>
                     <li v-else>
                         <span class="lable">配送地址</span>
                         <div class="info">
-                            <p>{{info.orderAttr.pickUpAddress}}</p>
+                            <el-tooltip class="item" effect="dark" :content="info.orderAttr.pickUpAddress" placement="left-end">
+                                <p>{{info.orderAttr.pickUpAddress}}</p>
+                            </el-tooltip>
                         </div>
                     </li>
                     <li>
@@ -172,8 +183,8 @@
             </div>
         </div>
         <div class="btn">
-            <span  @click="close">取消</span>
-            <span @click="fanchangTure">确定</span>
+            <button @click.prevent="close" class="span">取消</button>
+            <button @click.prevent="fanchangTure" v-button class="span">确定</button>
         </div>
     </section>
     <div class="mask" v-show="publicPorp" @click="close"></div>
@@ -375,6 +386,13 @@ export default {
             }
         })
     },
+    // 文件查看
+    lookUrl(){
+        this.$message({
+          message: '该功能正在开发，敬请期待哦！',
+          type: 'warning'
+        });
+    },
     // 跳转
     pathIndex(){
       console.log(111)
@@ -397,7 +415,8 @@ export default {
 
         }
         document.body.removeChild(input);
-    }
+    },
+    
   }
 }
 </script>
@@ -440,7 +459,7 @@ export default {
                 .info{
                     display: flex;
                     align-items: center;
-                    width: 315px;
+                    width: 280px;
                     height: 32px;
                     background: #F2F3F8;
                     padding: 16px;
@@ -518,7 +537,7 @@ export default {
 
         .remarkBox{
             .info{
-                width: 1055px;
+                width: 1092px;
                 min-height: 86px;
                 background: #F2F3F8;
                 display: block;
@@ -632,7 +651,7 @@ export default {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            span{
+            .span{
                 width: 65px;
                 height: 32px;
                 background: #DBDBDB;
@@ -642,7 +661,7 @@ export default {
                 border-radius: 3px;
                 margin-right: 32px;
             }
-            span:last-child{
+            .span:last-child{
                 margin: 0;
                 background: #3551DF;
                 color: #fff;
