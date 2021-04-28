@@ -130,8 +130,8 @@
         </div>
         <div class="btnBox">
             <div class="btn">
-                <span @click="downOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id)" class="downOrder" v-if="info.status!=1">再来一单</span>
-                <span @click="editOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id)" class="bianji" v-if="info.status==1">编辑订单</span>
+                <span @click="downOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id,0)" class="downOrder" v-if="info.status!=1">再来一单</span>
+                <span @click="editOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id,1)" class="bianji" v-if="info.status==1">编辑订单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==0">退单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==2">退单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==3">退单</span>
@@ -236,27 +236,29 @@ export default {
         })
     },
     // 再来一单
-    downOrder(id,name,orderId){
+    downOrder(id,name,orderId,type){
         this.confirm_pop("是否再一次下单").then(res=>{
             this.$router.push({
                 path: '/index/downOrder', //跳转的路径
                 query: {
                     id:id,
                     name:name,
-                    orderId:orderId
+                    orderId:orderId,
+                    type
                 }
             })
         })
     },
     // 编辑订单
-    editOrder(id,name,orderId){
+    editOrder(id,name,orderId,type){
         this.confirm_pop("是否对该订单进行编辑？").then(res=>{
             this.$router.push({
                 path: '/index/downOrder', //跳转的路径
                 query: {
                     id:id,
                     name:name,
-                    orderId:orderId
+                    orderId:orderId,
+                    type
                 }
             })
         })

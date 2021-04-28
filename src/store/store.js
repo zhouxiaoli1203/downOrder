@@ -8,7 +8,8 @@ export default new Vuex.Store({
     state:{
       currentIndex:"",
       userInfo:'',
-      expCompany:[]
+      expCompany:[],
+      orderInfo:''
     },
 
     //操作数据，唯一的通道是mutations/*配置全局函数*/
@@ -17,10 +18,16 @@ export default new Vuex.Store({
         state.userInfo = info
         localStorage.setItem('userInfo',JSON.stringify(info))
       },
-      setExpCompany(state, info){ //储存用户信息
+      setExpCompany(state, info){ 
         state.setExpCompany = info
         localStorage.setItem('expCompany',JSON.stringify(info))
       },
+
+      setOrderInfo(state, info){ 
+        state.orderInfo = info
+        localStorage.setItem('orderInfo',JSON.stringify(info))
+      },
+
     },
     getters : {
       getUserInfo(state){ //获取用户信息
@@ -30,7 +37,7 @@ export default new Vuex.Store({
         }
         return state.userInfo
       },
-      getExpCompany(state){ //获取用户信息
+      getExpCompany(state){ 
         console.log(state)
         if (!state.expCompany) {
           let info = JSON.parse(localStorage.getItem('expCompany'))
@@ -39,6 +46,17 @@ export default new Vuex.Store({
         }
         return state.setExpCompany
       },
+
+      getOrderInfo(state){ 
+        console.log(state+'51')
+        if (!state.orderInfo) {
+          let info = JSON.parse(localStorage.getItem('orderInfo'))
+          console.log(info)
+          state.orderInfo = info?info:''
+        }
+        return state.orderInfo
+      },
+
     },
 
     //actions,可以来做异步操作，然后提交给mutations，而后再对state(数据)进行操作

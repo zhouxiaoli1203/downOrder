@@ -3,14 +3,28 @@
     <div class="navHead">
       <!-- <div class="downNum">下单次数剩余：1000次</div> -->
       <div class="headLeft">
-        <span class="down cursor_p">条幅设计器下载</span>
-        <div class="img cursor_p">
-          <img :src="headOrder" alt="">
+        <!-- <span class="down cursor_p">条幅设计器下载</span> -->
+        <div class="img cursor_p" v-clickoutside="handleClose">
+          <img :src="headOrder" alt=""  @click="checkpop = !checkpop">
+          <div class="rizhiBox" v-show="checkpop">
+            <div class="top">
+              <h2>操作日志</h2>
+              <i class="el-icon-close" @click="checkpop = !checkpop"></i>
+            </div>
+            <div class="bot">
+              <ul>
+                <li v-for="x in 10">
+                  <p class="time">2021-04-11</p>
+                  <p>定制了30条条幅</p>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="img cursor_p">
+        <!-- <div class="img cursor_p">
           <img :src="headNoctice" alt="">
           <span>40</span>
-        </div>
+        </div> -->
         <div class="info">
           <p @click="passwordPorp = true">{{info.nickname}} &nbsp/</p>
           <span class="cursor_p" @click="loginOut">&nbsp退出</span>
@@ -62,6 +76,7 @@ export default {
       passwordPorp: false,
       unEdit:true,
       info:'',
+      checkpop: false,
     }
   },
   created(){
@@ -106,8 +121,19 @@ export default {
     // 退出登录
     loginOut(){
       this.confirm_pop("确认退出登录？").then(res=>{
-        localStorage.removeItem('token');
-        this.$router.replace('/');
+        this.$post('post',this.baseUrl + '/logout',
+        ).then((res) => {
+          if (res.code == 200) {
+            localStorage.removeItem('userInfo');
+            this.$store.state.userInfo = '';
+            localStorage.removeItem('expCompany');
+            this.$store.state.expCompany = [];              
+            localStorage.removeItem('token');
+            localStorage.removeItem('orderInfo');
+            this.$store.state.orderInfo = '';
+            this.$router.replace('/');
+          }
+        })
       })
     },
 
@@ -119,6 +145,9 @@ export default {
     LognClose(){
       this.passwordPorp=false
       this.unEdit=true
+    },
+    handleClose() {
+      this.checkpop = false
     },
   }
 }
@@ -219,5 +248,47 @@ export default {
       color: #333;
       margin-bottom: 24px;
     }
+  }
+  // 操作日志
+  .rizhiBox{
+    position: absolute;
+    width: 378px;
+    background: #FFFFFF;
+    top: 32px;
+    z-index: 1;
+    box-shadow: 0 0 40px 0 #ddd;
+    left: 50%;
+    transform: translate(-50%,0);
+    padding: 24px;
+
+    .top{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h2{
+        font-size: 16px;
+      }
+      i{
+        color: #999;
+        font-size: 26px;
+        cursor: pointer;
+      }
+    }
+    .bot{
+      margin-top: 24px;
+      ul{
+        height: 305px;
+        overflow-y: scroll;
+      }
+      li{
+        margin-bottom: 24px;
+      .time{
+          color: #999999;
+          margin-bottom: 10px;
+        }
+      }
+    }
+
   }
 </style>

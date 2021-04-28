@@ -28,6 +28,14 @@ export default {
   },
   methods:{
     downOrder(name,id){
+      if(id!=2){
+        this.$message({
+          message: '该功能正在开发，敬请期待哦！',
+          type: 'warning'
+        });
+
+        return false
+      }
       this.$router.push({  
           path: '/index/downOrder',   
           name: 'downOrder',  

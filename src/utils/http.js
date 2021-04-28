@@ -80,7 +80,7 @@
              if (response.data.code == '401') {
                  if (!token_invalid) {
                      localStorage.removeItem('token');
-                 //    window.location.href="/login"
+                    window.location.href="/login"
                  }
                  token_invalid = true;
              }

@@ -54,9 +54,17 @@ export default {
       console.log(key, keyPath);
     },
     handleSelect(index) {
-      console.log(index)
       this.activeIndex = index;
       this.$store.state.currentIndex = index; //导航高亮
+      let href = this.$route.path
+      let hrefUrl =  href.split('/')[1]
+      if(index!='/'+hrefUrl){
+        localStorage.removeItem('orderInfo');
+        this.$store.state.orderInfo = '';
+      }
+      
+
+      
     },
     getPath () {  //解决浏览器后退导航高亮问题
       let href = this.$route.path

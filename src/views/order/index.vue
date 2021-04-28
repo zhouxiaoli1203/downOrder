@@ -1,8 +1,9 @@
 <template>
   <div class="connonBg main">
-    <div class="search-head">
+    <div class="center">
+      <div class="search-head">
        <div class="fl drops">
-        <el-select v-model="status" placeholder="订单状态"  clearable class="yhc-dropdown" @change="orderStatus">
+        <el-select v-model="orderInfo.status" placeholder="订单状态"  clearable class="yhc-dropdown" @change="orderStatus">
           <el-option
             v-for="item in cost.receiveStatus"
             :key="item.value"
@@ -11,7 +12,7 @@
           </el-option>
         </el-select>
 
-        <el-select v-model="skuId" placeholder="订单类型"  clearable class="yhc-dropdown" @change="orderType">
+        <el-select v-model="orderInfo.skuId" placeholder="订单类型"  clearable class="yhc-dropdown" @change="orderType">
           <el-option
             v-for="item in listGoodAndSkus"
             :key="item.id"
@@ -20,7 +21,7 @@
           </el-option>
         </el-select>
         
-        <el-select v-model="timeType" placeholder="时间选择"  clearable class="yhc-dropdown" @change="orderTypeTime" :disabled="timeTypedisabled">
+        <el-select v-model="orderInfo.timeType" placeholder="时间选择"  clearable class="yhc-dropdown" @change="orderTypeTime" :disabled="orderInfo.timeTypedisabled">
           <el-option
             v-for="item in cost.orderTime"
             :key="item.value"
@@ -31,11 +32,12 @@
 
         <div class="yhc-item yhc-date">
           <el-date-picker
-            :disabled="orderTimedisabled"
+            :editable="false"
+            :disabled="orderInfo.orderTimedisabled"
             value-format="yyyy-MM-dd HH:mm:ss"
             :default-time="['00:00:00', '23:59:59']"
             @change="orderTimeChange"
-            v-model="value1"
+            v-model="orderInfo.timeValue"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -46,15 +48,16 @@
 
       <div class="fr displayFl right-btns">
         <div class="search-input yhc-item">
-          <el-input placeholder="订单号/客户姓名/联系方式" class="input-with-select" v-model="keyword" clearable @change="keywordSearch">
+          <el-input placeholder="订单号/客户姓名/联系方式" class="input-with-select" v-model="orderInfo.keyword" clearable @change="keywordSearch">
             <el-button slot="append" @click="keywordBtn">搜索</el-button>
           </el-input>
         </div>
         <div class="btn bgWhite export" @click="openExport">导出</div>
       </div>
     </div>
-    <div class="center">
-      <section v-if="orderList!=''">
+
+
+      <section v-if="orderList!=''" class="contBOX">
         <div class="table-content">
           <ul class="list-items">
             <li class="list-card" v-for="item in orderList" @click="goDetail(item.id,item.orderAttr.title)">
@@ -88,9 +91,10 @@
         <div class="pageblock">
           <el-pagination
             background
+            :current-page.sync="orderInfo.pageNum"
             @current-change="handleCurrentChange"
             layout="prev, pager, next"
-            :page-size="10"
+            :page-size="15"
             :total="total">
           </el-pagination>
         </div>
@@ -110,31 +114,69 @@ export default {
      return {
       dialogVisible:false,
       exportVisible:false,
-      value1:"",
-      exportDate:"",
-      form:{desc:""},
-      currentPage4: 4,
       orderList:[],
       noOrder:require('../../assets/img/noOrder.png'),
       listGoodAndSkus:[], //订单类型
-      pageNum:1, //页码
-      pageSize:10, //每页多少条
-      status:'',//订单状态
-      skuId:'',//订单类型 (单品Id)
-      timeType:'',//时间天数,
-      startDate:'',//开始时间
-      endDate:'',//结束时间
-      keyword:'', //关键词
       total:0,
-      timeTypedisabled:false,
-      orderTimedisabled:false
+      pageSize:15, //每页多少条
+      orderInfo:{
+        timeValue:"", //时间范围选择
+        pageNum:1, //页码
+        status:'',//订单状态
+        skuId:'',//订单类型 (单品Id)
+        timeType:'',//时间天数,
+        startDate:'',//开始时间
+        endDate:'',//结束时间
+        keyword:'', //关键词
+        timeTypedisabled:false, //时间选择
+        orderTimedisabled:false //时间范围
+      }
     }
   },
   components: {},
   created() {
+    console.log(380)
     this.listGoodAndSku();
-    let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-    this.getList(pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword);
+    let {pageSize,orderInfo} = this
+
+    let xinxi = this.$store.getters.getOrderInfo
+
+    console.log(xinxi)
+ 
+    if(xinxi){ //存
+
+      this.$store.commit('setOrderInfo',xinxi)
+
+      this.orderInfo = xinxi
+
+      this.getList(
+        xinxi.pageNum,
+        pageSize,
+        xinxi.status,
+        xinxi.skuId,
+        xinxi.timeType,
+        xinxi.startDate,
+        xinxi.endDate,
+        xinxi.keyword
+      );
+
+    }else{
+      this.$store.commit('setOrderInfo',orderInfo)
+
+      this.getList(
+        orderInfo.pageNum,
+        pageSize,
+        orderInfo.status,
+        orderInfo.skuId,
+        orderInfo.timeType,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        orderInfo.keyword
+      );
+
+    }
+
+   
   },
   mounted() {},
   methods: {
@@ -177,62 +219,130 @@ export default {
 
     // 点击页数
     handleCurrentChange(val) {
-      this.pageNum = val
-      let {pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-      this.getList(val,pageSize,status,skuId,timeType,startDate,endDate,keyword);
+      this.orderInfo.pageNum = val
+      let {pageSize,orderInfo} = this
+      this.getList(
+        val,
+        pageSize,
+        orderInfo.status,
+        orderInfo.skuId,
+        orderInfo.timeType,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        orderInfo.keyword
+      );
+
+      this.$store.commit('setOrderInfo',orderInfo)
+
     },
     //选择订单的状态
     orderStatus(val){
-      console.log(val)
-      this.status = val
-      let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-      this.getList(1,pageSize,val,skuId,timeType,startDate,endDate,keyword);
+      this.orderInfo.status = val
+      this.orderInfo.pageNum = 1
+      let {pageSize,orderInfo} = this
+      this.getList(
+        1,
+        pageSize,
+        val,
+        orderInfo.skuId,
+        orderInfo.timeType,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        orderInfo.keyword
+      );
+      this.$store.commit('setOrderInfo',orderInfo)
     }, 
     //选择订单的类型
     orderType(val){
-      console.log(val)
-      this.skuId = val
-      let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-      this.getList(1,pageSize,status,val,timeType,startDate,endDate,keyword);
-      
+      this.orderInfo.skuId = val
+      this.orderInfo.pageNum = 1
+      let {pageSize,orderInfo} = this
+
+      this.getList(
+        1,
+        pageSize,
+        orderInfo.status,
+        val,
+        orderInfo.timeType,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        orderInfo.keyword
+      );
+
+      this.$store.commit('setOrderInfo',orderInfo)
     }, 
     // 时间选择
     orderTypeTime(val){
       if(val){
-        this.orderTimedisabled = true
+        this.orderInfo.orderTimedisabled = true
       }else{
-        this.orderTimedisabled = false
+        this.orderInfo.orderTimedisabled = false
       }
-      console.log(val)
-      this.timeType = val
-      let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-      this.getList(1,pageSize,status,skuId,val,startDate,endDate,keyword);
+      this.orderInfo.timeType = val
+      this.orderInfo.pageNum = 1
+      let {pageSize,orderInfo} = this
+      this.getList(
+        1,
+        pageSize,
+        orderInfo.status,
+        orderInfo.skuId,
+        val,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        orderInfo.keyword
+      );
+      this.$store.commit('setOrderInfo',orderInfo)
     },
     // 时间范围
     orderTimeChange(val){
-      let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-
+      let {pageSize,orderInfo} = this
+      this.orderInfo.pageNum = 1
+      this.orderInfo.timeValue = val
       if(val){
-        this.timeTypedisabled = true
+        this.orderInfo.timeTypedisabled = true
         let start = val[0]
         let end = val[1]
-        this.getList(1,pageSize,status,skuId,timeType,start,end,keyword);
+        this.getList(1,pageSize,orderInfo.status,orderInfo.skuId,orderInfo.timeType,start,end,orderInfo.keyword);
       }else{
-        this.timeTypedisabled = false
+        this.orderInfo.timeTypedisabled = false
 
-        this.getList(1,pageSize,status,skuId,timeType,"","",keyword);
+        this.getList(1,pageSize,orderInfo.status,orderInfo.skuId,orderInfo.timeType,"","",orderInfo.keyword);
       }
+      this.$store.commit('setOrderInfo',orderInfo)
+
     },
 
     keywordSearch(val){
-      console.log(val)
-      let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-      this.getList(1,pageSize,status,skuId,timeType,startDate,endDate,val);
+      this.orderInfo.pageNum = 1
+      this.orderInfo.keyword = val
+      let {pageSize,orderInfo} = this
+      this.getList(
+        1,
+        pageSize,
+        orderInfo.status,
+        orderInfo.skuId,
+        orderInfo.timeType,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        val
+      )
+      this.$store.commit('setOrderInfo',orderInfo)
     },
     // 按钮搜索
     keywordBtn(){
-      let {pageNum,pageSize,status,skuId,timeType,startDate,endDate,keyword} = this
-      this.getList(1,pageSize,status,skuId,timeType,startDate,endDate,keyword);
+      let {pageSize,orderInfo} = this
+      this.orderInfo.pageNum = 1
+      this.getList(
+        1,
+        pageSize,
+        orderInfo.status,
+        orderInfo.skuId,
+        orderInfo.timeType,
+        orderInfo.startDate,
+        orderInfo.endDate,
+        orderInfo.keyword
+      )
+      this.$store.commit('setOrderInfo',orderInfo)
     },
     // /跳转的路径
     goDetail(id,title){
@@ -253,6 +363,10 @@ export default {
       let this_ = this;
       this_.exportVisible = true;
       // this_.exportDate = "";
+       this.$message({
+          message: '该功能正在开发，敬请期待哦！',
+          type: 'warning'
+        });
     },
   }
 }
@@ -260,10 +374,16 @@ export default {
 
 
 <style lang='less' scoped>
-  .center{
-    height: 96.5%;
-    position: relative;
+
+  .main{
+    overflow-y: scroll;
   }
+  .center{
+    background: none;
+    display: flex;
+    flex-flow: column;
+  }
+  
   .search-head {
     height: 32px;
     margin-bottom: 18px;
@@ -296,7 +416,7 @@ export default {
   }
   .table-content {
     padding: 24px;
-    background: #fff;
+    // background: #fff;
   }
   .list-items {
     display: flex;
@@ -360,12 +480,24 @@ export default {
       }
   }
 
+  .contBOX{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+    background: #fff;
+    border-radius: 10px;
+    padding-bottom: 24px;
+    .table-content{
+      flex: 1;
+    }
+  }
+
   // 页码定位
   .pageblock{
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translate(-50%,0);
+    .el-pagination{
+      text-align: center;
+    }
   }
 </style>
 

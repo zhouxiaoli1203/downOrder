@@ -138,7 +138,22 @@
             </el-form>
           </section>
           <section class="lookCont">
-
+            <div class="imgbanner">
+              <el-carousel :interval="5000" arrow="always" indicator-position="none" height="228px" :autoplay="false">
+                <el-carousel-item v-for="item in 4" :key="item">
+                  <img src="" alt="">
+                </el-carousel-item>
+              </el-carousel>
+              <div class="magnifier">
+                <i class="el-icon-search"></i>
+              </div>
+            </div>
+            <ul>
+              <li v-for="item in 4">
+                <img src="" alt="">
+                <p>禁止烧麦秸…</p>
+              </li>
+            </ul>
           </section>
         </div>
       </div>
@@ -168,10 +183,10 @@
                 <p>上传文件</p>
               </el-upload>
             </div>
-            <div class="choiceBox" @click="shejiqiClick(2)">
+            <!-- <div class="choiceBox" @click="shejiqiClick(2)">
               <img :src="shejiqi" alt="">
               <p>上传文件</p>
-            </div>
+            </div> -->
           </section>
           <div v-if="active==2">
             <section class="cont" v-if="buzhou==2">
@@ -449,6 +464,7 @@ export default {
       customerId:0,
       skuId:0,
       orderId:0,
+      typesName:0,
     }
   },
   created(){
@@ -457,6 +473,7 @@ export default {
     this.customerId = userInfo.id //用户的id
     this.skuId = this.$route.query.id //产品的id
     this.crumbsName = this.$route.query.name
+    this.typesName = this.$route.query.type  //  0再来一单，1编辑订单
   },
   mounted(){
   },
@@ -763,7 +780,7 @@ export default {
     },
     // 订单确定弹框提交
     submitOrder(){
-      let { orderForm,customerId,skuId } = this
+      let { orderForm,customerId,skuId,orderId,typesName } = this
       let data = {
         customerId,
         deliveryType:orderForm.deliveryType,
@@ -778,7 +795,16 @@ export default {
         source:orderForm.source,
         waybillCode:orderForm.waybillCode
       }
-      this.$post('post',this.baseUrl + '/order/submit',data
+      let url 
+      if(typesName!=1){
+        url = '/order/submit'
+      }else{
+        url = '/order/update'
+        this.$set(data,'orderId',orderId)
+      }
+      console.log(url)
+      console.log(data)
+      this.$post('post',this.baseUrl + url,data
       ).then((res) => {
         if (res.code == 200) {
           this.$message({
@@ -924,7 +950,67 @@ export default {
   .lookCont{
     width: 45%;
     background: #F5F6F9;
-    height: 500px;
+    height: 382px;
+    padding: 24px 24px 8px;
+    border-radius: 10px;
+
+    .imgbanner{
+      position: relative;
+      .el-carousel__item{
+        text-align: center;
+      }
+      img{
+        width: 280px;
+        height: 228px;
+        border-radius: 10px;
+      }
+
+      .magnifier{
+        position: absolute;
+        bottom: 11px;
+        right: 110px;
+        z-index: 11;
+
+        i{
+          background: rgba(0, 0, 0, 0.4);
+          width: 44px;
+          height: 44px;
+          display: inline-block;
+          text-align: center;
+          line-height: 44px;
+          font-size: 28px;
+          color: #fff;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+      }
+    }
+
+  
+
+    ul{
+      border-top: 1px solid #CBCFE3;
+      padding-top: 8px;
+      display: flex;
+      align-items: center;
+      height:99px;
+      overflow-x: scroll;
+      margin-top: 24px;
+      li{
+        margin-right: 24px;
+        img{
+          width: 76px;
+          height: 58px;
+          border-radius: 10px;
+          border: 1px solid #FFEF40;
+        }
+        p{
+          font-size: 12px;
+          margin-top: 8px;
+        }
+      }
+    }
+    
   }
 
   .orderButton{
