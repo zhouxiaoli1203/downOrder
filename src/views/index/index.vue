@@ -21,38 +21,6 @@ export default {
   data () {
     return {
       list:[],
-      // list:[
-      //   {
-      //     name:'红色条幅',
-      //     img:require('../../assets/img/tiaofu.png'),
-      //     id:1,
-      //   },
-      //   {
-      //     name:'打印资料',
-      //     img:require('../../assets/img/dayin.png'),
-      //     id:2,
-      //   },
-      //   {
-      //     name:'印刷',
-      //     img:require('../../assets/img/yinshu.png'),
-      //     id:3,
-      //   },
-      //   {
-      //     name:'喷绘',
-      //     img:require('../../assets/img/penhui.png'),
-      //     id:5,
-      //   },
-      //   {
-      //     name:'写真',
-      //     img:require('../../assets/img/xiezhen.png'),
-      //     id:6,
-      //   },
-      //   {
-      //     name:'旗帜',
-      //     img:require('../../assets/img/qizhi.png'),
-      //     id:7,
-      //   }
-      // ]
     }
   },
   created(){

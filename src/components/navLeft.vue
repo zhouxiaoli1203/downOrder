@@ -32,9 +32,21 @@ export default {
     }
   },
   created(){
+    this.listExpressCompany();
     this.getPath()
   },
   methods: {
+    // 获取物流
+    listExpressCompany(){
+      this.$post('get',this.baseUrl + '/order/listExpressCompany',
+      ).then((res) => {
+        if (res.code == 200) {
+          console.log(1522)
+          this.$store.commit('setExpCompany',res.data)
+        }
+      })
+    },
+
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
     },

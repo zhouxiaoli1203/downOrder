@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="navHead">
-      <div class="downNum">下单次数剩余：1000次</div>
+      <!-- <div class="downNum">下单次数剩余：1000次</div> -->
       <div class="headLeft">
         <span class="down cursor_p">条幅设计器下载</span>
         <div class="img cursor_p">
@@ -101,6 +101,8 @@ export default {
       })
     },
 
+   
+
     // 退出登录
     loginOut(){
       this.confirm_pop("确认退出登录？").then(res=>{
@@ -127,7 +129,7 @@ export default {
   .navHead{
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     position: absolute;
     top: 0;
     left: 200px;

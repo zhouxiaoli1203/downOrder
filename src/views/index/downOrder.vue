@@ -75,10 +75,12 @@
               </el-form-item>
               <el-form-item label="订单来源" prop="source">
                 <el-select v-model="orderForm.source" placeholder="请选择订单来源" style="width:100%" @change="sourceChange">
-                  <el-option label="淘宝" value="1"></el-option>
-                  <el-option label="京东" value="2"></el-option>
-                  <el-option label="PDD" value="3"></el-option>
-                  <el-option label="线下" value="4"></el-option>
+                  <el-option
+                    v-for="item in cost.source"
+                    :key="item.value"
+                    :label="item.name"
+                    :value="item.value">
+                  </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="客户姓名" prop="receiptName">
@@ -89,9 +91,10 @@
               </el-form-item>
               <el-form-item label="配送方式" class="deliveryType">
                 <el-radio-group v-model="orderForm.deliveryType" size="medium" @change="deliveryTypeChange">
-                  <el-radio border label="1">邮寄</el-radio>
+                  <el-radio border v-for="item in cost.deliveryType" :label="item.value" :key="item.value">{{item.name}}</el-radio>
+                  <!-- <el-radio border label="1">邮寄</el-radio>
                   <el-radio border label="2">同城配送</el-radio>
-                  <el-radio border label="3">自提</el-radio>
+                  <el-radio border label="3">自提</el-radio> -->
                 </el-radio-group>
               </el-form-item>
               <el-row v-if="orderForm.deliveryType!=3">
@@ -719,7 +722,17 @@ export default {
     // 全部清除
     resetForm(formName){
       this.$refs[formName].resetFields();
-      this.form.productGroup = [{num:"",price:""}];
+      this.orderForm.skuInfos = [
+        {
+          productCode:'',
+          fontColor:'白色',
+          height: '',
+          num: 1,
+          remark: '',
+          width: '',
+          name:'',
+        }
+      ];
     },
     cityChange(val){ //选择收货地址
       this.orderForm.Address = this.CodeToText[val[0]] + this.CodeToText[val[1]] + this.CodeToText[val[2]]

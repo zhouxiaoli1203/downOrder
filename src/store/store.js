@@ -7,7 +7,8 @@ export default new Vuex.Store({
     //所有的数据都放在state中
     state:{
       currentIndex:"",
-      userInfo:''
+      userInfo:'',
+      expCompany:[]
     },
 
     //操作数据，唯一的通道是mutations/*配置全局函数*/
@@ -15,6 +16,10 @@ export default new Vuex.Store({
       setUserInfo(state, info){ //储存用户信息
         state.userInfo = info
         localStorage.setItem('userInfo',JSON.stringify(info))
+      },
+      setExpCompany(state, info){ //储存用户信息
+        state.setExpCompany = info
+        localStorage.setItem('expCompany',JSON.stringify(info))
       },
     },
     getters : {
@@ -24,6 +29,15 @@ export default new Vuex.Store({
           state.userInfo = info?info:''
         }
         return state.userInfo
+      },
+      getExpCompany(state){ //获取用户信息
+        console.log(state)
+        if (!state.expCompany) {
+          let info = JSON.parse(localStorage.getItem('expCompany'))
+          console.log(info)
+          state.setExpCompany = info?info:''
+        }
+        return state.setExpCompany
       },
     },
 

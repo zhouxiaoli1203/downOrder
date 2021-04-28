@@ -15,6 +15,17 @@ const constant = {
         {name:"已退单",value:"7"},
         {name:"请求返厂",value:"8"},
         {name:"返厂中",value:"9"},
-    ]
+    ],
+    source:[
+        {name:"淘宝",value:"1"},
+        {name:"京东",value:"2"},
+        {name:"PDD",value:"3"},
+        {name:"线下",value:"4"},
+    ],
+    deliveryType:[
+        {name:"邮寄",value:"1"},
+        {name:"同城配送",value:"2"},
+        {name:"自提",value:"3"},
+    ],
 };
 export default constant

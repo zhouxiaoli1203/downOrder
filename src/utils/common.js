@@ -1,3 +1,4 @@
+import store from '@/store/store'
 const Fns={
     confirm_pop(cnt,title){
         return new Promise((resolve, reject) => {
@@ -12,6 +13,15 @@ const Fns={
                 }
               })
         })
+    },
+    getExpressCompany(){
+        this.$post("get",this.baseUrl+"/order/listExpressCompany").then((res)=>{
+            if(res.code == 200){
+                store.state.expCompany = res.data;
+
+                console.log(res.data)
+            }
+        });
     },
 }
 export default Fns

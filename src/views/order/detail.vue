@@ -26,16 +26,7 @@
                     <li class="orderStaus">
                         <span class="lable">订单状态</span>
                         <div class="info">
-                            <p v-if="info.status==0">认领中</p>
-                            <p v-if="info.status==1">已驳回</p>
-                            <p v-if="info.status==2">待生产</p>
-                            <p v-if="info.status==3">生产中</p>
-                            <p v-if="info.status==4">生产完成</p>
-                            <p v-if="info.status==5">已发货 ({{info.expressCompanyName}})</p>
-                            <p v-if="info.status==6">退单中</p>
-                            <p v-if="info.status==7">已退单</p>
-                            <p v-if="info.status==8">请求返厂</p>
-                            <p v-if="info.status==9">返厂中</p>
+                            <p >{{info.status | yhc_status}}</p>
                             <el-tooltip class="item" effect="dark" :content="info.operationLogs[0].remark" placement="left-end" v-if="info.status==1 && info.operationLogs[0].remark!=null">
                                 <img :src="tips" alt="" >
                             </el-tooltip>
@@ -45,10 +36,7 @@
                     <li>
                         <span class="lable">订单来源</span>
                         <div class="info">
-                            <p v-if="info.source=='1'">淘宝</p>
-                            <p v-if="info.source=='2'">京东</p>
-                            <p v-if="info.source=='3'">PDD</p>
-                            <p v-if="info.source=='4'">线下</p>
+                            <p>{{info.source | source}}</p>
                         </div>
                     </li>
                     <li>
@@ -80,7 +68,7 @@
                         <div class="info">
                             <p>{{item.crafts.productName}}</p>
                             <span class="look">查看</span>
-                            <span class="xiazai">下载</span>
+                            <span class="xiazai" @click="downloadUrl(item.crafts.productCode)">下载</span>
                         </div>
                     </li>
                     <li>
@@ -110,9 +98,7 @@
                     <li>
                         <span class="lable">配送方式</span>
                         <div class="info">
-                            <p v-if="info.orderAttr.deliveryType==1">邮寄</p>
-                            <p v-if="info.orderAttr.deliveryType==2">同城配送</p>
-                            <p v-if="info.orderAttr.deliveryType==3">自提</p>
+                            <p>{{info.orderAttr.deliveryType | yhc_dlyType}}</p>
                         </div>
                     </li>
                     <li v-if="info.orderAttr.deliveryType!=3">
@@ -136,7 +122,7 @@
                     <li v-if="info.orderAttr.deliveryType!=3">
                         <span class="lable">快递公司</span>
                         <div class="info">
-                            <p>10</p>
+                            <p>{{info.orderAttr.waybillCode}}</p>
                         </div>
                     </li>
                 </ul>
@@ -150,7 +136,7 @@
                 <span @click="orderCancel" class="tuidan" v-if="info.status==2">退单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==3">退单</span>
                 <span @click="backOrderapplyReturn" class="fanchang" v-if="info.status==5">返厂</span>
-                <span @click="" class="quxiao" v-if="info.status==6">取消退单</span>    
+                <span @click="orderResetCancel" class="quxiao" v-if="info.status==6">取消退单</span>    
             </div>
             
      
@@ -168,7 +154,6 @@
                 v-model="description">
             </el-input>
             <div class="shangchuan">
-                 <!-- @click="handleRemove(file)" -->
                 <ul>
                     <li v-for="(item, index) in fileList" :key="index">
                         <img :src="item.url" alt="" class="img">
@@ -200,6 +185,7 @@
 <script>
 export default {
   name: 'navhead',
+
   data () {
     return {
         info:'',
@@ -220,8 +206,8 @@ export default {
     }
   },
   created(){
-    this.orderId = this.$route.query.id,
     this.crumbsName = this.$route.query.title
+    this.orderId = this.$route.query.id,
     this.getByIdInfo(this.$route.query.id)
     let userInfo = this.$store.getters.getUserInfo
     this.customerId = userInfo.id
@@ -236,6 +222,15 @@ export default {
                 this.info = res.data
                 if(res.data.status==5){
                     this.danhao = res.data.expressCode
+                }
+                if (res.data.orderAttr.deliveryType != 3) {
+                
+                    this.info.orderAttr.waybillCode = this.$store.getters.getExpCompany.filter(
+                        (item) => {
+                        return item.code == this.info.orderAttr.waybillCode
+                        }
+                    )[0].name
+                    
                 }
             }
         })
@@ -282,6 +277,22 @@ export default {
             })
         })
     },
+    // 取消退单
+    orderResetCancel(){
+        this.confirm_pop("确定取消退单吗？").then(res=>{
+            this.$post('post', this.baseUrl + '/order/resetCancel',{
+                orderId:this.orderId
+            }).then((res) => {
+                if (res.code == 200) {
+                    this.getByIdInfo(this.orderId)
+                    this.$message({
+                        message:res.msg,
+                        type: 'success'
+                    });
+                }
+            })
+        })
+    },
 
     // 申请返厂
     backOrderapplyReturn(){
@@ -293,6 +304,7 @@ export default {
         this.fileList.splice(index,1);
         this.picsList.splice(index,1);
     },
+    // 返厂上传图片
     handlePictureCardPreview(file) {
         const isJPG = file.type === 'image/jpg';
         const isJPEG = file.type === 'image/jpeg';
@@ -344,12 +356,22 @@ export default {
             }
         })
     },
-    // 取消返厂
+    // 关闭返厂弹框
     close(){
         this.publicPorp = false
         this.applyReturnPorp = false
         this.fileList=[]
         this.picsList=[]
+    },
+     // 文件下载
+    downloadUrl(productCode){
+        this.$post('post', this.baseUrl + '/production/getDownloadUrl',{
+            productCode
+        }).then((res) => {
+            if (res.code == 200) {
+                window.open(this.baseUrl + res.data);
+            }
+        })
     },
     // 跳转
     pathIndex(){

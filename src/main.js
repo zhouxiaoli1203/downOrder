@@ -21,6 +21,10 @@ Object.keys(Fns).forEach(key => {
     Vue.prototype[key] = Fns[key]
 })
 
+//全局的filter
+import filters from './utils/filters'
+filters(Vue);
+
 
 Vue.use(ElementUI);
 Vue.config.productionTip = false
