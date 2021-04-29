@@ -1,7 +1,7 @@
 <template>
   <div class='loginPage'>
       <div class="login-pop">
-          <div class="juxing">兀兔印刷接单系统</div>
+          <div class="juxing">兀兔印刷下单系统</div>
               <div class="form-title">账号登录</div>
           <el-form >
               <el-form-item class="yhc-item mb40">

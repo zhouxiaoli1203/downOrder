@@ -14,16 +14,13 @@
                     <li>
                         <span class="lable">订单标题</span>
                         <div class="info">
-                            <p>{{info.orderAttr.title}}</p>
+                            <input type="text" readonly  v-model="info.orderAttr.title" class="p">
                         </div>
                     </li>
                     <li>
                         <span class="lable">订单编号</span>
                         <div class="info">
-                            <el-tooltip class="item" effect="dark" :content="info.orderCode" placement="left-end">
-                                 <p>{{info.orderCode}}</p>
-                            </el-tooltip>
-                           
+                            <input type="text" readonly  v-model="info.orderCode" class="p">
                         </div>
                        
                     </li>
@@ -65,15 +62,13 @@
                     <li>
                         <span class="lable">产品尺寸{{index+1}}</span>
                         <div class="info">
-                            <p>{{item.crafts.width}}*{{item.crafts.height}}mm</p>
+                            <p>{{item.crafts.width}}*{{item.crafts.height}}m</p>
                         </div>
                     </li>
                     <li class="fileBox">
                         <span class="lable">产品文件{{index+1}}</span>
                         <div class="info">
-                            <el-tooltip class="item" effect="dark" :content="item.crafts.productName" placement="left-end">
-                                <p>{{item.crafts.productName}}</p>
-                            </el-tooltip>
+                            <input type="text" readonly  v-model="item.crafts.productName" class="p">
                             <span class="look" @click="lookUrl">查看</span>
                             <span class="xiazai" @click="downloadUrl(item.crafts.productCode)">下载</span>
                         </div>
@@ -111,17 +106,13 @@
                     <li v-if="info.orderAttr.deliveryType!=3">
                         <span class="lable">配送地址</span>
                         <div class="info">
-                            <el-tooltip class="item" effect="dark" :content="info.orderAttr.receiptAddress+info.orderAttr.receiptDetailAddress" placement="left-end">
-                                <p>{{info.orderAttr.receiptAddress+info.orderAttr.receiptDetailAddress}}</p>
-                            </el-tooltip>
+                            <input type="text" readonly  v-model="info.orderAttr.receiptAddress+info.orderAttr.receiptDetailAddress" class="p">
                         </div>
                     </li>
                     <li v-else>
                         <span class="lable">配送地址</span>
                         <div class="info">
-                            <el-tooltip class="item" effect="dark" :content="info.orderAttr.pickUpAddress" placement="left-end">
-                                <p>{{info.orderAttr.pickUpAddress}}</p>
-                            </el-tooltip>
+                            <input type="text" readonly  v-model="info.orderAttr.pickUpAddress" class="p">
                         </div>
                     </li>
                     <li>
@@ -153,41 +144,42 @@
      
         </div>
     </div>
-    <!-- 弹框 -->
-    <section class="publicPorp applyReturnPorp" v-show="applyReturnPorp">
-        <h3>返厂理由</h3>
-        <div class="info">
-            <el-input
-            resize="none"
-                type="textarea"
-                :rows="2"
-                placeholder="请输入返厂理由"
-                v-model="description">
-            </el-input>
-            <div class="shangchuan">
-                <ul>
-                    <li v-for="(item, index) in fileList" :key="index">
-                        <img :src="item.url" alt="" class="img">
-                        <img :src="upDEL" alt="" class="upDEL" @click="handleRemove(index)">
-                    </li>
-                </ul>
-                <el-upload
-                    :show-file-list="false"
-                    multiple
-                    action="#"
-                    list-type="picture-card"
-                    :before-upload="handlePictureCardPreview"
-                    :auto-upload="true">
-                    <i slot="default" class="el-icon-plus"></i>
-                </el-upload>
+    <!-- 返厂弹框 -->
+    <div class="mask" v-show="applyReturnPorp" ref='select_frame' ondragstart="return false">
+        <section class="publicPorp applyReturnPorp">
+            <h3>返厂理由</h3>
+            <div class="info">
+                <el-input
+                resize="none"
+                    type="textarea"
+                    :rows="2"
+                    placeholder="请输入返厂理由"
+                    v-model="description">
+                </el-input>
+                <div class="shangchuan">
+                    <ul>
+                        <li v-for="(item, index) in fileList" :key="index">
+                            <img :src="item.url" alt="" class="img">
+                            <img :src="upDEL" alt="" class="upDEL" @click="handleRemove(index)">
+                        </li>
+                    </ul>
+                    <el-upload
+                        :show-file-list="false"
+                        multiple
+                        action="#"
+                        list-type="picture-card"
+                        :before-upload="handlePictureCardPreview"
+                        :auto-upload="true">
+                        <i slot="default" class="el-icon-plus"></i>
+                    </el-upload>
+                </div>
             </div>
-        </div>
-        <div class="btn">
-            <button @click.prevent="close" class="span">取消</button>
-            <button @click.prevent="fanchangTure" v-button class="span">确定</button>
-        </div>
-    </section>
-    <div class="mask" v-show="publicPorp" @click="close"></div>
+            <div class="btn">
+                <button @click.prevent="close" class="span">取消</button>
+                <button @click.prevent="fanchangTure" v-button class="span">确定</button>
+            </div>
+        </section>
+    </div>
     
   </div>
 </template>
@@ -222,6 +214,31 @@ export default {
     this.getByIdInfo(this.$route.query.id)
     let userInfo = this.$store.getters.getUserInfo
     this.customerId = userInfo.id
+  },
+ mounted(){
+    // 拖拽上传文件
+    this.$refs.select_frame.ondragleave = (e) => {
+      e.preventDefault()  // 阻止离开时的浏览器默认行为
+    }
+    this.$refs.select_frame.ondrop = (e) => {
+      e.preventDefault()    // 阻止拖放后的浏览器默认行为
+      const data = e.dataTransfer.files  // 获取文件对象
+      if (data.length < 1) {
+        return  // 检测是否有文件拖拽到页面
+      }
+      console.log(data)
+        for (let i = 0; i < data.length; i++) {
+            let info = data[i]
+            this.uploadCredentialImage(info)
+        }
+    }
+    this.$refs.select_frame.ondragenter = (e) => {
+      e.preventDefault()  // 阻止拖入时的浏览器默认行为
+      this.$refs.select_frame.border = '2px dashed red'
+    }
+    this.$refs.select_frame.ondragover = (e) => {
+      e.preventDefault()    // 阻止拖来拖去的浏览器默认行为
+    }
   },
   methods: {
     // 获取订单信息
@@ -319,13 +336,17 @@ export default {
     },
     // 返厂上传图片
     handlePictureCardPreview(file) {
+        this.uploadCredentialImage(file)
+    },
+
+    // 返厂图片请求上传
+    uploadCredentialImage(file){
         const isJPG = file.type === 'image/jpg';
         const isJPEG = file.type === 'image/jpeg';
         const isPNG = file.type === 'image/png'
         if (!isJPG  &&  !isPNG && !isJPEG) {
             return this.$message.error('上传头像图片只能JPG,PNG!');
         }
-
         let param = new FormData(); // 创建form对象
         param.append("file",file);
         param.append("orderId",this.orderId); 
@@ -340,8 +361,6 @@ export default {
                 this.picsList.push(res.data)
             }
         })
-
-
     },
     // 确定返厂
     fanchangTure(){
@@ -464,11 +483,12 @@ export default {
                     background: #F2F3F8;
                     padding: 16px;
 
-                    p{
+                    p, .p{
                         display: block;
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        flex: 1;
                     }
                     
                 }
@@ -509,7 +529,7 @@ export default {
             .info{
                 background: none;
                 padding: 0;
-                p{
+                p, .p{
                     background: #F2F3F8;
                     height: 32px;
                     line-height: 32px;

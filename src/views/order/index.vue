@@ -62,7 +62,7 @@
           <ul class="list-items">
             <li class="list-card" v-for="item in orderList" @click="goDetail(item.id,item.orderAttr.title)">
               <div class="head">
-                <h3>{{item.orderAttr.title}}</h3>
+                <h3 :title="item.orderAttr.title">{{item.orderAttr.title}}</h3>
                 <span class="yixiadan" v-if="item.status==0">认领中</span>
                 <span class="yixiadan" v-if="item.status==1" style="color:#FF8F1C">已驳回</span>
                 <span class="yixiadan" v-if="item.status==2">待生产</span>
@@ -440,6 +440,13 @@ export default {
           font-size: 16px;
           font-weight: 500;
           color: #333;
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          -webkit-box-flex: 1;
+          flex: 1;
+          margin-right: 15px;
         }
       }
       .content {

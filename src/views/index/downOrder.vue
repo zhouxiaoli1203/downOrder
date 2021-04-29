@@ -9,7 +9,7 @@
       <div class="center">
         <div class="orderContBox">
           <section class="orderCont">
-            <el-form :model="orderForm" :rules="orderFormRules" ref="orderForm" label-width="80px" class="demo-ruleForm">
+            <el-form :model="orderForm" :rules="orderFormRules" ref="orderForm" label-width="80px" class="demo-ruleForm"  @submit.native.prevent>
               <div class="skuInfos">
                 <el-row v-if="orderForm.skuInfos">
                   <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="skuInfosLI">
@@ -40,13 +40,13 @@
                       <el-row>
                         <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.width`" :rules="skuInfosGroupRules.infowidth">
-                            <el-input v-model="item.width" placeholder="宽（mm）"></el-input>
+                            <el-input v-model="item.width" placeholder="宽（m）"></el-input>
                           </el-form-item>
                         </el-col>
                         <el-col class="line" :span="2">X</el-col>
                         <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
-                            <el-input v-model="item.height" placeholder="高（mm）"></el-input>
+                            <el-input v-model="item.height" placeholder="高（m）"></el-input>
                           </el-form-item>
                         </el-col>
                       </el-row>
@@ -92,9 +92,6 @@
               <el-form-item label="配送方式" class="deliveryType">
                 <el-radio-group v-model="orderForm.deliveryType" size="medium" @change="deliveryTypeChange">
                   <el-radio border v-for="item in cost.deliveryType" :label="item.value" :key="item.value">{{item.name}}</el-radio>
-                  <!-- <el-radio border label="1">邮寄</el-radio>
-                  <el-radio border label="2">同城配送</el-radio>
-                  <el-radio border label="3">自提</el-radio> -->
                 </el-radio-group>
               </el-form-item>
               <el-row v-if="orderForm.deliveryType!=3">
@@ -127,11 +124,20 @@
                   </el-form-item>
                 </el-col>
               </el-row>
+               <el-row>
+                <el-col>
+                  <el-form-item >
+                      <el-input  type="textarea" placeholder="请粘贴或输入地址"  @input="pasteSearch" v-model="orderForm.textarea"></el-input>
+                  </el-form-item>
+                 
+                </el-col>
+              </el-row>
+
               <el-row class="orderButton">
                 <el-col>
                   <el-form-item>
-                    <button @click.prevent="resetForm('orderForm')">清除全部</button>
-                    <button type="primary" @click.prevent="submitForm('orderForm')">提交订单</button>
+                    <el-button @click.prevent="resetForm('orderForm')" class="button">清除全部</el-button>
+                    <el-button type="primary" @click.prevent="submitForm('orderForm')" class="button">提交订单</el-button>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -158,80 +164,82 @@
         </div>
       </div>
       <!-- 弹框 -->
-      <section class="uploadSection publicPorp" v-show="buzhouPorp">
-        <div class="close" @click="Close">
-          <i class="el-icon-close"></i>
-        </div>
-        <div class="buzhou">
-          <el-steps :active="active" finish-status="success">
-            <el-step title="选择文件"></el-step>
-            <el-step title="上传文件"></el-step>
-            <el-step title="上传完成"></el-step>
-          </el-steps>
-        </div>
-        <div class="uploadcont">
-          <section class="choicesection" v-if="active==1">
-            <div class="choiceBox">
-              <el-upload
-                class="upload-demo"
-                drag
-                action=""
-                :show-file-list="false"
-                :before-upload="beforeAvatarUpload"
-                >
-                <img :src="file" alt="">
+      <div class="mask" v-show="buzhouPorp" ref='select_frame' ondragstart="return false">
+        <section class="uploadSection publicPorp">
+          <div class="close" @click="Close">
+            <i class="el-icon-close"></i>
+          </div>
+          <div class="buzhou">
+            <el-steps :active="active" finish-status="success">
+              <el-step title="选择文件"></el-step>
+              <el-step title="上传文件"></el-step>
+              <el-step title="上传完成"></el-step>
+            </el-steps>
+          </div>
+          <div class="uploadcont">
+            <section class="choicesection" v-if="active==1">
+              <div class="choiceBox tuozhuai">
+                <el-upload
+                  class="upload-demo"
+                  action=""
+                  :show-file-list="false"
+                  :before-upload="beforeAvatarUpload"
+                  >
+                  <img :src="file" alt="">
+                  <p>上传文件</p>
+                </el-upload>
+              </div>
+              <!-- <div class="choiceBox" @click="shejiqiClick(2)">
+                <img :src="shejiqi" alt="">
                 <p>上传文件</p>
-              </el-upload>
+              </div> -->
+            </section>
+            <div v-if="active==2">
+              <section class="cont" v-if="buzhou==2">
+                <h5>2021-03-21</h5>
+                <ul>
+                  <li>
+                    <p class="rodioBox">
+                      <el-radio v-model="radio" label="1"><br></el-radio>
+                    </p>
+                    <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
+                  </li>
+                  <li>
+                    <p class="rodioBox">
+                      <el-radio v-model="radio" label="1"><br></el-radio>
+                    </p>
+                    <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
+                  </li>
+                </ul>
+              </section>
+              <section class="cont" v-if="buzhou==1">
+                <ul>
+                  <li v-for="item in localList">
+                    <span>{{item}}</span>
+                  </li>
+                </ul>
+              </section>
             </div>
-            <!-- <div class="choiceBox" @click="shejiqiClick(2)">
-              <img :src="shejiqi" alt="">
-              <p>上传文件</p>
-            </div> -->
-          </section>
-          <div v-if="active==2">
-            <section class="cont" v-if="buzhou==2">
-              <h5>2021-03-21</h5>
-              <ul>
-                <li>
-                  <p class="rodioBox">
-                    <el-radio v-model="radio" label="1"><br></el-radio>
-                  </p>
-                  <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
-                </li>
-                <li>
-                  <p class="rodioBox">
-                    <el-radio v-model="radio" label="1"><br></el-radio>
-                  </p>
-                  <span>我认为，大多数设计师只是试图从他们已经做过的事情中努力，在讲故事方面并</span>
-                </li>
-              </ul>
+            <section class="complete" v-if="active==3">
+              <img :src="complete" alt="">
+              <span>上传完成</span>
             </section>
-            <section class="cont" v-if="buzhou==1">
-              <ul>
-                <li v-for="item in localList">
-                  <span>{{item}}</span>
-                </li>
-              </ul>
-            </section>
+            <div class="btn" v-if="active==1">
+                <button class="close" @click.prevent="Close">取消</button>
+                <button @click.prevent="firstNext">下一步</button>
+            </div>
+            <div class="btn" v-if="active==2">
+                <button @click.prevent="lastStep">上一步</button>
+                <button @click.prevent="next">下一步</button>
+            </div>
+            <div class="btn" v-if="active==3">
+                <button @click.prevent="lastStep">上一步</button>
+                <button @click.prevent="finishBtn">完成</button>
+            </div>
           </div>
-          <section class="complete" v-if="active==3">
-            <img :src="complete" alt="">
-            <span>上传完成</span>
-          </section>
-          <div class="btn" v-if="active==1">
-              <button class="close" @click.prevent="Close">取消</button>
-              <button @click.prevent="firstNext">下一步</button>
-          </div>
-          <div class="btn" v-if="active==2">
-              <button @click.prevent="lastStep">上一步</button>
-              <button @click.prevent="next">下一步</button>
-          </div>
-          <div class="btn" v-if="active==3">
-              <button @click.prevent="lastStep">上一步</button>
-              <button @click.prevent="finishBtn">完成</button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
+    
  
 
      <!-- 确认订单弹框 -->
@@ -253,7 +261,7 @@
           <li>
             <span class="tit">产品尺寸</span>
             <div class="info">
-              <span class="name">宽{{item.width}}mm*高{{item.height}}mm</span>
+              <span class="name">宽{{item.width}}m*高{{item.height}}m</span>
               <p>{{item.remark}}</p>
             </div>
           </li>
@@ -312,8 +320,8 @@
           </template>
         </ul>
         <div class="orderButton trueorderButton">
-          <button @click.prevent="orderTrueClose">取消</button>
-          <button type="primary" @click.prevent="submitOrder" v-button>提交订单</button>
+          <button @click.prevent="orderTrueClose" class="button">取消</button>
+          <button type="primary" @click.prevent="submitOrder" v-button class="button">提交订单</button>
         </div>
       </section>
       <div class="mask" v-show="publicPorp"></div>
@@ -321,6 +329,7 @@
 </template>
 
 <script>
+import AddressParse from 'address-parse';
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
   name: 'downOrder',
@@ -336,12 +345,7 @@ export default {
         }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
           callback(new Error('尺寸必须为数字类型'));
         }else{
-          console.log(value.length)
-          if(value % 1 === 0){
-            callback();
-          }else{
-            callback(new Error('尺寸不能包含小数点'));
-          }
+          callback();
         }
       }else{
         callback(new Error('请输入尺寸'));
@@ -388,8 +392,7 @@ export default {
       CodeToText,
       crumbsName:'',
       orderForm:{
-        skuInfos:[
-        ],
+        skuInfos:[],
         //  skuInfos:[
         //   {
         //     productCode:'',
@@ -408,12 +411,13 @@ export default {
         receiptMobile:'',
         deliveryType:'1', //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
         deliveryTypeName:'邮寄',
-        waybillCode:'', //物流公司
-        waybillCodeName:'',
+        waybillCode:'STO', //物流公司
+        waybillCodeName:'申通快递',
         receiptAddress:'', //收货人的地址 （省＋市＋区） //这是是省市区的码
         Address:'', //省市区码转换过的文字,下订单的时候用这个
         receiptDetailAddress:'', //收货人详情地址
         pickUpAddress:'', //自提点
+        textarea:'', //自动识别的内容
       },
       orderFormRules: {
         title: [
@@ -474,8 +478,31 @@ export default {
     this.skuId = this.$route.query.id //产品的id
     this.crumbsName = this.$route.query.name
     this.typesName = this.$route.query.type  //  0再来一单，1编辑订单
+
+ 
   },
   mounted(){
+    // 拖拽上传文件
+    this.$refs.select_frame.ondragleave = (e) => {
+      e.preventDefault()  // 阻止离开时的浏览器默认行为
+    }
+    this.$refs.select_frame.ondrop = (e) => {
+      e.preventDefault()    // 阻止拖放后的浏览器默认行为
+      const data = e.dataTransfer.files[0]  // 获取文件对象
+      if (data.length < 1) {
+        return  // 检测是否有文件拖拽到页面
+      }
+      console.log(data)
+      // this.upload(data)//上传文件的方法
+      this.productionUpload(data)
+    }
+    this.$refs.select_frame.ondragenter = (e) => {
+      e.preventDefault()  // 阻止拖入时的浏览器默认行为
+      this.$refs.select_frame.border = '2px dashed red'
+    }
+    this.$refs.select_frame.ondragover = (e) => {
+      e.preventDefault()    // 阻止拖来拖去的浏览器默认行为
+    }
   },
   methods:{
     // 获取物流
@@ -567,7 +594,6 @@ export default {
             }else{
               let wuliuCode = data.orderAttr.waybillCode
               orderForm.waybillCode = wuliuCode// 物流的code
-
               console.log(this.wuliuList)
               this.wuliuList.forEach((item,index)=>{
                 if(wuliuCode==item.code){
@@ -604,13 +630,18 @@ export default {
     },
     // 上传文件
     beforeAvatarUpload(file) {
+      this.productionUpload(file)
+    },
+
+    // 上传文件请求
+    productionUpload(file){
       this.localList = [] //上传之前先清空
       let name = file.name
       console.log(name)
       let param = new FormData(); // 创建form对象
       param.append("file",file);
       param.append("name",name); 
-      this.$post('post','http://ga.timan.vip:8090/production/upload',param,'upload'
+      this.$post('post',this.baseUrl +'/production/upload',param,'upload'
       ).then((res) => {
         if (res.code == 200) {
           let { localList } = this
@@ -626,9 +657,56 @@ export default {
     fileUpload(val){
       console.log(val)
       this.buzhouPorp = true
-      this.publicPorp = true
       this.sort = val
     },
+
+    // 自动识别地址及姓名
+
+    pasteSearch(val){
+      this.pasteAddress(val)
+    },
+    pasteAddress(val){
+      let { orderForm } = this
+      const [result, ...results] = AddressParse.parse(val, true);
+
+      // console.log(result);
+      // console.log(results)
+
+      let info = result
+      
+      orderForm.receiptName = info.name //姓名
+      orderForm.receiptMobile = info.mobile //手机号
+
+      if(orderForm.deliveryType!=3){
+        let provCode
+        let cityCode
+        let distCode
+        
+        if(info.province){
+          let prov = TextToCode[info.province]
+          provCode = prov.code
+        }
+
+        if (info.city) {
+          let city = TextToCode[info.province] [info.city]
+          cityCode = city.code
+        }
+
+        if (info.area) {
+          let dist = TextToCode[info.province] [info.city] [info.area]
+          distCode = dist.code   
+        }
+        
+        orderForm.receiptAddress = [provCode, cityCode, distCode]  //收货人的地址 （省＋市＋区） //这是是省市区的码
+        orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
+
+        orderForm.receiptDetailAddress = info.details //收货人详情地址
+      }
+
+    },
+
+  
+    
     // 下一步
     next() {this.active++},
     // 点击面包屑
@@ -698,7 +776,10 @@ export default {
         this.orderForm.Address='' // 省市区码
 
       }else{
+        this.orderForm.waybillCode='STO' // 物流的code
+        this.orderForm.waybillCodeName='申通快递' // 物流的名字
         this.orderForm.pickUpAddress = '' //自提地址 
+        this.pasteAddress(this.orderForm.textarea)
       }
 
     },
@@ -738,6 +819,7 @@ export default {
     },
     // 全部清除
     resetForm(formName){
+      console.log(111)
       this.confirm_pop("确定要全部清空吗？").then(res=>{
         this.$refs[formName].resetFields();
         this.orderForm.skuInfos = [
@@ -751,6 +833,11 @@ export default {
             name:'',
           }
         ];
+        this.orderForm.deliveryType = '1'//如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
+        this.orderForm.deliveryTypeName = '邮寄'
+        this.orderForm.waybillCode = 'STO' //物流公司
+        this.orderForm.waybillCodeName = '申通快递'
+        this.orderForm.textarea = ''
       })
     },
     cityChange(val){ //选择收货地址
@@ -1023,15 +1110,17 @@ export default {
 
   .orderButton{
     text-align: center;
-    button{
+    .button{
       width: 124px;
       height: 32px;
       background: #DBDBDB;
       border-radius: 4px;
       text-align: center;
       line-height: 32px;
+      padding: 0;
+      border: none;
     }
-    button:nth-child(2){
+    .button:nth-child(2){
       background: #3551DF;
       color: #fff;
       margin-left: 32px;
@@ -1097,12 +1186,14 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-top: 105px;
+      padding-top: 84px;
+      
 
       .choiceBox{
-        width: 62px;
-        height: 62px;
+        width: 100px;
+        height: 100px;
         text-align: center;
+            border-radius: 8px;
 
         img{
           width: 22px;
@@ -1112,6 +1203,10 @@ export default {
           font-size: 12px;
           color: #666;
         }
+      }
+
+      .tuozhuai{
+        border: 1px dashed #CDCEE1;
       }
       .choiceBox:nth-child(2){
         background: #E6E9F8;
