@@ -57,7 +57,7 @@
          // config.yhc_f_a = config[config.method == 'post' ? 'data' : 'params'].yhc_f_a;
          // delete config[config.method == 'post' ? 'data' : 'params'].yhc_f_a;
          if(localStorage.getItem('token')){
-             config.headers.Authorization = "Bearer"+" "+localStorage.getItem('token');
+            config.headers.Authorization = "Bearer"+" "+localStorage.getItem('token');
          }
         //  if (config.method == 'post') {
         //      config.data =JSON.stringify(config.data);
@@ -79,7 +79,7 @@
              //token失效的状态码
              if (response.data.code == '401') {
                  if (!token_invalid) {
-                     localStorage.removeItem('token');
+                    localStorage.removeItem('token');
                     window.location.href="/login"
                  }
                  token_invalid = true;

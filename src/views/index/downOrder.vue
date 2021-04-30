@@ -124,17 +124,9 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-               <el-row>
-                <el-col>
-                  <el-form-item >
-                      <el-input  type="textarea" placeholder="请粘贴或输入地址"  @input="pasteSearch" v-model="orderForm.textarea"></el-input>
-                  </el-form-item>
-                 
-                </el-col>
-              </el-row>
-
               <el-row class="orderButton">
-                <el-col>
+                <el-col style="display:flex;align-items:center;justify-content: center;">
+                  <span class="shibieqi" @click="shibieqiClick">地址识别器</span>
                   <el-form-item>
                     <el-button @click.prevent="resetForm('orderForm')" class="button">清除全部</el-button>
                     <el-button type="primary" @click.prevent="submitForm('orderForm')" class="button">提交订单</el-button>
@@ -171,9 +163,9 @@
           </div>
           <div class="buzhou">
             <el-steps :active="active" finish-status="success">
-              <el-step title="选择文件"></el-step>
               <el-step title="上传文件"></el-step>
-              <el-step title="上传完成"></el-step>
+              <!-- <el-step title="上传文件"></el-step> -->
+              <el-step title="确认上传"></el-step>
             </el-steps>
           </div>
           <div class="uploadcont">
@@ -230,12 +222,12 @@
             </div>
             <div class="btn" v-if="active==2">
                 <button @click.prevent="lastStep">上一步</button>
-                <button @click.prevent="next">下一步</button>
-            </div>
-            <div class="btn" v-if="active==3">
-                <button @click.prevent="lastStep">上一步</button>
                 <button @click.prevent="finishBtn">完成</button>
             </div>
+            <!-- <div class="btn" v-if="active==3">
+                <button @click.prevent="lastStep">上一步</button>
+                <button @click.prevent="finishBtn">完成</button>
+            </div> -->
           </div>
         </section>
       </div>
@@ -324,6 +316,18 @@
           <button type="primary" @click.prevent="submitOrder" v-button class="button">提交订单</button>
         </div>
       </section>
+
+      <!-- 地址识别器弹窗 -->
+      <section class="publicPorp shibieqiPorp" v-show="shibieqiPorp">
+        <div class="textare">
+          <el-input  type="textarea" placeholder="请粘贴或输入地址" v-model="orderForm.textarea"></el-input>
+        </div>
+        <div class="orderButton trueorderButton">
+          <button @click.prevent="Close" class="button">取消</button>
+          <button @click.prevent="trueShibie" v-button class="button">确定</button>
+        </div>
+
+      </section>
       <div class="mask" v-show="publicPorp"></div>
   </div>
 </template>
@@ -336,8 +340,7 @@ export default {
   data () {
     var widthHeight = (rule,value,callback) => {
       if(value){
-        console.log(value)
-         value = String(value)
+        value = String(value)
         let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
         let num = Number(values)  //将字符串转换为数
         if(isNaN(num)){  //判断是否是非数字
@@ -345,7 +348,18 @@ export default {
         }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
           callback(new Error('尺寸必须为数字类型'));
         }else{
-          callback();
+
+          if(value % 1 === 0){
+            callback();
+          }else{
+            let changdu = value.toString().split(".")[1].length
+
+            if(changdu>3){
+              callback(new Error('最多输入小数点后3位'));
+            }else{
+              callback();
+            }
+          }
         }
       }else{
         callback(new Error('请输入尺寸'));
@@ -469,6 +483,7 @@ export default {
       skuId:0,
       orderId:0,
       typesName:0,
+      shibieqiPorp:false
     }
   },
   created(){
@@ -542,13 +557,13 @@ export default {
             let data = res.data
             data.orderSkus.forEach((item,index)=>{
               let info ={
-                productCode:item.crafts.productCode,
-                fontColor:item.crafts.fontColor,
-                height:item.crafts.height,
+                productCode:item.attributes.productCode,
+                fontColor:item.attributes.fontColor,
+                height:item.attributes.height/1000,
                 num:item.num,
-                remark:item.crafts.remark,
-                width:item.crafts.width,
-                name:item.crafts.productName,//文件的名字
+                remark:item.attributes.remark,
+                width:item.attributes.width/1000,
+                name:item.attributes.productName,//文件的名字
               }
               orderForm.skuInfos.push(info)
             })
@@ -660,10 +675,16 @@ export default {
       this.sort = val
     },
 
-    // 自动识别地址及姓名
+    // 点击识别器
+    shibieqiClick(){
+      this.publicPorp=true
+      this.shibieqiPorp = true
+    },
 
-    pasteSearch(val){
-      this.pasteAddress(val)
+    // 自动识别地址及姓名
+    trueShibie(){
+
+      this.pasteAddress(this.orderForm.textarea)
     },
     pasteAddress(val){
       let { orderForm } = this
@@ -673,6 +694,10 @@ export default {
       // console.log(results)
 
       let info = result
+      console.log(info)
+      if(info==undefined){
+        return false
+      }
       
       orderForm.receiptName = info.name //姓名
       orderForm.receiptMobile = info.mobile //手机号
@@ -703,10 +728,12 @@ export default {
         orderForm.receiptDetailAddress = info.details //收货人详情地址
       }
 
-    },
+      this.publicPorp=false
+      this.shibieqiPorp = false
 
-  
-    
+
+
+    },
     // 下一步
     next() {this.active++},
     // 点击面包屑
@@ -819,7 +846,6 @@ export default {
     },
     // 全部清除
     resetForm(formName){
-      console.log(111)
       this.confirm_pop("确定要全部清空吗？").then(res=>{
         this.$refs[formName].resetFields();
         this.orderForm.skuInfos = [
@@ -850,9 +876,10 @@ export default {
     },
     // 关闭上传弹框
     Close(){
-      console.log(111)
+
       this.buzhouPorp=false
       this.publicPorp=false
+      this.shibieqiPorp = false
     },
     // 关闭确认订单弹框
     orderTrueClose(){
@@ -870,6 +897,15 @@ export default {
     // 订单确定弹框提交
     submitOrder(){
       let { orderForm,customerId,skuId,orderId,typesName } = this
+
+      let skuInfosList = JSON.parse(JSON.stringify(orderForm.skuInfos));
+      
+      skuInfosList.forEach((i,key)=>{
+        console.log(key)
+        skuInfosList[key].width=i.width*1000
+        skuInfosList[key].height=i.height*1000
+      })
+      
       let data = {
         customerId,
         deliveryType:orderForm.deliveryType,
@@ -880,10 +916,13 @@ export default {
         receiptName:orderForm.receiptName,
         skuId,
         title:orderForm.title,
-        skuInfos:orderForm.skuInfos,
+        skuInfos:skuInfosList,
         source:orderForm.source,
         waybillCode:orderForm.waybillCode
       }
+
+      console.log(data)
+
       let url 
       if(typesName!=1){
         url = '/order/submit'
@@ -1125,6 +1164,12 @@ export default {
       color: #fff;
       margin-left: 32px;
     }
+
+    .shibieqi{
+      color: #409EFF;
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
   .trueorderButton{
     margin-top: 32px;
@@ -1320,4 +1365,6 @@ export default {
       }
     }
   }
+
+ 
 </style>

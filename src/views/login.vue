@@ -30,7 +30,11 @@ export default {
   },
   components: {},
   created(){
-    //   localStorage.removeItem("token");
+    localStorage.removeItem("token");
+    localStorage.removeItem('orderInfo');
+    this.$store.state.orderInfo = '';
+    localStorage.removeItem('userInfo');
+    this.$store.state.userInfo = '';
   },
   mounted(){},
   methods: {

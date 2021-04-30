@@ -62,15 +62,15 @@
                     <li>
                         <span class="lable">产品尺寸{{index+1}}</span>
                         <div class="info">
-                            <p>{{item.crafts.width}}*{{item.crafts.height}}m</p>
+                            <p>{{item.attributes.width/1000}}*{{item.attributes.height/1000}}m</p>
                         </div>
                     </li>
                     <li class="fileBox">
                         <span class="lable">产品文件{{index+1}}</span>
                         <div class="info">
-                            <input type="text" readonly  v-model="item.crafts.productName" class="p">
+                            <input type="text" readonly  v-model="item.attributes.productName" class="p">
                             <span class="look" @click="lookUrl">查看</span>
-                            <span class="xiazai" @click="downloadUrl(item.crafts.productCode)">下载</span>
+                            <span class="xiazai" @click="downloadUrl(item.attributes.productCode)">下载</span>
                         </div>
                     </li>
                     <li>

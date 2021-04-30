@@ -114,12 +114,12 @@
   padding: 10px 22px 0 10px;
 }
 .uploadSection .buzhou {
-  padding-left: 85px;
+  padding-left: 172px;
   margin-bottom: 32px;
 }
 .uploadSection .el-step.is-horizontal {
   position: relative;
-  flex-basis: 38% !important;
+  flex-basis: 80% !important;
 }
 .uploadSection .el-step__description {
   display: none;
@@ -298,4 +298,25 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(95, 95, 95, 0.7);
+}
+.shibieqiPorp {
+  background: #fff;
+  width: 500px;
+  height: 30%;
+  padding: 24px;
+}
+.shibieqiPorp .textare {
+  height: 68%;
+}
+.shibieqiPorp .textare .el-textarea {
+  height: 100%;
+}
+.shibieqiPorp .textare .el-textarea textarea {
+  height: 100% !important;
+}
+.orderButton .el-form-item {
+  margin-bottom: 0 !important;
+}
+.orderButton .el-form-item__content {
+  margin-left: 54px !important;
 }
