@@ -28,22 +28,38 @@ export default {
   },
   methods:{
     downOrder(name,id){
-      if(id!=2){
-        this.$message({
-          message: '该功能正在开发，敬请期待哦！',
-          type: 'warning'
-        });
+      console.log(id)
+      // if(id!=2){
+      //   this.$message({
+      //     message: '该功能正在开发，敬请期待哦！',
+      //     type: 'warning'
+      //   });
 
-        return false
+      //   return false
+      // }
+      if(id==2){
+        this.$router.push({  
+            path: '/index/downOrder',   
+            name: 'downOrder',  
+            query: {  
+              name:name,
+              id:id
+            }
+        })  
       }
-      this.$router.push({  
-          path: '/index/downOrder',   
-          name: 'downOrder',  
-          query: {  
-            name:name,
-            id:id
-          }
-      })  
+
+      if(id==7){
+        this.$router.push({  
+            path: '/index/downOrder',   
+            name: 'downOrderAll',  
+            query: {  
+              name:name,
+              id:id
+            }
+        })  
+      }
+
+
     },
     // 查询主产品和单品列表
     listGoodAndSkus() {

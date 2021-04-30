@@ -39,6 +39,11 @@ export default new Router({
           component: () => import('@/views/index/downOrder.vue'),
         },
         {
+          path: '/index/downOrderAll',
+          name: 'downOrderAll',
+          component: () => import('@/views/index/downOrderAll.vue'),
+        },
+        {
           path: '/order',
           name: 'order',
           component: () => import('@/views/order/index.vue'),

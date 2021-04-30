@@ -46,6 +46,7 @@
  // 请求超时时间
  axios.defaults.timeout = 15000;
  
+ 
  // post请求头
 //  axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
  axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
@@ -53,6 +54,7 @@
  // 请求拦截器
  axios.interceptors.request.use(
      config => {
+        //  debugger
          // config.headers.token = localStorage.getItem('token');
          // config.yhc_f_a = config[config.method == 'post' ? 'data' : 'params'].yhc_f_a;
          // delete config[config.method == 'post' ? 'data' : 'params'].yhc_f_a;
@@ -71,6 +73,7 @@
  // // 响应拦截器
  axios.interceptors.response.use(
      response => {
+        //  debugger
          if (response.data.code == 200 || (response.config.yhc_f_a && response.config.yhc_f_a.indexOf(response.data.code) != -1)) {
              token_invalid = false;
              return Promise.resolve(response);
@@ -89,6 +92,10 @@
      },
      // 服务器状态码不是200的情况
      error => {
+        //  debugger
+         console.log(error)
+         console.log(error.response)
+         console.log(error.response.status)
          let tip = '';
          if (error.response && error.response.status) {
              switch (error.response.status) {
@@ -129,6 +136,7 @@
          r.then(res => {
              resolve(res.data);
          }).catch(err => {
+             console.log(err)
              console.log(`%c【Status Code:${err.data.status}, Message:${err.data.msg}${err.config&&err.config.url?', Request URL:'+err.config.url:''}】`, 'color: #ee0a24;font-size: 12px;font-weight: 400;');
              //业务代码需要catch 主要避免Uncaught (in promise)的错误报错
              // (needCatch || (typeof yhc_f_a === 'boolean' && yhc_f_a)) && reject(err);
