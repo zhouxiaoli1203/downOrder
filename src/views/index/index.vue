@@ -47,6 +47,14 @@ export default {
             }
         })  
       }
+      if(id==5 || id==6){
+        this.$message({
+          message: '该功能正在开发，敬请期待哦！',
+          type: 'warning'
+        });
+
+        return false
+      }
 
       if(id==7){
         this.$router.push({  

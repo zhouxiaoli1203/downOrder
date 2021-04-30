@@ -30,12 +30,6 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
-                    <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" class="pubilcRadio">
-                      <el-radio-group v-model="item.fontColor" size="medium">
-                        <el-radio border label="白色">白色</el-radio>
-                        <el-radio border label="黄色">黄色</el-radio>
-                      </el-radio-group>
-                    </el-form-item>
                     <el-form-item label="产品尺寸" required>
                       <el-row>
                         <el-col :span="8">
@@ -44,22 +38,9 @@
                           </el-form-item>
                         </el-col>
                         <el-col class="line" :span="2">X</el-col>
-                        <el-col :span="8" class="inputSelect">
+                        <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
-                            <!-- <el-input v-model="item.height" placeholder="宽度（m）"></el-input> -->
-                             <el-autocomplete
-                              popper-class="my-autocomplete"
-                              v-model="item.height"
-                              :fetch-suggestions="querySearch"
-                              placeholder="宽度（m）"
-                              @select="handleSelect">
-              
-                              <template slot-scope="{ item }">
-                                <!-- <div class="name">{{ item.value }}</div> -->
-                                <span class="addr">{{ item.name }}</span>
-                              </template>
-                            </el-autocomplete>
-
+                            <el-input v-model="item.height" placeholder="宽度（m）"></el-input>
                           </el-form-item>
                         </el-col>
                       </el-row>
@@ -71,11 +52,51 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
+
+                    <el-form-item label="产品工艺" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" class="productCraft">
+                      <!-- <el-radio-group v-model="item.fontColor" >
+                        <el-radio label="白色">白色</el-radio>
+                        <el-radio label="黄色">黄色</el-radio>
+                         <el-radio v-model="radio" label="2">备选项</el-radio>
+                      </el-radio-group> -->
+                      <el-radio-group v-model="item.gongyi" @change="craftsChange($event,index)">
+                        <div class="li">
+                          <el-radio label="打扣">打扣</el-radio>
+                          <el-select v-model="item.mingchneg" placeholder="请选择" @change="craftsName($event,index)" v-if="craftsType=='打扣'">
+                            <el-option
+                              v-for="item in dakouOptions"
+                              :key="item"
+                              :label="item"
+                              :value="item">
+                            </el-option>
+                          </el-select>
+                        </div>
+                        <div class="li">
+                          <el-radio label="缝吊耳">缝吊耳</el-radio>
+                          <el-select v-model="item.mingchneg" placeholder="请选择" @change="craftsName($event,index)" v-if="craftsType=='缝吊耳'">
+                            <el-option
+                              v-for="item in diaoerOptions"
+                              :key="item"
+                              :label="item"
+                              :value="item">
+                            </el-option>
+                          </el-select>
+                        </div>
+                        <div class="li"><el-radio label="缝筒">缝筒</el-radio></div>
+                        <div class="li"><el-radio label="裁净边">裁净边</el-radio></div>
+
+                        
+                        
+                      </el-radio-group>
+                    </el-form-item>
+
+
                     <el-form-item label="产品数量" :prop="`skuInfos.${index}.num`" :rules="skuInfosGroupRules.infonum">
                       <el-col :span="4" class="num">
                         <el-input v-model="item.num"></el-input>
                       </el-col>
                     </el-form-item>
+
                   </el-col>
                 </el-row>
               </div>
@@ -167,7 +188,7 @@
                 </li>
               </ul>
             </div>
-            <div class="url">
+             <div class="url">
               <iframe :src="skuIdUrl" frameborder="0"></iframe>
             </div>
           </section>
@@ -262,12 +283,12 @@
               <span class="titname">{{item.name}}</span>
             </div>
           </li>
-          <li>
+          <!-- <li>
             <span class="tit">字体颜色</span>
             <div class="info">
               <span class="name">{{item.fontColor}}</span>
             </div>
-          </li>
+          </li> -->
           <li>
             <span class="tit">产品尺寸</span>
             <div class="info">
@@ -329,7 +350,7 @@
             </li>
           </template>
         </ul>
-        <div class="orderButton trueorderButton" style="margin-top:25px">
+        <div class="orderButton trueorderButton">
           <button @click.prevent="orderTrueClose" class="button">取消</button>
           <button type="primary" @click.prevent="submitOrder" v-button class="button">提交订单</button>
         </div>
@@ -340,7 +361,7 @@
         <div class="textare">
           <el-input  type="textarea" placeholder="请粘贴或输入地址" v-model="orderForm.textarea"></el-input>
         </div>
-        <div class="orderButton trueorderButton">
+        <div class="orderButton trueorderButton" style="margin-top:25px">
           <button @click.prevent="Close" class="button">取消</button>
           <button @click.prevent="trueShibie" v-button class="button">确定</button>
         </div>
@@ -424,18 +445,21 @@ export default {
       CodeToText,
       crumbsName:'',
       orderForm:{
-        skuInfos:[],
-        //  skuInfos:[
-        //   {
-        //     productCode:'',
-        //     fontColor:'白色',
-        //     height:'',
-        //     num: 1,
-        //     remark: '',
-        //     width:'',
-        //     name:'',//文件的名字
-        //   }
-        // ],
+        // skuInfos:[],
+         skuInfos:[
+            {
+              productCode:'',
+              // fontColor:'白色',
+              height: '',
+              num: 1,
+              remark: '',
+              width: '',
+              crafts:{},
+              name:'',
+              gongyi:'',
+              mingchneg:'',
+            }
+        ],
         title:'',
         source:'', //订单来源，
         sourceName:'',
@@ -479,8 +503,8 @@ export default {
       },
       skuInfosGroupRules: {
         infoname: [{required: true,  message: '请上传文件',  trigger: 'blur'}],
-        infowidth: [{required: true,  validator: widthHeight,  trigger: 'change'}],
-        infoheight: [{required: true, validator: widthHeight, trigger: 'change'}],
+        infowidth: [{required: true,  validator: widthHeight,  trigger: 'blur'}],
+        infoheight: [{required: true, validator: widthHeight, trigger: 'blur'}],
         inforemark: [{required: true, message: '请输入订单具体信息', trigger: 'blur'}],
         infonum: [{required: true, validator: numRule, trigger: 'blur'}],
       },
@@ -502,21 +526,10 @@ export default {
       orderId:0,
       typesName:0,
       shibieqiPorp:false,
-      restaurants: [
-        {
-          value:'0.5',
-          name:'0.5米 (实际0.45米)'
-        },
-        {
-          value:'0.7',
-          name:' 0.7米 (实际0.65米)'
-        },
-        {
-          value:'0.9',
-          name:' 0.9米 (实际0.85米)'
-        }
-      ],
-      skuIdUrl:''
+      dakouOptions:['四角打扣','每隔2米打一个扣'],
+      diaoerOptions:['四角缝吊耳'],
+      skuIdUrl:'',
+      craftsType:'',
     }
   },
   created(){
@@ -527,8 +540,6 @@ export default {
     this.crumbsName = this.$route.query.name
     this.typesName = this.$route.query.type  //  0再来一单，1编辑订单
     this.skuIdUrl = 'https://api.gundongyongheng.com/new/?act=get&id='+ this.$route.query.id
-
- 
   },
   mounted(){
     // 拖拽上传文件
@@ -554,10 +565,17 @@ export default {
     }
   },
   methods:{
-
-      handleSelect(item) {
-        console.log(item,'----------------------');
-      },
+    craftsChange(val,index){
+      let { orderForm} = this
+      orderForm.skuInfos[index].gongyi = val
+      orderForm.skuInfos[index].mingchneg = ''
+      this.craftsType = val //点击的是那个单选框
+    },
+    craftsName(val,index){
+      let { orderForm } = this
+      let jain = orderForm.skuInfos[index].gongyi
+      orderForm.skuInfos[index].crafts[jain] = val
+    },
     // 获取物流
     listExpressCompany(){
       this.$post('get',this.baseUrl + '/order/listExpressCompany',
@@ -569,17 +587,20 @@ export default {
             this.orderId = dingdanid
             this.getByIdInfo(dingdanid) // 获取订单的信息
           }else{
-            this.orderForm.skuInfos.push(
-              {
-                productCode:'',
-                fontColor:'白色',
-                height: '',
-                num: 1,
-                remark: '',
-                width: '',
-                name:'',
-              }
-            );
+            // this.orderForm.skuInfos.push(
+            //   {
+            //     productCode:'',
+            //     // fontColor:'白色',
+            //     height: '',
+            //     num: 1,
+            //     remark: '',
+            //     width: '',
+            //     crafts:'',
+            //     name:'',
+            //      gongyi:'',
+            //     mingchneg:'',
+            //   }
+            // );
           }
         }
        
@@ -596,7 +617,7 @@ export default {
             data.orderSkus.forEach((item,index)=>{
               let info ={
                 productCode:item.attributes.productCode,
-                fontColor:item.attributes.fontColor,
+                // fontColor:item.attributes.fontColor,
                 height:item.attributes.height/1000,
                 num:item.num,
                 remark:item.attributes.remark,
@@ -860,19 +881,26 @@ export default {
     // 添加产品
     addLadder(){
       this.orderForm.skuInfos.push(
+
         {
-          productCode:'',
-          fontColor:'白色',
-          height: '',
-          num: 1,
-          remark: '',
-          width: '',
-          name:'',
-        }
+            productCode:'',
+            // fontColor:'白色',
+            height: '',
+            num: 1,
+            remark: '',
+            width: '',
+            crafts:{},
+            name:'',
+            gongyi:'',
+            mingchneg:'',
+          }
       );
     },
     // 订单提交验证
     submitForm(formName){
+      this.orderTruePorp = true
+          this.publicPorp = true//遮罩层
+          return
       console.log(formName)
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
@@ -889,7 +917,7 @@ export default {
         this.orderForm.skuInfos = [
           {
             productCode:'',
-            fontColor:'白色',
+            // fontColor:'白色',
             height: '',
             num: 1,
             remark: '',
@@ -937,13 +965,36 @@ export default {
       let { orderForm,customerId,skuId,orderId,typesName } = this
 
       let skuInfosList = JSON.parse(JSON.stringify(orderForm.skuInfos));
-      
+      let infoLIST=[
+      ]
+      let info = {}
       skuInfosList.forEach((i,key)=>{
+        console.log(i)
         console.log(key)
         skuInfosList[key].width=i.width*1000
         skuInfosList[key].height=i.height*1000
+        
+        // infoLIST[key]={
+        //           info['crafts'] = i.crafts
+        //           info['height'] = i.height*1000
+        //           info['width'] = i.width*1000
+        //           info['num'] = i.num
+        //           info['productCode'] = i.productCode
+        //           info['remark'] = i.remark
+        // }
+        
+
+
+
+
+
+        
+
       })
-      
+
+      console.log(infoLIST)
+
+      return
       let data = {
         customerId,
         deliveryType:orderForm.deliveryType,
@@ -991,22 +1042,7 @@ export default {
           });
         }
       })
-    },
-
-    //调取宽度的数据
-    querySearch(queryString, cb) {
-      var restaurants = this.restaurants;
-      var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-      // 调用 callback 返回建议列表的数据
-      cb(results);
-    },
-    createFilter(queryString) {
-      return (restaurant) => {
-        console.log(restaurant)
-        // return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-         return  restaurant
-      };
-    },
+    }
     
   },
 }
@@ -1138,8 +1174,7 @@ export default {
     width: 45%;
     display: flex;
     flex-flow: column;
-  
-    
+
     .imgbannerBox{
 
       background: #F5F6F9;
@@ -1242,7 +1277,6 @@ export default {
     }
   }
   .trueorderButton{
-    // margin-top: 32px;
     height: 32%;
     align-items: center;
     justify-content: center;

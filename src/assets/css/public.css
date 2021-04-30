@@ -56,20 +56,20 @@
 .skuInfos .el-row {
   margin: 0 !important;
 }
-.skuInfos .el-radio.is-bordered {
+.skuInfos .pubilcRadio .el-radio.is-bordered {
   background: #fff;
 }
-.skuInfos .el-radio__inner {
+.skuInfos .pubilcRadio .el-radio__inner {
   display: none;
 }
-.skuInfos .el-radio.is-bordered.is-checked {
+.skuInfos .pubilcRadio .el-radio.is-bordered.is-checked {
   background: #3551DF !important;
   border-color: #3551DF;
 }
-.skuInfos .el-radio__input.is-checked + .el-radio__label {
+.skuInfos .pubilcRadio .el-radio__input.is-checked + .el-radio__label {
   color: #fff;
 }
-.skuInfos .el-radio--medium.is-bordered {
+.skuInfos .pubilcRadio .el-radio--medium.is-bordered {
   width: 100px;
   text-align: center;
   padding: 10px 22px 0 10px;
@@ -94,6 +94,33 @@
   font-size: 20px;
   line-height: normal;
   margin: 0;
+}
+.productCraft .li {
+  display: block;
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+}
+.productCraft .li .el-input {
+  width: 145px !important;
+  margin-left: 15px;
+}
+.productCraft .li:last-child {
+  margin-right: 0;
+}
+.productCraft .el-radio-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 40px;
+}
+.productCraft .el-radio__inner {
+  width: 16px;
+  height: 16px;
+  border-radius: 0%;
+}
+.productCraft .el-radio {
+  margin-right: 0;
 }
 .deliveryType .el-radio.is-bordered {
   background: #F0F0F0;
@@ -303,10 +330,10 @@
   background: #fff;
   width: 500px;
   height: 30%;
-  padding: 24px;
 }
 .shibieqiPorp .textare {
   height: 68%;
+  padding: 3% 3% 0;
 }
 .shibieqiPorp .textare .el-textarea {
   height: 100%;
@@ -319,4 +346,8 @@
 }
 .orderButton .el-form-item__content {
   margin-left: 54px !important;
+}
+.inputSelect .el-form-item__content,
+.inputSelect .el-autocomplete {
+  width: 100%;
 }

@@ -79,6 +79,12 @@
                             <p>{{item.num}}</p>
                         </div>
                     </li>
+                     <li v-if="item.skuId==2">
+                        <span class="lable">产品颜色{{index+1}}</span>
+                        <div class="info">
+                            <p>{{item.attributes.fontColor}}</p>
+                        </div>
+                    </li>
                     <li class="remarkBox">
                         <span class="lable">产品描述{{index+1}}</span>
                         <div class="info">
@@ -492,7 +498,7 @@ export default {
                 .info{
                     display: flex;
                     align-items: center;
-                    width: 280px;
+                    width: 200px;
                     height: 32px;
                     background: #F2F3F8;
                     padding: 16px;

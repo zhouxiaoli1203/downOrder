@@ -36,12 +36,17 @@ export default new Router({
         {
           path: '/index/downOrder',
           name: 'downOrder',
-          component: () => import('@/views/index/downOrder.vue'),
+          component: () => import('@/views/index/downOrder.vue'), //红色条幅
         },
         {
           path: '/index/downOrderAll',
           name: 'downOrderAll',
-          component: () => import('@/views/index/downOrderAll.vue'),
+          component: () => import('@/views/index/downOrderAll.vue'),   //通用
+        },
+        {
+          path: '/index/downOrderCraft',
+          name: 'downOrderCraft',
+          component: () => import('@/views/index/downOrderCraft.vue'), //彩色条幅 旗帜
         },
         {
           path: '/order',

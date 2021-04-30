@@ -73,23 +73,25 @@
     .el-row{
         margin: 0 !important;
     }
-    .el-radio.is-bordered{
-        background: #fff;
-    }
-    .el-radio__inner{
-        display: none;
-    }
-    .el-radio.is-bordered.is-checked{
-        background: #3551DF !important;
-        border-color: #3551DF;
-    }
-    .el-radio__input.is-checked+.el-radio__label{
-        color: #fff;
-    }
-    .el-radio--medium.is-bordered{
-        width: 100px;
-        text-align: center;
-        padding: 10px 22px 0 10px;
+    .pubilcRadio{
+        .el-radio.is-bordered{
+            background: #fff;
+        }
+        .el-radio__inner{
+            display: none;
+        }
+        .el-radio.is-bordered.is-checked{
+            background: #3551DF !important;
+            border-color: #3551DF;
+        }
+        .el-radio__input.is-checked+.el-radio__label{
+            color: #fff;
+        }
+        .el-radio--medium.is-bordered{
+            width: 100px;
+            text-align: center;
+            padding: 10px 22px 0 10px;
+        }
     }
 
     .num{
@@ -117,7 +119,48 @@
         line-height: normal;
         margin: 0;
     }
+    
 }
+
+//工艺
+.productCraft{
+    
+    // display: flex;
+    // align-items: center;
+    .li{
+        display: block;
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+        .el-input{
+            width: 145px !important;
+            margin-left: 15px;
+        }
+
+        // .el-input__inner{
+        //     width: 200px;
+        // }
+    }
+    .li:last-child{
+        margin-right: 0;
+    }
+    .el-radio-group{
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        height: 40px;
+    }
+
+    .el-radio__inner{
+        width: 16px;
+        height: 16px;
+        border-radius: 0%;
+    }
+    .el-radio{
+        margin-right: 0;
+    }
+    
+} 
 
 
 
@@ -385,9 +428,10 @@
     background: #fff;
     width: 500px;
     height: 30%;
-    padding: 24px;
+    // padding: 24px;
     .textare{
       height: 68%;
+      padding: 3% 3% 0;
       .el-textarea{
         height: 100%;
         textarea{
@@ -405,3 +449,10 @@
         margin-left: 54px !important 
     }
   }
+
+//  下订单
+.inputSelect{
+    .el-form-item__content, .el-autocomplete{
+        width: 100%;
+    }
+}

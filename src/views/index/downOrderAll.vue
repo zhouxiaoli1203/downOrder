@@ -30,7 +30,7 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
-                    <!-- <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor">
+                    <!-- <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" >
                       <el-radio-group v-model="item.fontColor" size="medium">
                         <el-radio border label="白色">白色</el-radio>
                         <el-radio border label="黄色">黄色</el-radio>
@@ -40,13 +40,13 @@
                       <el-row>
                         <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.width`" :rules="skuInfosGroupRules.infowidth">
-                            <el-input v-model="item.width" placeholder="宽（m）"></el-input>
+                            <el-input v-model="item.width" placeholder="长度（m）"></el-input>
                           </el-form-item>
                         </el-col>
                         <el-col class="line" :span="2">X</el-col>
                         <el-col :span="8">
                           <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
-                            <el-input v-model="item.height" placeholder="高（m）"></el-input>
+                            <el-input v-model="item.height" placeholder="宽度（m）"></el-input>
                           </el-form-item>
                         </el-col>
                       </el-row>
@@ -136,22 +136,27 @@
             </el-form>
           </section>
           <section class="lookCont">
-            <div class="imgbanner">
-              <el-carousel :interval="5000" arrow="always" indicator-position="none" height="228px" :autoplay="false">
-                <el-carousel-item v-for="item in 4" :key="item">
-                  <img src="" alt="">
-                </el-carousel-item>
-              </el-carousel>
-              <div class="magnifier">
-                <i class="el-icon-search"></i>
+            <div class="imgbannerBox">
+              <div class="imgbanner">
+                <el-carousel :interval="5000" arrow="always" indicator-position="none" height="228px" :autoplay="false">
+                  <el-carousel-item v-for="item in 4" :key="item">
+                    <img src="" alt="">
+                  </el-carousel-item>
+                </el-carousel>
+                <div class="magnifier">
+                  <i class="el-icon-search"></i>
+                </div>
               </div>
+              <ul>
+                <li v-for="item in 4">
+                  <img src="" alt="">
+                  <p>禁止烧麦秸…</p>
+                </li>
+              </ul>
             </div>
-            <ul>
-              <li v-for="item in 4">
-                <img src="" alt="">
-                <p>禁止烧麦秸…</p>
-              </li>
-            </ul>
+             <div class="url">
+              <iframe :src="skuIdUrl"></iframe>
+            </div>
           </section>
         </div>
       </div>
@@ -253,7 +258,7 @@
           <li>
             <span class="tit">产品尺寸</span>
             <div class="info">
-              <span class="name">宽{{item.width}}m*高{{item.height}}m</span>
+              <span class="name">长度{{item.width}}m*宽度{{item.height}}m</span>
               <p>{{item.remark}}</p>
             </div>
           </li>
@@ -311,7 +316,7 @@
             </li>
           </template>
         </ul>
-        <div class="orderButton trueorderButton">
+        <div class="orderButton trueorderButton" style="margin-top:25px">
           <button @click.prevent="orderTrueClose" class="button">取消</button>
           <button type="primary" @click.prevent="submitOrder" v-button class="button">提交订单</button>
         </div>
@@ -483,7 +488,8 @@ export default {
       skuId:0,
       orderId:0,
       typesName:0,
-      shibieqiPorp:false
+      shibieqiPorp:false,
+      skuIdUrl:''
     }
   },
   created(){
@@ -493,6 +499,7 @@ export default {
     this.skuId = this.$route.query.id //产品的id
     this.crumbsName = this.$route.query.name
     this.typesName = this.$route.query.type  //  0再来一单，1编辑订单
+     this.skuIdUrl = 'https://api.gundongyongheng.com/new/?act=get&id='+ this.$route.query.id
   },
   mounted(){
     // 拖拽上传文件
@@ -556,7 +563,7 @@ export default {
             data.orderSkus.forEach((item,index)=>{
               let info ={
                 productCode:item.attributes.productCode,
-                fontColor:item.attributes.fontColor,
+                // fontColor:item.attributes.fontColor,
                 height:item.attributes.height/1000,
                 num:item.num,
                 remark:item.attributes.remark,
@@ -1081,10 +1088,26 @@ export default {
   }
   .lookCont{
     width: 45%;
-    background: #F5F6F9;
-    height: 382px;
-    padding: 24px 24px 8px;
-    border-radius: 10px;
+    display: flex;
+    flex-flow: column;
+
+    .imgbannerBox{
+
+      background: #F5F6F9;
+      height: 382px;
+      border-radius: 10px;
+      padding: 24px 24px 8px;
+  
+    }
+    .url{
+      flex: 1;
+      width: 100%;
+
+      iframe{
+        width: 100%;
+        height: 100%;
+      }
+    }
 
     .imgbanner{
       position: relative;
@@ -1170,7 +1193,10 @@ export default {
     }
   }
   .trueorderButton{
-    margin-top: 32px;
+    height: 32%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
   }
 
   // 选择文件步骤条

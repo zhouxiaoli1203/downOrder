@@ -81,6 +81,7 @@
               <div class="footer">
                 <span class="fl status red" v-if="item.orderAttr.goodsName=='条幅'">{{item.orderAttr.goodsName}}</span>
                 <span class="fl status blue" v-if="item.orderAttr.goodsName=='打印'">{{item.orderAttr.goodsName}}</span>
+                <span class="fl status blue" v-if="item.orderAttr.goodsName=='通用'">{{item.orderAttr.goodsName}}</span>
                 <span class="fr icon">
                   <i class="el-icon-arrow-right"></i>
                 </span>
