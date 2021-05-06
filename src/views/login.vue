@@ -17,7 +17,6 @@
 </template>
 
 <script>
-import axios from "axios"
 export default {
   name: 'loginPage',
   data(){
@@ -30,15 +29,16 @@ export default {
   },
   components: {},
   created(){
-    localStorage.removeItem("token");
-    localStorage.removeItem('orderInfo');
-    this.$store.state.orderInfo = '';
-    localStorage.removeItem('userInfo');
-    this.$store.state.userInfo = '';
   },
   mounted(){},
   methods: {
       submit(){
+            localStorage.removeItem("token");
+            localStorage.removeItem('orderInfo');
+            this.$store.state.orderInfo = '';
+            localStorage.removeItem('userInfo');
+            this.$store.state.userInfo = '';
+
           if(!this.form.account || !this.form.pwd){
               return this.$message.error("请输入正确账号和密码");
           }
@@ -47,35 +47,13 @@ export default {
                 "username": this.form.account,
           }
 
-
-            let config = {
-                headers: { "Content-Type": "application/json;charset=UTF-8"}   
-            };
-
-        //     axios.post(this.baseUrl+"/loginByPassword", data, config).then((res)=>{
-        //       if(res.code == 200){
-
-        //         localStorage.setItem("token", res.data);
-        //         console.log(localStorage);
-        //             this.$router.replace({  //核心语句
-        //                 path:'/index',   //跳转的路径
-        //                 // query:{           //路由传参时push和query搭配使用 ，作用时传递参数
-        //                 //     token:res.data
-        //                 // }
-        //             })
-        //       }
-        //   });
-
           this.$post("post",this.baseUrl+"/loginByPassword",data).then((res)=>{
               if(res.code == 200){
-                  localStorage.setItem("token", res.data);
-                  console.log(localStorage);
-                     this.$router.replace({  //核心语句
-                        path:'/index',   //跳转的路径
-                        // query:{           //路由传参时push和query搭配使用 ，作用时传递参数
-                        //     token:res.data
-                        // }
-                    })
+                localStorage.setItem("token", res.data);
+                console.log(localStorage);
+                this.$router.replace({  //核心语句
+                    path:'/index',   //跳转的路
+                })
               }
           });
        

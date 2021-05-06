@@ -47,11 +47,28 @@ export default {
             }
         })  
       }
-      if(id==5 || id==6){
-        this.$message({
-          message: '该功能正在开发，敬请期待哦！',
-          type: 'warning'
-        });
+      if(id==5){
+        this.$router.push({  
+          path: '/index/downOrderColor',   
+          name: 'downOrderColor',  
+          query: {  
+            name:name,
+            id:id
+          }
+        })  
+
+        return false
+      }
+
+      if(id==6){
+        this.$router.push({  
+          path: '/index/downOrderCraft',   
+          name: 'downOrderCraft',  
+          query: {  
+            name:name,
+            id:id
+          }
+        })  
 
         return false
       }

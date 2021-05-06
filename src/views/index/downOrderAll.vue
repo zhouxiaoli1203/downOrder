@@ -60,7 +60,7 @@
                     </el-form-item>
                     <el-form-item label="产品数量" :prop="`skuInfos.${index}.num`" :rules="skuInfosGroupRules.infonum">
                       <el-col :span="4" class="num">
-                        <el-input v-model="item.num"></el-input>
+                        <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
                       </el-col>
                     </el-form-item>
                   </el-col>
@@ -338,7 +338,8 @@
 </template>
 
 <script>
-import AddressParse from 'address-parse';
+// import AddressParse from 'address-parse';
+import AddressParse from 'zh-address-parse'
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
   name: 'downOrder',
@@ -691,21 +692,19 @@ export default {
 
       this.pasteAddress(this.orderForm.textarea)
     },
-    pasteAddress(val){
+
+     pasteAddress(val){
       let { orderForm } = this
-      const [result, ...results] = AddressParse.parse(val, true);
-
-      // console.log(result);
-      // console.log(results)
-
+      // const [result, ...results] = AddressParse.parse(val, true);
+      const result = AddressParse(val)
+      
       let info = result
-      console.log(info)
       if(info==undefined){
         return false
       }
       
       orderForm.receiptName = info.name //姓名
-      orderForm.receiptMobile = info.mobile //手机号
+      orderForm.receiptMobile = info.phone //手机号
 
       if(orderForm.deliveryType!=3){
         let provCode
@@ -714,22 +713,32 @@ export default {
         
         if(info.province){
           let prov = TextToCode[info.province]
-          provCode = prov.code
+          if (prov) {
+            provCode = prov.code
+          }
         }
 
         if (info.city) {
-          let city = TextToCode[info.province] [info.city]
-          cityCode = city.code
+          if(info.city==info.province){
+            let city = TextToCode[info.province] ['市辖区']
+            cityCode = city.code
+          }else{
+            let city = TextToCode[info.province] [info.city]
+            cityCode = city.code
+          }
         }
 
         if (info.area) {
-          let dist = TextToCode[info.province] [info.city] [info.area]
-          distCode = dist.code   
+          if(info.city==info.province){
+            let dist = TextToCode[info.province] ['市辖区'] [info.area]
+            distCode = dist.code  
+          }else{
+            let dist = TextToCode[info.province] [info.city] [info.area]
+            distCode = dist.code  
+          }
         }
-        
         orderForm.receiptAddress = [provCode, cityCode, distCode]  //收货人的地址 （省＋市＋区） //这是是省市区的码
         orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
-
         orderForm.receiptDetailAddress = info.details //收货人详情地址
       }
 
@@ -739,6 +748,7 @@ export default {
 
 
     },
+   
     // 下一步
     next() {this.active++},
     // 点击面包屑
@@ -958,6 +968,10 @@ export default {
           });
         }
       })
+    },
+    // 数量计步器
+    handleChange(value,index) {
+      this.orderForm.skuInfos[index].num=value
     }
     
   },

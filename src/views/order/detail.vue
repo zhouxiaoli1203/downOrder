@@ -3,8 +3,9 @@
     <div class="center" v-if="info">
         <div class="crumbsHeader">
             <div class="crumbs">
-              <span @click="pathIndex()">我的订单 / </span>
-              <span>{{crumbsName}}</span>
+                <i class="el-icon-back" @click="pathIndex()"></i>
+                <span @click="pathIndex()">我的订单&nbsp/</span>
+                <span style="flex:1">&nbsp{{crumbsName}}</span>
           </div>
         </div>
         <div class="orderinfoBox">
@@ -28,7 +29,6 @@
                         <span class="lable">订单状态</span>
                         <div class="info">
                             <p >{{info.status | yhc_status}} <span v-if="info.status==5">（{{info.expressCompanyName}}）</span></p>
-                            
                             <el-tooltip class="item" effect="dark" :content="info.operationLogs[0].remark" placement="left-end" v-if="info.status==1 && info.operationLogs[0].remark!=null">
                                 <img :src="tips" alt="" >
                             </el-tooltip>
@@ -51,6 +51,12 @@
                         <span class="lable">订单类型</span>
                         <div class="info">
                             <p>{{info.orderAttr.goodsName}}</p>
+                        </div>
+                    </li>
+                    <li v-if="info.status==5">
+                        <span class="lable">物流单号</span>
+                        <div class="info">
+                            <input type="text" readonly  v-model="info.expressCode" class="p">
                         </div>
                     </li>
                 </ul>
@@ -83,6 +89,12 @@
                         <span class="lable">产品颜色{{index+1}}</span>
                         <div class="info">
                             <p>{{item.attributes.fontColor}}</p>
+                        </div>
+                    </li>
+                    <li v-if="JSON.stringify(item.attributes.crafts)!='{}'">
+                        <span class="lable">产品工艺{{index+1}}</span>
+                        <div class="info">
+                            <p>{{item.num}}</p>
                         </div>
                     </li>
                     <li class="remarkBox">

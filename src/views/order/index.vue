@@ -101,7 +101,7 @@
             :current-page.sync="orderInfo.pageNum"
             @current-change="handleCurrentChange"
             layout="prev, pager, next"
-            :page-size="15"
+            :page-size="20"
             :total="total">
           </el-pagination>
         </div>
@@ -121,7 +121,7 @@ export default {
       noOrder:require('../../assets/img/noOrder.png'),
       listGoodAndSkus:[], //订单类型
       total:0,
-      pageSize:15, //每页多少条
+      pageSize:20, //每页多少条
       orderInfo:{
         timeValue:"", //时间范围选择
         pageNum:1, //页码
@@ -138,7 +138,6 @@ export default {
   },
   components: {},
   created() {
-    console.log(380)
     this.listGoodAndSku();
     let {pageSize,orderInfo} = this
 
@@ -451,7 +450,8 @@ export default {
         }
       }
       .content {
-        margin: 8px 0 28px;
+        margin: 8px 0 0;
+        height: 63px;
         p {
           font-size: 12px;
           color: #abaebb;

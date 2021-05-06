@@ -59,6 +59,14 @@
 .crumbsHeader{
     margin-bottom: 24px;
     .crumbs{
+        display: flex;
+        align-items: center;
+        .el-icon-back{
+            font-size: 24px;
+            color: #666;
+            margin-right: 10px;
+            cursor: pointer;
+        }
         span{
             cursor: pointer;
         }    
@@ -119,7 +127,20 @@
         line-height: normal;
         margin: 0;
     }
+
+    .el-input-number{
+        width: 145px;
+    }
+    .el-input-number__decrease, .el-input-number__increase{
+        width: 38px;
+    }
     
+}
+
+.orderTitle{
+    .el-input__inner{
+        padding-right: 70px;
+    }
 }
 
 //工艺

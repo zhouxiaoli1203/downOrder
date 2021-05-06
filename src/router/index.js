@@ -44,6 +44,11 @@ export default new Router({
           component: () => import('@/views/index/downOrderAll.vue'),   //通用
         },
         {
+          path: '/index/downOrderColor',
+          name: 'downOrderColor',
+          component: () => import('@/views/index/downOrderColor.vue'), //彩色条幅
+        },
+        {
           path: '/index/downOrderCraft',
           name: 'downOrderCraft',
           component: () => import('@/views/index/downOrderCraft.vue'), //彩色条幅 旗帜
