@@ -21,10 +21,10 @@
             </div>
           </div>
         </div> -->
-        <!-- <div class="img cursor_p">
+        <div class="img cursor_p">
           <img :src="headNoctice" alt="">
           <span>40</span>
-        </div> -->
+        </div>
         <div class="info">
           <p @click="passwordPorp = true">{{info.nickname}} &nbsp/</p>
           <span class="cursor_p" @click="loginOut">&nbsp退出</span>

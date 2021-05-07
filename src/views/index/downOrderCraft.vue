@@ -2,7 +2,7 @@
   <div class="connonBg main">
        <div class="crumbsHeader">
             <div class="crumbs">
-              <span @click="pathIndex()">订单提交 / </span>
+              <span @click="pathIndex()">订单提交&nbsp/&nbsp</span>
               <span>{{crumbsName}}</span>
           </div>
         </div>
@@ -30,8 +30,8 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
-                     <el-form-item label="材料选择" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" class="pubilcRadio">
-                      <el-radio-group v-model="item.fontColor" size="medium">
+                     <el-form-item label="材料选择" :prop="`skuInfos.${index}.paper`" :rules="skuInfosGroupRules.infofontPaper" class="pubilcRadio">
+                      <el-radio-group v-model="item.paper" size="medium">
                         <el-radio border label="双透彩旗">双透彩旗</el-radio>
                         <el-radio border label="贡缎布">贡缎布</el-radio>
                       </el-radio-group>
@@ -46,14 +46,7 @@
                         <el-col class="line" :span="2">X</el-col>
                         <el-col :span="8" class="inputSelect">
                           <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
-                             <el-select v-model="item.height" placeholder="请选择">
-                              <el-option
-                                v-for="item in restaurants"
-                                :key="item.value"
-                                :label="item.name"
-                                :value="item.value">
-                              </el-option>
-                            </el-select>
+                            <el-input v-model="item.height" placeholder="宽度（m）"></el-input>
                           </el-form-item>
                         </el-col>
                       </el-row>
@@ -66,25 +59,24 @@
                       </el-row>
                     </el-form-item>
                     
-
-                    <el-form-item label="产品工艺"  class="productCraft">
-                      <el-radio-group v-model="item.gongyi" @change="craftsChange($event,index)">
+                    <el-form-item label="产品工艺"  class="productCraft gongyiProduct" :prop="`skuInfos.${index}.gongyi`" :rules="skuInfosGroupRules.infoGongyi">
+                      <el-radio-group v-model="item.gongyi">
                         <div class="li">
-                          <el-radio label="缝筒">缝筒</el-radio>
-                          <el-select v-model="item.diaoerVal" placeholder="类型" @change="craftsName($event,index,'缝筒')">
-                            <el-option
-                              v-for="item in fengtongOptions"
-                              :key="item"
-                              :label="item"
-                              :value="item">
-                            </el-option>
-                          </el-select>
+                          <el-radio label="缝筒" @click.native.prevent='handleCancel("缝筒",index)'>缝筒</el-radio>
+                            <el-select v-model="item.fengtongVal" placeholder="类型" @change="craftsName($event,index,'缝筒')">
+                              <el-option
+                                v-for="item in fengtongOptions"
+                                :key="item"
+                                :label="item"
+                                :value="item">
+                              </el-option>
+                            </el-select>
                         </div>
-                        <div class="li"><el-radio label="裁净边">裁净边</el-radio></div>
+                        <div class="li"><el-radio label="裁净边" @click.native.prevent='handleCancel("裁净边",index)'>裁净边</el-radio></div>
                       </el-radio-group>
                     </el-form-item>
 
-                    <el-form-item label="产品数量" :prop="`skuInfos.${index}.num`" :rules="skuInfosGroupRules.infonum">
+                    <el-form-item label="产品数量" >
                       <el-col :span="4" class="num">
                         <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
                       </el-col>
@@ -262,9 +254,7 @@
           </div>
         </section>
       </div>
-    
- 
-
+  
      <!-- 确认订单弹框 -->
       <section class="orderTruePorp publicPorp" v-show="orderTruePorp">
         <h3>商品详情</h3>
@@ -275,17 +265,23 @@
               <span class="titname">{{item.name}}</span>
             </div>
           </li>
-          <!-- <li>
-            <span class="tit">字体颜色</span>
+          <li>
+            <span class="tit">材料选择</span>
             <div class="info">
-              <span class="name">{{item.fontColor}}</span>
+              <span class="name">{{item.paper}}</span>
             </div>
-          </li> -->
+          </li>
           <li>
             <span class="tit">产品尺寸</span>
             <div class="info">
               <span class="name">长度{{item.width}}m*宽度{{item.height}}m</span>
               <p>{{item.remark}}</p>
+            </div>
+          </li>
+          <li v-if="JSON.stringify(item.crafts)!='{}'">
+            <span class="tit">产品工艺</span>
+            <div class="info">
+              <span class="name">{{item.crafts | yhc_toObj }}</span>
             </div>
           </li>
           <li>
@@ -328,7 +324,7 @@
             </div>
           </li>
           <template  v-if="orderForm.deliveryType!=3">
-            <li>
+            <li v-if="orderForm.waybillCodeName!=''">
               <span class="tit">物流公司</span>
               <div class="info">
                 <span class="name">{{orderForm.waybillCodeName}}</span>
@@ -364,7 +360,6 @@
 </template>
 
 <script>
-// import AddressParse from 'address-parse';
 import AddressParse from 'zh-address-parse'
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
@@ -381,11 +376,6 @@ export default {
           }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
             callback(new Error('尺寸必须为数字类型'));
           }else{
-            
-            if(Number(value)>380){
-              callback(new Error(' 长度最长380m'));
-            }
-
             if(value % 1 === 0){
               callback();
             }else{
@@ -404,27 +394,6 @@ export default {
         callback(new Error('请输入尺寸'));
       }
     };
-    var numRule = (rule,value,callback) => {
-      if(value){
-        console.log(value)
-        value = String(value)
-        let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
-        let num = Number(values)  //将字符串转换为数
-        if(isNaN(num)){  //判断是否是非数字
-          callback(new Error('数量必须为数字'));
-        }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
-          callback(new Error('数量必须为数字类型'));
-        }else{
-          if(value>0){
-            callback();
-          }else{
-            callback(new Error('数量必须大于0'));
-          }
-        }
-      }else{
-        callback(new Error('请输入数量'));
-      }
-    };
     var receiptMobileRule = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入联系人电话'));
@@ -438,6 +407,19 @@ export default {
         callback();        
       }
     };
+    var infoGongyiRule = (rule, value, callback) => {
+      let index = rule.field.split('.')[1]
+      if (value=='缝筒') {
+        let txt = this.orderForm.skuInfos[Number(index)].fengtongVal
+        console.log(txt);
+        if(txt==''){
+          callback(new Error('请选择类型'));
+        } 
+        callback();   
+      }else{
+        callback();   
+      }
+    }
     return {
       radio:'1',
       active: 1,
@@ -445,24 +427,7 @@ export default {
       CodeToText,
       crumbsName:'',
       orderForm:{
-        skuInfos:[
-          {
-              productCode:'',
-              // fontColor:'白色',
-              height: '',
-              num: 1,
-              remark: '',
-              width: '',
-              crafts:{},
-              name:'',
-              gongyi:'', 
-              dakouVal:'',
-              diaoerVal:'',
-              mingcheng:'',
-              craftsType:'',
-            }
-        ],
-        
+        skuInfos:[],
         title:'',
         source:'4', //订单来源，
         sourceDisabled:false,
@@ -507,11 +472,11 @@ export default {
       },
       skuInfosGroupRules: {
         infoname: [{required: true,  message: '请上传文件',  trigger: 'blur'}],
-        infofontColor: [{required: true,message: '请选择材料',}],
+        infofontPaper: [{required: true,message: '请选择材料',}],
         infowidth: [{required: true,  validator: widthHeight,  trigger: 'change'}],
         infoheight: [{required: true, validator: widthHeight, trigger: 'change'}],
         inforemark: [{required: true, message: '请输入订单具体信息', trigger: 'blur'}],
-        infonum: [{required: true, validator: numRule, trigger: 'blur'}],
+        infoGongyi:[{validator: infoGongyiRule,  trigger: 'change'}]
       },
       delImg:require('../../assets/img/delImg.png'),
       file:require('../../assets/img/file.png'),
@@ -531,20 +496,6 @@ export default {
       orderId:0,
       typesName:0,
       shibieqiPorp:false,
-      restaurants: [
-        {
-          value:'0.5',
-          name:'0.5米 (实际0.45米)'
-        },
-        {
-          value:'0.7',
-          name:' 0.7米 (实际0.65米)'
-        },
-        {
-          value:'0.9',
-          name:' 0.9米 (实际0.85米)'
-        }
-      ],
       skuIdUrl:'',
       fengtongOptions:['左缝筒','上缝筒','右缝筒','左右缝筒','上下缝筒','上缝筒左缝吊耳'],
     }
@@ -557,8 +508,6 @@ export default {
     this.crumbsName = this.$route.query.name
     this.typesName = this.$route.query.type  //  0再来一单，1编辑订单
     this.skuIdUrl = 'https://api.gundongyongheng.com/new/?act=get&id='+ this.$route.query.id
-
- 
   },
   mounted(){
     // 拖拽上传文件
@@ -584,45 +533,34 @@ export default {
     }
   },
   methods:{
-    craftsChange(val,index){
-      console.log(val);
-      console.log(index);
-      let { orderForm} = this
-      orderForm.skuInfos[index].crafts = {}
-      orderForm.skuInfos[index].gongyi = val 
-      orderForm.skuInfos[index].craftsType = val //点击的是那个单选框
-
-      let name
-
-      if(val=='打扣'){
-        name = orderForm.skuInfos[index].dakouVal 
-      }
-
-      if(val=='缝吊耳'){
-        name = orderForm.skuInfos[index].diaoerVal 
-      }
-
-      orderForm.skuInfos[index].crafts[val] = name?name:null
-
-
-    },
     craftsName(val,index,lab){
+      console.log(val);
       let { orderForm } = this
       let name = orderForm.skuInfos[index].gongyi //单选的名称
       let valname
-      if(lab=='打扣'){
-        valname = orderForm.skuInfos[index].dakouVal 
+      if(lab=='缝筒'){
+        valname = orderForm.skuInfos[index].fengtongVal 
       }
-      if(lab=='缝吊耳'){
-        valname = orderForm.skuInfos[index].diaoerVal 
-      }
-      if(name){
+      if(name == lab){
         orderForm.skuInfos[index].crafts[name] = valname
       }
-      
     },
-    handleSelect(item) {
-      console.log(item,'----------------------');
+    // 取消单选
+    handleCancel(val,index){
+
+      let { orderForm} = this
+      orderForm.skuInfos[index].crafts = {}
+      orderForm.skuInfos[index].gongyi = val == orderForm.skuInfos[index].gongyi ? '' : val
+      let tit = orderForm.skuInfos[index].gongyi
+      if(tit){
+        let name
+        if(val=='缝筒'){
+          name = orderForm.skuInfos[index].fengtongVal 
+        }
+        orderForm.skuInfos[index].crafts[val] = name?name:null
+      }
+
+
     },
     // 获取物流
     listExpressCompany(){
@@ -635,17 +573,20 @@ export default {
             this.orderId = dingdanid
             this.getByIdInfo(dingdanid) // 获取订单的信息
           }else{
-            // this.orderForm.skuInfos.push(
-            //   {
-            //     productCode:'',
-            //     // fontColor:'',
-            //     height: '',
-            //     num: 1,
-            //     remark: '',
-            //     width: '',
-            //     name:'',
-            //   }
-            // );
+            this.orderForm.skuInfos.push(
+              {
+                productCode:'',
+                height: '',
+                num: 1,
+                remark: '',
+                width: '',
+                crafts:{},
+                name:'',
+                gongyi:'', 
+                fengtongVal:'',
+                paper:'',
+              }
+            );
           }
         }
        
@@ -662,13 +603,27 @@ export default {
             data.orderSkus.forEach((item,index)=>{
               let info ={
                 productCode:item.attributes.productCode,
-                // fontColor:item.attributes.fontColor,
+                paper:item.attributes.paper,
                 height:item.attributes.height/1000,
                 num:item.num,
                 remark:item.attributes.remark,
                 width:item.attributes.width/1000,
                 name:item.attributes.productName,//文件的名字
+                crafts:item.attributes.crafts
               }
+
+              let crafts = item.attributes.crafts
+              for(let i in crafts){
+                console.log(i)
+                console.log(crafts[i]);
+
+                info['gongyi'] = i
+
+                if(i=='缝筒'){
+                  info['fengtongVal'] = crafts[i]
+                }
+              }
+
               orderForm.skuInfos.push(info)
             })
 
@@ -697,9 +652,23 @@ export default {
             orderForm.deliveryType = data.orderAttr.deliveryType //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
             if(deliveryType==1){
               orderForm.deliveryTypeName = '邮寄'
+
+              let wuliuCode = data.orderAttr.waybillCode
+              orderForm.waybillCode = wuliuCode// 物流的code
+              console.log(this.wuliuList)
+              this.wuliuList.forEach((item,index)=>{
+                if(wuliuCode==item.code){
+                  console.log(item.name)
+                   orderForm.waybillCodeName= item.name   // 物流的名字
+                }
+              })
+
             }
             if(deliveryType==2){
               orderForm.deliveryTypeName = '同城配送'
+
+              orderForm.waybillCode='' // 物流的code
+              orderForm.waybillCodeName='' // 物流的名字
             }
             if(deliveryType==3){
               orderForm.deliveryTypeName = '自提'  
@@ -716,15 +685,7 @@ export default {
 
             }else{
               orderForm.sourceDisabled = false
-              let wuliuCode = data.orderAttr.waybillCode
-              orderForm.waybillCode = wuliuCode// 物流的code
-              console.log(this.wuliuList)
-              this.wuliuList.forEach((item,index)=>{
-                if(wuliuCode==item.code){
-                  console.log(item.name)
-                   orderForm.waybillCodeName= item.name   // 物流的名字
-                }
-              })
+             
 
               orderForm.receiptDetailAddress = data.orderAttr.receiptDetailAddress// 详细地址
 
@@ -732,16 +693,34 @@ export default {
               var reg = /.+?(省|市|自治区|自治州|县|区)/g;
 
               let addressInfo  = dizhi.match(reg)
+              console.log(addressInfo);
 
               let prov = TextToCode[addressInfo[0]]
               let provCode = prov.code
+
+              let cityCode 
+              let distCode 
   
-              let city = TextToCode[addressInfo[0]] [addressInfo[1]]
-              let cityCode = city.code
+            
+
+              if(addressInfo[0]==addressInfo[1]){
+                let city = TextToCode[addressInfo[0]] ['市辖区']
+                cityCode = city.code
+
+                let dist = TextToCode[addressInfo[0]] ['市辖区'] [addressInfo[2]]
+                distCode = dist.code
+
+
+              }else{
+                let city = TextToCode[addressInfo[0]] [addressInfo[1]]
+                cityCode = city.code
+
+                let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
+                distCode = dist.code
+              }
     
 
-              let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
-              let distCode = dist.code
+             
   
               orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
               
@@ -837,7 +816,7 @@ export default {
         }
         orderForm.receiptAddress = [provCode, cityCode, distCode]  //收货人的地址 （省＋市＋区） //这是是省市区的码
         orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
-        orderForm.receiptDetailAddress = info.details //收货人详情地址
+        orderForm.receiptDetailAddress = info.detail //收货人详情地址
       }
 
       this.publicPorp=false
@@ -900,9 +879,13 @@ export default {
     deliveryTypeChange(val){
       if(val==1){
         this.orderForm.deliveryTypeName = '邮寄'
+        this.orderForm.waybillCode='STO' // 物流的code
+        this.orderForm.waybillCodeName='申通快递' // 物流的名字
       }
       if(val==2){
         this.orderForm.deliveryTypeName = '同城配送'
+        this.orderForm.waybillCode='' // 物流的code
+        this.orderForm.waybillCodeName='' // 物流的名字
       }
       if(val==3){
         this.orderForm.deliveryTypeName = '自提'  
@@ -921,8 +904,7 @@ export default {
 
 
       }else{
-        this.orderForm.waybillCode='STO' // 物流的code
-        this.orderForm.waybillCodeName='申通快递' // 物流的名字
+       
         this.orderForm.pickUpAddress = '' //自提地址 
         this.pasteAddress(this.orderForm.textarea)
         this.orderForm.sourceDisabled = false
@@ -941,27 +923,21 @@ export default {
     addLadder(){
       this.orderForm.skuInfos.push(
         {
-              productCode:'',
-              // fontColor:'白色',
-              height: '',
-              num: 1,
-              remark: '',
-              width: '',
-              crafts:{},
-              name:'',
-              gongyi:'', 
-              dakouVal:'',
-              diaoerVal:'',
-              mingcheng:'',
-              craftsType:'',
-            }
+          productCode:'',
+          height: '',
+          num: 1,
+          remark: '',
+          width: '',
+          crafts:{},
+          name:'',
+          gongyi:'', 
+          fengtongVal:'',
+          paper:'',
+        }
       );
     },
     // 订单提交验证
     submitForm(formName){
-       this.orderTruePorp = true
-          this.publicPorp = true//遮罩层
-      console.log(formName)
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
           this.orderTruePorp = true
@@ -977,12 +953,15 @@ export default {
         this.orderForm.skuInfos = [
           {
             productCode:'',
-            // fontColor:'',
             height: '',
             num: 1,
             remark: '',
             width: '',
+            crafts:{},
             name:'',
+            gongyi:'', 
+            fengtongVal:'',
+            paper:'',
           }
         ];
         this.orderForm.deliveryType = '1'//如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
@@ -1028,28 +1007,10 @@ export default {
     // 订单确定弹框提交
     submitOrder(){
       let { orderForm,customerId,skuId,orderId,typesName } = this
-      let skuInfosList =[]
+      let skuInfosList = []
       orderForm.skuInfos.forEach((i,key)=>{
         console.log(i)
         console.log(key)
-        if(i.gongyi == '打扣' && i.dakouVal==''){
-          this.$message({
-            message: '请选择打扣的类型',
-            type: 'warning'
-          });
-
-          return false
-        }
-
-        if(i.gongyi == '缝吊耳' && i.diaoerVal==''){
-          this.$message({
-            message: '请选择缝吊耳的类型',
-            type: 'warning'
-          });
-
-          return false
-        }
-
         let info = {
           crafts:i.crafts,
           height:i.height*1000,
@@ -1057,6 +1018,7 @@ export default {
           num:i.num,
           productCode:i.productCode,
           remark:i.remark,
+          paper:i.paper
         }
         skuInfosList.push(info)
       })
@@ -1077,9 +1039,6 @@ export default {
       }
 
       console.log(data)
-
- 
-
       let url 
       if(typesName!=1){
         url = '/order/submit'

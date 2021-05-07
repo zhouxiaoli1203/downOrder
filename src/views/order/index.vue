@@ -56,35 +56,34 @@
       </div>
     </div>
 
-
       <section class="contBOX">
         <div class="table-content" v-if="orderList!=''">
           <ul class="list-items">
             <li class="list-card" v-for="item in orderList" @click="goDetail(item.id,item.orderAttr.title)">
               <div class="head">
-                <h3 :title="item.orderAttr.title">{{item.orderAttr.title}}</h3>
-                <span class="yixiadan" v-if="item.status==0">认领中</span>
-                <span class="yixiadan" v-if="item.status==1" style="color:#FF8F1C">已驳回</span>
-                <span class="yixiadan" v-if="item.status==2">待生产</span>
-                <span class="yixiadan" v-if="item.status==3">生产中</span>
-                <span class="yixiadan" v-if="item.status==4">生产完成</span>
-                <span class="yixiadan" v-if="item.status==5" style="color:#3551DF">已发货</span>
-                <span class="yixiadan" v-if="item.status==6" style="color:#394250">退单中</span>
-                <span class="yixiadan" v-if="item.status==7" style="color:#394250">已退单</span>
-                <span class="yixiadan" v-if="item.status==8" style="color:#FF3333">请求返厂</span>
-                <span class="yixiadan" v-if="item.status==9" style="color:#FF3333">返厂中</span>
+                <p>创建：{{item.createTime}}</p>
+                <span class="yixiadan" :class='{"0":"spanBluehui","1":"spanOrange","2":"spanBluehui","3":"spanBluehui","4":"spanBluehui","5":"spanBlue","6":"spanRed","7":"spanGray","8":"spanRed","9":"spanRed"}[item.status]'>{{item.status | yhc_status}}</span>
               </div>
               <div class="content">
-                <p>创建：{{item.createTime}}</p>
-                <p v-if="item.deliveryTime!=null">发货：{{item.deliveryTime}}</p>
+                <h3 :title="item.orderAttr.title">{{item.orderAttr.title}}</h3>
+                <p v-if="item.deliveryTime!=null">
+                  <img src="@/assets/img/fahuo.png" alt="">
+                  发货：{{item.deliveryTime}}
+                </p>
               </div>
               <div class="footer">
-                <span class="fl status red" v-if="item.orderAttr.goodsName=='条幅'">{{item.orderAttr.goodsName}}</span>
-                <span class="fl status blue" v-if="item.orderAttr.goodsName=='打印'">{{item.orderAttr.goodsName}}</span>
-                <span class="fl status blue" v-if="item.orderAttr.goodsName=='通用'">{{item.orderAttr.goodsName}}</span>
-                <span class="fr icon">
-                  <i class="el-icon-arrow-right"></i>
-                </span>
+                <div class="xinxi">
+                  <span class="fl status red" v-if="item.orderAttr.goodsName=='条幅'">{{item.orderAttr.goodsName}}</span>
+                  <span class="fl status blue" v-if="item.orderAttr.goodsName=='打印'">{{item.orderAttr.goodsName}}</span>
+                  <span class="fl status bluehui" v-if="item.orderAttr.goodsName=='通用'">{{item.orderAttr.goodsName}}</span>
+                  <span class="fl status oranges" v-if="item.orderAttr.goodsName=='旗帜'">{{item.orderAttr.goodsName}}</span>
+                  <p class="chicun">{{(item.orderSkus[0].attributes.width/1000)}}*{{(item.orderSkus[0].attributes.height/1000)}}m</p>
+                  <p class="yanse" v-if="item.orderSkus[0].attributes.fontColor!=undefined">{{item.orderSkus[0].attributes.fontColor}}</p>
+                </div>
+                <div class="gouwuche" v-if="item.orderSkus.length>1">
+                  <img src="@/assets/img/gouwuche.png" alt="">
+                  <span>{{item.orderSkus.length}}</span>
+                </div>
               </div>
             </li>
           </ul>
@@ -425,8 +424,8 @@ export default {
     justify-content: flex-start;
     flex-wrap: wrap;
     .list-card {
-      width: 274px;
-      height: 149px;
+      width: 360px;
+      height: 210px;
       background: #ffffff;
       border-radius: 10px;
       padding: 16px 12px;
@@ -436,42 +435,120 @@ export default {
       .head {
         display: flex;
         justify-content: space-between;
-        h3 {
-          font-size: 16px;
-          font-weight: 500;
-          color: #333;
-          display: block;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          -webkit-box-flex: 1;
-          flex: 1;
-          margin-right: 15px;
+        align-items: center;
+        border-bottom: 1px solid #F0F0F0;
+        padding-bottom: 16px;
+
+        span{
+          color: #fff;
+          text-align: center;
+          line-height: 24px;
+          width: 58px;
+          height: 24px;
+          border-radius: 4px;
+        }
+
+        .spanBlue{
+          background: #3551DF;
+        }
+        .spanOrange{
+          background:#FF8F1C;
+        }
+
+        .spanBluehui{
+          background:#35A3DF;
+        }
+
+        .spanRed{
+          background:#FF3333;
+        }
+
+        .spanGray{
+          background:#D3D3D3;;
         }
       }
       .content {
         margin: 8px 0 0;
-        height: 63px;
+        height: 96px;
+
+        h3 {
+          font-weight: 500;
+          color: #333;
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          line-height: 20px;
+          margin-right: 15px;
+          margin-bottom: 16px;
+        }
+
         p {
-          font-size: 12px;
-          color: #abaebb;
+          color: #3551DF;
           line-height: 17px;
+          display: flex;
+          align-items: center;
+
+          img{
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+          }
         }
       }
       .footer {
         clear: both;
-        overflow: hidden;
-        i{
-          font-size: 20px;
-          color: #999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .xinxi{
+          display: flex;
+          align-items: center;
+
+          .chicun{
+            height: 25px;
+            background-color: rgba(53, 81, 223, 0.04);
+            color: #3551df;
+            border-radius: 4px;
+            line-height: 25px;
+            padding: 0 8px;
+            margin: 0 16px;
+          }
+          .yanse{
+            height: 25px;
+            background-color: rgba(53, 81, 223, 0.04);
+            color: #3551df;
+            border-radius: 4px;
+            line-height: 25px;
+            padding: 0 8px;
+          }
+        }
+        .gouwuche{
+          width: 25px;
+          height: 25px;
+          position: relative;
+          img{
+            width: 100%;
+            height: 100%;
+          }
+          span{
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff3333;
+            color: #fff;
+            text-align: center;
+            line-height: 16px;
+            font-size: 12px;
+          }
         }
       }
-    }
-    .yixiadan{
-        color:#35A3DF;
-    }
-    .yipohui{
-        color:#FF8F1C;
     }
     .status{
       width: 64px;
@@ -482,6 +559,14 @@ export default {
         &.blue{
             color:#3A65FF;
             background-color:rgba(58,101,255,0.09);
+        }
+        &.bluehui{
+            color:#369DFF;
+            background-color:rgba(54,157,255,0.04);
+        }
+        &.oranges{
+            color:#C99512;
+            background-color:rgba(209,149,18,0.04);
         }
         &.red{
             color:#FF3333;

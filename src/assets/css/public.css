@@ -142,6 +142,13 @@
 .productCraft .el-radio {
   margin-right: 0;
 }
+.gongyiProduct .el-form-item__error {
+  left: 69px !important;
+}
+.gongyiProduct .ul {
+  display: flex;
+  align-items: center;
+}
 .deliveryType .el-radio.is-bordered {
   background: #F0F0F0;
 }

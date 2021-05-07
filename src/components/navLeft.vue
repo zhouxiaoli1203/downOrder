@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="navLeft">
-        <h2>兀兔印刷订单系统</h2>
+        <h2>兀兔印刷下单系统</h2>
         <div class="navMenu">
           <el-menu
             :default-active="activeIndex"

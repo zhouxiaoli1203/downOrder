@@ -85,16 +85,22 @@
                             <p>{{item.num}}</p>
                         </div>
                     </li>
-                     <li v-if="item.skuId==2">
+                    <li v-if="item.skuId==2">
                         <span class="lable">产品颜色{{index+1}}</span>
                         <div class="info">
                             <p>{{item.attributes.fontColor}}</p>
                         </div>
                     </li>
-                    <li v-if="JSON.stringify(item.attributes.crafts)!='{}'">
+                    <li v-if="item.attributes.paper">
+                        <span class="lable">产品材料{{index+1}}</span>
+                        <div class="info">
+                            <p>{{item.attributes.paper}}</p>
+                        </div>
+                    </li>
+                    <li v-if="JSON.stringify(item.attributes.crafts)!='{}' && item.attributes.crafts!=undefined">
                         <span class="lable">产品工艺{{index+1}}</span>
                         <div class="info">
-                            <p>{{item.num}}</p>
+                            <p>{{item.attributes.crafts | yhc_toObj }}</p>
                         </div>
                     </li>
                     <li class="remarkBox">
@@ -291,6 +297,12 @@ export default {
             if(id==7){
                 path='/index/downOrderAll'
             }
+            if(id==5){
+                path='/index/downOrderColor'
+            }
+            if(id==6){
+                path='/index/downOrderCraft'
+            }
             this.$router.push({
                 path: path, //跳转的路径
                 query: {
@@ -311,6 +323,12 @@ export default {
             }
             if(id==7){
                 path='/index/downOrderAll'
+            }
+            if(id==5){
+                path='/index/downOrderColor'
+            }
+            if(id==6){
+                path='/index/downOrderCraft'
             }
             this.$router.push({
                 path: path, //跳转的路径

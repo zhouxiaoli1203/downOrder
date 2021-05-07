@@ -2,7 +2,7 @@
   <div class="connonBg main">
        <div class="crumbsHeader">
             <div class="crumbs">
-              <span @click="pathIndex()">订单提交 / </span>
+              <span @click="pathIndex()">订单提交&nbsp/&nbsp</span>
               <span>{{crumbsName}}</span>
           </div>
         </div>
@@ -30,12 +30,6 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
-                    <!-- <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" >
-                      <el-radio-group v-model="item.fontColor" size="medium">
-                        <el-radio border label="白色">白色</el-radio>
-                        <el-radio border label="黄色">黄色</el-radio>
-                      </el-radio-group>
-                    </el-form-item> -->
                     <el-form-item label="产品尺寸" required>
                       <el-row>
                         <el-col :span="8">
@@ -58,7 +52,7 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
-                    <el-form-item label="产品数量" :prop="`skuInfos.${index}.num`" :rules="skuInfosGroupRules.infonum">
+                    <el-form-item label="产品数量">
                       <el-col :span="4" class="num">
                         <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
                       </el-col>
@@ -70,11 +64,11 @@
                   <i class="el-icon-plus"></i>
                   <span>添加</span>
                 </div>           
-              <el-form-item label="订单标题" prop="title">
-                <el-input v-model="orderForm.title" placeholder="请输入订单标题"></el-input>
+              <el-form-item label="订单标题" prop="title" class="orderTitle">
+                <el-input v-model="orderForm.title" placeholder="请输入订单标题"  maxlength="200" show-word-limit></el-input>
               </el-form-item>
               <el-form-item label="订单来源" prop="source">
-                <el-select v-model="orderForm.source" placeholder="请选择订单来源" style="width:100%" @change="sourceChange">
+                <el-select v-model="orderForm.source" placeholder="请选择订单来源" style="width:100%" @change="sourceChange" :disabled="orderForm.sourceDisabled">
                   <el-option
                     v-for="item in cost.source"
                     :key="item.value"
@@ -94,13 +88,13 @@
                   <el-radio border v-for="item in cost.deliveryType" :label="item.value" :key="item.value">{{item.name}}</el-radio>
                 </el-radio-group>
               </el-form-item>
+              <el-form-item label="物流公司" prop="waybillCode" v-if="orderForm.deliveryType==1">
+                <el-select v-model="orderForm.waybillCode" placeholder="请选择物流公司" style="width:100%"  @change="waybillCodeChange">
+                  <el-option v-for="item in wuliuList" :key="item.value" :label="item.name" :value="item.code"></el-option>
+                </el-select>
+              </el-form-item>
               <el-row v-if="orderForm.deliveryType!=3">
                 <el-col>
-                  <el-form-item label="物流公司" prop="waybillCode">
-                    <el-select v-model="orderForm.waybillCode" placeholder="请选择物流公司" style="width:100%"  @change="waybillCodeChange">
-                      <el-option v-for="item in wuliuList" :key="item.value" :label="item.name" :value="item.code"></el-option>
-                    </el-select>
-                  </el-form-item>
                   <el-form-item label="地址信息" prop="receiptAddress">
                     <el-cascader class="width100"
                         v-model="orderForm.receiptAddress"
@@ -302,7 +296,7 @@
             </div>
           </li>
           <template  v-if="orderForm.deliveryType!=3">
-            <li>
+            <li v-if="orderForm.waybillCodeName!=''">
               <span class="tit">物流公司</span>
               <div class="info">
                 <span class="name">{{orderForm.waybillCodeName}}</span>
@@ -338,7 +332,6 @@
 </template>
 
 <script>
-// import AddressParse from 'address-parse';
 import AddressParse from 'zh-address-parse'
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
@@ -346,50 +339,32 @@ export default {
   data () {
     var widthHeight = (rule,value,callback) => {
       if(value){
-        value = String(value)
-        let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
-        let num = Number(values)  //将字符串转换为数
-        if(isNaN(num)){  //判断是否是非数字
-          callback(new Error('尺寸必须为数字'));
-        }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
-          callback(new Error('尺寸必须为数字类型'));
-        }else{
-
-          if(value % 1 === 0){
-            callback();
+        if(Number(value)>0){
+          value = String(value)
+          let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
+          let num = Number(values)  //将字符串转换为数
+          if(isNaN(num)){  //判断是否是非数字
+            callback(new Error('尺寸必须为数字'));
+          }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
+            callback(new Error('尺寸必须为数字类型'));
           }else{
-            let changdu = value.toString().split(".")[1].length
-
-            if(changdu>3){
-              callback(new Error('最多输入小数点后3位'));
-            }else{
+            if(value % 1 === 0){
               callback();
+            }else{
+              let changdu = value.toString().split(".")[1].length
+              if(changdu>3){
+                callback(new Error('最多输入小数点后3位'));
+              }else{
+                callback();
+              }
             }
+            callback();
           }
+        }else{
+          callback(new Error('尺寸必须大于0'));
         }
       }else{
         callback(new Error('请输入尺寸'));
-      }
-    };
-    var numRule = (rule,value,callback) => {
-      if(value){
-        console.log(value)
-        value = String(value)
-        let values = value.replace('/(^\s*)|(\s*$)','')  //去除字符串前后空格
-        let num = Number(values)  //将字符串转换为数
-        if(isNaN(num)){  //判断是否是非数字
-          callback(new Error('数量必须为数字'));
-        }else if(value === ''|| value === null){  //空字符串和null都会被当做数字
-          callback(new Error('数量必须为数字类型'));
-        }else{
-          if(value>0){
-            callback();
-          }else{
-            callback(new Error('数量必须大于0'));
-          }
-        }
-      }else{
-        callback(new Error('请输入数量'));
       }
     };
     var receiptMobileRule = (rule, value, callback) => {
@@ -413,20 +388,10 @@ export default {
       crumbsName:'',
       orderForm:{
         skuInfos:[],
-        //  skuInfos:[
-        //   {
-        //     productCode:'',
-        //     fontColor:'白色',
-        //     height:'',
-        //     num: 1,
-        //     remark: '',
-        //     width:'',
-        //     name:'',//文件的名字
-        //   }
-        // ],
         title:'',
-        source:'', //订单来源，
-        sourceName:'',
+        source:'4', //订单来源，
+        sourceDisabled:false,
+        sourceName:'线下',
         receiptName:'', //客户姓名
         receiptMobile:'',
         deliveryType:'1', //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
@@ -470,7 +435,6 @@ export default {
         infowidth: [{required: true,  validator: widthHeight,  trigger: 'blur'}],
         infoheight: [{required: true, validator: widthHeight, trigger: 'blur'}],
         inforemark: [{required: true, message: '请输入订单具体信息', trigger: 'blur'}],
-        infonum: [{required: true, validator: numRule, trigger: 'blur'}],
       },
       delImg:require('../../assets/img/delImg.png'),
       file:require('../../assets/img/file.png'),
@@ -597,11 +561,29 @@ export default {
             orderForm.receiptName = data.orderAttr.receiptName //客户姓名
             orderForm.receiptMobile = data.orderAttr.receiptMobile
             orderForm.deliveryType = data.orderAttr.deliveryType //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
+
             if(deliveryType==1){
+              
               orderForm.deliveryTypeName = '邮寄'
+
+              let wuliuCode = data.orderAttr.waybillCode
+              orderForm.waybillCode = wuliuCode// 物流的code
+              console.log(this.wuliuList)
+              this.wuliuList.forEach((item,index)=>{
+                if(wuliuCode==item.code){
+                  console.log(item.name)
+                   orderForm.waybillCodeName= item.name   // 物流的名字
+                }
+              })
+              
             }
             if(deliveryType==2){
               orderForm.deliveryTypeName = '同城配送'
+
+              orderForm.waybillCode='' // 物流的code
+              orderForm.waybillCodeName='' // 物流的名字
+
+
             }
             if(deliveryType==3){
               orderForm.deliveryTypeName = '自提'  
@@ -612,16 +594,15 @@ export default {
               orderForm.receiptAddress='' // 省市区码
               orderForm.Address='' // 省市区
               orderForm.pickUpAddress = data.orderAttr.pickUpAddress //自提地址 
+
+              orderForm.sourceDisabled = true
+
+
             }else{
-              let wuliuCode = data.orderAttr.waybillCode
-              orderForm.waybillCode = wuliuCode// 物流的code
-              console.log(this.wuliuList)
-              this.wuliuList.forEach((item,index)=>{
-                if(wuliuCode==item.code){
-                  console.log(item.name)
-                   orderForm.waybillCodeName= item.name   // 物流的名字
-                }
-              })
+
+              orderForm.sourceDisabled = false
+
+          
 
               orderForm.receiptDetailAddress = data.orderAttr.receiptDetailAddress// 详细地址
 
@@ -632,14 +613,29 @@ export default {
 
               let prov = TextToCode[addressInfo[0]]
               let provCode = prov.code
-  
-              let city = TextToCode[addressInfo[0]] [addressInfo[1]]
-              let cityCode = city.code
-    
 
-              let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
-              let distCode = dist.code
+              let cityCode 
+              let distCode 
   
+            
+
+              if(addressInfo[0]==addressInfo[1]){
+                let city = TextToCode[addressInfo[0]] ['市辖区']
+                cityCode = city.code
+
+                let dist = TextToCode[addressInfo[0]] ['市辖区'] [addressInfo[2]]
+                distCode = dist.code
+
+
+              }else{
+                let city = TextToCode[addressInfo[0]] [addressInfo[1]]
+                cityCode = city.code
+
+                let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
+                distCode = dist.code
+              }
+
+
               orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
               
               orderForm.Address = data.orderAttr.receiptAddress// 省市区
@@ -693,18 +689,15 @@ export default {
       this.pasteAddress(this.orderForm.textarea)
     },
 
-     pasteAddress(val){
+    pasteAddress(val){
       let { orderForm } = this
-      // const [result, ...results] = AddressParse.parse(val, true);
-      const result = AddressParse(val)
-      
-      let info = result
-      if(info==undefined){
+      const info = AddressParse(val)
+      console.log(info);
+      if(JSON.stringify(info)=='{}'){
         return false
       }
-      
-      orderForm.receiptName = info.name //姓名
-      orderForm.receiptMobile = info.phone //手机号
+      orderForm.receiptName = info.name?info.name:orderForm.receiptName //姓名
+      orderForm.receiptMobile = info.phone?info.phone:orderForm.receiptMobile //手机号
 
       if(orderForm.deliveryType!=3){
         let provCode
@@ -739,12 +732,11 @@ export default {
         }
         orderForm.receiptAddress = [provCode, cityCode, distCode]  //收货人的地址 （省＋市＋区） //这是是省市区的码
         orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
-        orderForm.receiptDetailAddress = info.details //收货人详情地址
+        orderForm.receiptDetailAddress = info.detail //收货人详情地址
       }
 
       this.publicPorp=false
       this.shibieqiPorp = false
-
 
 
     },
@@ -803,9 +795,13 @@ export default {
     deliveryTypeChange(val){
       if(val==1){
         this.orderForm.deliveryTypeName = '邮寄'
+        this.orderForm.waybillCode='STO' // 物流的code
+        this.orderForm.waybillCodeName='申通快递' // 物流的名字
       }
       if(val==2){
         this.orderForm.deliveryTypeName = '同城配送'
+        this.orderForm.waybillCode='' // 物流的code
+        this.orderForm.waybillCodeName='' // 物流的名字
       }
       if(val==3){
         this.orderForm.deliveryTypeName = '自提'  
@@ -817,11 +813,15 @@ export default {
         this.orderForm.receiptAddress='' // 省市区码
         this.orderForm.Address='' // 省市区码
 
+        this.orderForm.source = '4' //订单来源，
+        this.orderForm.sourceDisabled = true
+        this.orderForm.sourceName = '线下'
+
+
       }else{
-        this.orderForm.waybillCode='STO' // 物流的code
-        this.orderForm.waybillCodeName='申通快递' // 物流的名字
         this.orderForm.pickUpAddress = '' //自提地址 
         this.pasteAddress(this.orderForm.textarea)
+        this.orderForm.sourceDisabled = false
       }
 
     },
@@ -839,7 +839,6 @@ export default {
       this.orderForm.skuInfos.push(
         {
           productCode:'',
-          // fontColor:'白色',
           height: '',
           num: 1,
           remark: '',
@@ -866,7 +865,6 @@ export default {
         this.orderForm.skuInfos = [
           {
             productCode:'',
-            // fontColor:'白色',
             height: '',
             num: 1,
             remark: '',
@@ -879,6 +877,10 @@ export default {
         this.orderForm.waybillCode = 'STO' //物流公司
         this.orderForm.waybillCodeName = '申通快递'
         this.orderForm.textarea = ''
+
+        this.orderForm.source = '4' //订单来源，
+        this.orderForm.sourceDisabled = false
+        this.orderForm.sourceName = '线下'
       })
     },
     cityChange(val){ //选择收货地址

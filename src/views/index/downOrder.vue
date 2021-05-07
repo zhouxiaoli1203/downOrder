@@ -2,7 +2,7 @@
   <div class="connonBg main">
        <div class="crumbsHeader">
             <div class="crumbs">
-              <span @click="pathIndex()">订单提交 / </span>
+              <span @click="pathIndex()">订单提交&nbsp/&nbsp</span>
               <span>{{crumbsName}}</span>
           </div>
         </div>
@@ -309,7 +309,7 @@
             </div>
           </li>
           <template  v-if="orderForm.deliveryType!=3">
-            <li>
+            <li v-if="orderForm.waybillCodeName!=''">
               <span class="tit">物流公司</span>
               <div class="info">
                 <span class="name">{{orderForm.waybillCodeName}}</span>
@@ -600,8 +600,6 @@ export default {
 
             let source = data.source
             let deliveryType = data.orderAttr.deliveryType
-
-
             orderForm.title=data.orderAttr.title
             orderForm.source=data.source//订单来源，
 
@@ -623,9 +621,26 @@ export default {
             orderForm.deliveryType = data.orderAttr.deliveryType //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
             if(deliveryType==1){
               orderForm.deliveryTypeName = '邮寄'
+
+              let wuliuCode = data.orderAttr.waybillCode
+              orderForm.waybillCode = wuliuCode// 物流的code
+              console.log(this.wuliuList)
+              this.wuliuList.forEach((item,index)=>{
+                if(wuliuCode==item.code){
+                  console.log(item.name)
+                   orderForm.waybillCodeName= item.name   // 物流的名字
+                }
+              })
+
+
             }
             if(deliveryType==2){
               orderForm.deliveryTypeName = '同城配送'
+
+              orderForm.waybillCode='' // 物流的code
+              orderForm.waybillCodeName='' // 物流的名字
+              
+              
             }
             if(deliveryType==3){
               orderForm.deliveryTypeName = '自提'  
@@ -642,16 +657,7 @@ export default {
 
             }else{
               orderForm.sourceDisabled = false
-              let wuliuCode = data.orderAttr.waybillCode
-              orderForm.waybillCode = wuliuCode// 物流的code
-              console.log(this.wuliuList)
-              this.wuliuList.forEach((item,index)=>{
-                if(wuliuCode==item.code){
-                  console.log(item.name)
-                   orderForm.waybillCodeName= item.name   // 物流的名字
-                }
-              })
-
+        
               orderForm.receiptDetailAddress = data.orderAttr.receiptDetailAddress// 详细地址
 
               let dizhi = data.orderAttr.receiptAddress
@@ -661,13 +667,26 @@ export default {
 
               let prov = TextToCode[addressInfo[0]]
               let provCode = prov.code
-  
-              let city = TextToCode[addressInfo[0]] [addressInfo[1]]
-              let cityCode = city.code
-    
 
-              let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
-              let distCode = dist.code
+              let cityCode 
+              let distCode 
+  
+          
+              if(addressInfo[0]==addressInfo[1]){
+                let city = TextToCode[addressInfo[0]] ['市辖区']
+                cityCode = city.code
+
+                let dist = TextToCode[addressInfo[0]] ['市辖区'] [addressInfo[2]]
+                distCode = dist.code
+
+
+              }else{
+                let city = TextToCode[addressInfo[0]] [addressInfo[1]]
+                cityCode = city.code
+
+                let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
+                distCode = dist.code
+              }
   
               orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
               
@@ -763,7 +782,7 @@ export default {
         }
         orderForm.receiptAddress = [provCode, cityCode, distCode]  //收货人的地址 （省＋市＋区） //这是是省市区的码
         orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
-        orderForm.receiptDetailAddress = info.details //收货人详情地址
+        orderForm.receiptDetailAddress = info.detail //收货人详情地址
       }
 
       this.publicPorp=false
@@ -826,9 +845,20 @@ export default {
     deliveryTypeChange(val){
       if(val==1){
         this.orderForm.deliveryTypeName = '邮寄'
+
+        this.orderForm.waybillCode='STO' // 物流的code
+        this.orderForm.waybillCodeName='申通快递' // 物流的名字
+
       }
       if(val==2){
+
         this.orderForm.deliveryTypeName = '同城配送'
+
+        this.orderForm.waybillCode='' // 物流的code
+        this.orderForm.waybillCodeName='' // 物流的名字
+
+        
+
       }
       if(val==3){
         this.orderForm.deliveryTypeName = '自提'  
@@ -847,8 +877,6 @@ export default {
 
 
       }else{
-        this.orderForm.waybillCode='STO' // 物流的code
-        this.orderForm.waybillCodeName='申通快递' // 物流的名字
         this.orderForm.pickUpAddress = '' //自提地址 
         this.pasteAddress(this.orderForm.textarea)
         this.orderForm.sourceDisabled = false
