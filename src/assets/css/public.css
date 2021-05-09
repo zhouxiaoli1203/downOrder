@@ -120,6 +120,7 @@
   display: flex;
   align-items: center;
   margin-right: 15px;
+  margin-bottom: 7px;
 }
 .productCraft .li .el-input {
   width: 145px !important;
@@ -132,7 +133,6 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  height: 40px;
 }
 .productCraft .el-radio__inner {
   width: 16px;

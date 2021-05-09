@@ -65,6 +65,37 @@
                         </el-col>
                       </el-row>
                     </el-form-item>
+
+                    <el-form-item label="产品工艺" class="productCraft gongyiProduct">
+                      <el-radio-group v-model="item.gongyi">
+                        <div class="li">
+                          <el-radio label="打扣" @click.native.prevent="handleCancel('打扣',index)">打扣</el-radio>
+                            <el-select v-model="item.dakouVal" placeholder="类型" @change="craftsName($event,index,'打扣')">
+                              <el-option
+                                v-for="item in dakouOptions"
+                                :key="item"
+                                :label="item"
+                                :value="item">
+                              </el-option>
+                            </el-select>
+                        </div>
+                        <div class="li">
+                          <el-radio label="缝吊耳" @click.native.prevent="handleCancel('缝吊耳',index)">缝吊耳</el-radio>
+                            <el-select v-model="item.diaoerVal" placeholder="四角缝吊耳" @change="craftsName($event,index,'缝吊耳')">
+                              <el-option
+                                v-for="item in diaoerOptions"
+                                :key="item"
+                                :label="item"
+                                :value="item">
+                              </el-option>
+                            </el-select>
+                        </div>
+                        <div class="li"><el-radio label="缝筒" @click.native.prevent='handleCancel("缝筒",index)'>缝筒</el-radio></div>
+                        <div class="li"><el-radio label="裁净边" @click.native.prevent='handleCancel("裁净边",index)'>裁净边</el-radio></div>
+                      </el-radio-group>
+                    </el-form-item>
+
+
                     <el-form-item label="产品数量" :prop="`skuInfos.${index}.num`" :rules="skuInfosGroupRules.infonum">
                       <el-col :span="4" class="num">
                         <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
@@ -267,6 +298,12 @@
             <div class="info">
               <span class="name">长度{{item.width}}m*宽度{{item.height}}m</span>
               <p>{{item.remark}}</p>
+            </div>
+          </li>
+          <li v-if="JSON.stringify(item.crafts)!='{}'">
+            <span class="tit">产品工艺</span>
+            <div class="info">
+              <span class="name">{{item.crafts | yhc_toObj }}</span>
             </div>
           </li>
           <li>
@@ -509,7 +546,9 @@ export default {
           name:' 0.9米 (实际0.85米)'
         }
       ],
-      skuIdUrl:''
+      skuIdUrl:'',
+      dakouOptions:['四角打扣','每隔2米打一个扣'],
+      diaoerOptions:['四角缝吊耳'],
     }
   },
   created(){
@@ -547,8 +586,45 @@ export default {
     }
   },
   methods:{
+    craftsName(val,index,lab){
+      let { orderForm } = this
+      let name = orderForm.skuInfos[index].gongyi //单选的名称
+      let valname
+      if(lab=='打扣'){
+        valname = orderForm.skuInfos[index].dakouVal 
+      }
+      if(lab=='缝吊耳'){
+        valname = orderForm.skuInfos[index].diaoerVal 
+      }
+      if(name == lab){
+        orderForm.skuInfos[index].crafts[name] = valname
+      }
+    },
     handleSelect(item) {
       console.log(item,'----------------------');
+    },
+    // 取消单选
+    handleCancel(val,index){
+      console.log(val);
+      console.log(index);
+      let { orderForm} = this
+      orderForm.skuInfos[index].crafts = {}
+
+      orderForm.skuInfos[index].gongyi = val == orderForm.skuInfos[index].gongyi ? '' : val
+
+      let tit = orderForm.skuInfos[index].gongyi
+
+      if(tit){
+        let name
+        if(val=='打扣'){
+          name = orderForm.skuInfos[index].dakouVal 
+        }
+
+        if(val=='缝吊耳'){
+          name = orderForm.skuInfos[index].diaoerVal 
+        }
+        orderForm.skuInfos[index].crafts[val] = name?name:null
+      }
     },
     // 获取物流
     listExpressCompany(){
@@ -570,6 +646,10 @@ export default {
                 remark: '',
                 width: '',
                 name:'',
+                crafts:{},
+                gongyi:'', 
+                dakouVal:'',
+                diaoerVal:'',
               }
             );
           }
@@ -594,9 +674,33 @@ export default {
                 remark:item.attributes.remark,
                 width:item.attributes.width/1000,
                 name:item.attributes.productName,//文件的名字
+                crafts:item.attributes.crafts?item.attributes.crafts:{}
+              }
+
+              console.log(item.attributes.crafts);
+            
+
+              let crafts = item.attributes.crafts
+              for(let i in crafts){
+                console.log(i)
+                console.log(crafts[i]);
+
+                info['gongyi'] = i
+
+                if(i=='打扣'){
+                  info['dakouVal'] = crafts[i]
+                }
+
+                if(i=='缝吊耳'){
+                  info['diaoerVal'] = crafts[i]
+                }
               }
               orderForm.skuInfos.push(info)
+
+
             })
+
+            
 
             let source = data.source
             let deliveryType = data.orderAttr.deliveryType
@@ -902,14 +1006,42 @@ export default {
           remark: '',
           width: '',
           name:'',
+          crafts:{},
+          gongyi:'', 
+          dakouVal:'',
+          diaoerVal:'',
         }
       );
     },
     // 订单提交验证
     submitForm(formName){
       console.log(formName)
+      let arr = this.orderForm.skuInfos
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
+
+          for (var i in arr) {
+            if(arr[i].gongyi == '打扣' && arr[i].dakouVal=='' || arr[i].gongyi == '打扣' && arr[i].dakouVal==undefined){
+              this.$message({
+                message: '请选择打扣的类型',
+                type: 'warning'
+              });
+
+              return false
+            }
+
+            if(arr[i].gongyi == '缝吊耳' && arr[i].diaoerVal=='' || arr[i].gongyi == '缝吊耳' && arr[i].diaoerVal==undefined){
+              this.$message({
+                message: '请选择缝吊耳的类型',
+                type: 'warning'
+              });
+
+              return false
+            }
+
+            
+          }
+
           this.orderTruePorp = true
           this.publicPorp = true//遮罩层
         } else {
@@ -929,6 +1061,10 @@ export default {
             remark: '',
             width: '',
             name:'',
+            crafts:{},
+            gongyi:'', 
+            dakouVal:'',
+            diaoerVal:'',
           }
         ];
         this.orderForm.deliveryType = '1'//如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
@@ -975,13 +1111,21 @@ export default {
     submitOrder(){
       let { orderForm,customerId,skuId,orderId,typesName } = this
 
-      let skuInfosList = JSON.parse(JSON.stringify(orderForm.skuInfos));
-      
-      skuInfosList.forEach((i,key)=>{
-        console.log(key)
-        skuInfosList[key].width=i.width*1000
-        skuInfosList[key].height=i.height*1000
-      })
+      let arr = orderForm.skuInfos
+      let skuInfosList = []
+
+       for (var i in arr) {
+        let info = {
+          crafts:arr[i].crafts,
+          height:arr[i].height*1000,
+          width:arr[i].width*1000,
+          num:arr[i].num,
+          productCode:arr[i].productCode,
+          remark:arr[i].remark,
+          fontColor:arr[i].fontColor,
+        }
+        skuInfosList.push(info)
+      }
       
       let data = {
         customerId,

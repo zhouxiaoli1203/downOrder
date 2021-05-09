@@ -59,7 +59,7 @@
                       </el-row>
                     </el-form-item>
                     
-                    <el-form-item label="产品工艺"  class="productCraft gongyiProduct" :prop="`skuInfos.${index}.gongyi`" :rules="skuInfosGroupRules.infoGongyi">
+                    <el-form-item label="产品工艺"  class="productCraft gongyiProduct" >
                       <el-radio-group v-model="item.gongyi">
                         <div class="li">
                           <el-radio label="缝筒" @click.native.prevent='handleCancel("缝筒",index)'>缝筒</el-radio>
@@ -407,19 +407,7 @@ export default {
         callback();        
       }
     };
-    var infoGongyiRule = (rule, value, callback) => {
-      let index = rule.field.split('.')[1]
-      if (value=='缝筒') {
-        let txt = this.orderForm.skuInfos[Number(index)].fengtongVal
-        console.log(txt);
-        if(txt==''){
-          callback(new Error('请选择类型'));
-        } 
-        callback();   
-      }else{
-        callback();   
-      }
-    }
+
     return {
       radio:'1',
       active: 1,
@@ -476,7 +464,6 @@ export default {
         infowidth: [{required: true,  validator: widthHeight,  trigger: 'change'}],
         infoheight: [{required: true, validator: widthHeight, trigger: 'change'}],
         inforemark: [{required: true, message: '请输入订单具体信息', trigger: 'blur'}],
-        infoGongyi:[{validator: infoGongyiRule,  trigger: 'change'}]
       },
       delImg:require('../../assets/img/delImg.png'),
       file:require('../../assets/img/file.png'),
@@ -609,7 +596,7 @@ export default {
                 remark:item.attributes.remark,
                 width:item.attributes.width/1000,
                 name:item.attributes.productName,//文件的名字
-                crafts:item.attributes.crafts
+                crafts:item.attributes.crafts?item.attributes.crafts:{}
               }
 
               let crafts = item.attributes.crafts
@@ -938,8 +925,21 @@ export default {
     },
     // 订单提交验证
     submitForm(formName){
+      let arr = this.orderForm.skuInfos
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
+          for (var i in arr) {
+            console.log(arr[i].fengtongVal);
+            if(arr[i].gongyi == '缝筒' && arr[i].fengtongVal=='' || arr[i].gongyi == '缝筒' && arr[i].fengtongVal==undefined){
+              this.$message({
+                message: '请选择类型',
+                type: 'warning'
+              });
+
+              return false
+            }            
+          }
+
           this.orderTruePorp = true
           this.publicPorp = true//遮罩层
         } else {

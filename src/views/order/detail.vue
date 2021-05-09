@@ -145,7 +145,7 @@
                             <p>{{info.orderAttr.receiptMobile}}</p>
                         </div>
                     </li>
-                    <li v-if="info.orderAttr.deliveryType!=3">
+                    <li v-if="info.orderAttr.deliveryType==1">
                         <span class="lable">快递公司</span>
                         <div class="info">
                             <p>{{info.orderAttr.waybillCode}}</p>
@@ -275,7 +275,7 @@ export default {
                 if(res.data.status==5){
                     this.danhao = res.data.expressCode
                 }
-                if (res.data.orderAttr.deliveryType != 3) {
+                if (res.data.orderAttr.deliveryType == 1) {
                 
                     this.info.orderAttr.waybillCode = this.$store.getters.getExpCompany.filter(
                         (item) => {

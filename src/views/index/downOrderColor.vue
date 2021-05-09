@@ -634,7 +634,7 @@ export default {
                 remark:item.attributes.remark,
                 width:item.attributes.width/1000,
                 name:item.attributes.productName,//文件的名字
-                crafts:item.attributes.crafts
+                crafts:item.attributes.crafts?item.attributes.crafts:{}
               }
               let crafts = item.attributes.crafts
               for(let i in crafts){
@@ -975,7 +975,7 @@ export default {
         let arr = this.orderForm.skuInfos
         if (valid) {
             for (var i in arr) {
-              if(arr[i].gongyi == '打扣' && arr[i].dakouVal==''){
+              if(arr[i].gongyi == '打扣' && arr[i].dakouVal=='' || arr[i].gongyi == '打扣' && arr[i].dakouVal==undefined){
                 this.$message({
                   message: '请选择打扣的类型',
                   type: 'warning'
@@ -984,7 +984,7 @@ export default {
                 return false
               }
 
-              if(arr[i].gongyi == '缝吊耳' && arr[i].diaoerVal==''){
+              if(arr[i].gongyi == '缝吊耳' && arr[i].diaoerVal=='' || arr[i].gongyi == '打扣' && arr[i].diaoerVal==undefined){
                 this.$message({
                   message: '请选择缝吊耳的类型',
                   type: 'warning'
