@@ -378,3 +378,9 @@
 .inputSelect .el-autocomplete {
   width: 100%;
 }
+.nocticePoro .el-tabs__content {
+  height: 85%;
+}
+.nocticePoro .el-tabs__nav-wrap::after {
+  display: none;
+}

@@ -21,12 +21,12 @@
             </div>
           </div>
         </div> -->
-        <!-- <div class="img cursor_p">
+        <div class="img cursor_p" @click="nocticePorpclick">
           <img :src="headNoctice" alt="">
           <span>40</span>
-        </div> -->
+        </div>
         <div class="info">
-          <p @click="passwordPorp = true">{{info.nickname}} &nbsp/</p>
+          <p @click="passwordPorpclick">{{info.nickname}} &nbsp/</p>
           <span class="cursor_p" @click="loginOut">&nbsp退出</span>
         </div>
       </div>
@@ -50,7 +50,62 @@
         </el-form-item>
       </el-form>
     </section>
-    <div class="mask" @click="LognClose" v-show="passwordPorp"></div>
+
+    <!-- 通知信息 -->
+    <section class="publicPorp nocticePoro" v-show="nocticePorp">
+      <div class="title">
+        <h3>系统消息</h3>
+        <i class="el-icon-close"  @click="LognClose">
+        </i>
+      </div>
+      <div class="contentBox">
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+          <el-tab-pane
+            :key="item.name"
+            v-for="(item, index) in editableTabs"
+            :label="item.title"
+            :name="item.name"
+          >
+            {{item.content}}
+            <ul class="">
+              <li v-for="item in Notifylist" @click="readNotify(item.id)">
+                <div class="state">
+                  <i class="weiDu" v-if="item.state == 0"></i>
+                  <span class="yiDu" v-if="item.state == 1">已读</span>
+                </div>
+                <div class="cont">
+                  <span>{{item.createTime}}</span>
+                  <p>{{item.content}}</p>
+                </div>
+              </li>
+            </ul>
+          </el-tab-pane>
+        </el-tabs>
+        <div class="pageblock">
+          <el-pagination
+            background
+            @current-change="handleCurrentChange"
+            layout="prev, pager, next"
+            :page-size="10"
+            :total="total">
+          </el-pagination>
+        </div>
+      </div>
+      
+    </section>
+
+
+    <audio
+      ref="audio"
+  
+      @ended="audioEnd"
+      
+    >
+      <source type="audio/ogg"
+      :src="resData.questionAudio">
+    </audio>
+
+    <div class="mask" @click="LognClose" v-show="publicPorp"></div>
   </div>
 </template>
 
@@ -74,15 +129,64 @@ export default {
         ],
       },
       passwordPorp: false,
+      publicPorp:false,
+      nocticePorp:false,
       unEdit:true,
       info:'',
       checkpop: false,
+      editableTabs: [
+        {
+          title: '全部',
+          name: '2',
+        },
+        {
+          title: '仅未读',
+          name: '0',
+        }, 
+        {
+          title: '仅已读',
+          name: '1',
+        }
+      ],
+      activeName: '2',
+      Notifylist:[],
+      total:0,
+      pageNum:1,
+      state:2,
+      resData: {
+        questionAudio: 'https://api.gundongyongheng.com/clock.mp3', // 音频
+      },
     }
   },
   created(){
     this.userInfo()
+    this.pageNotify(this.pageNum,this.state)
   },
   methods: {
+    // 点击喇叭图标, 开始播放音频
+		handlePlayAudio() {
+	      console.log(111)
+        console.log(this.$refs.audio);
+        console.log(this.$refs);
+	      this.$refs.audio.play() // 这里使用了audio的原生开始播放事件,同样不加on, 并使用ref获取dom
+
+	    },
+	    // 音频停止后, 把喇叭置灰
+	    audioEnd() {
+	      console.log(1111)
+	    },
+    // 点击修改密码
+    passwordPorpclick(){
+      this.publicPorp=true
+      this.passwordPorp=true
+
+    },
+
+    // 点击通知
+    nocticePorpclick(){
+      this.publicPorp=true
+      this.nocticePorp=true
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -144,11 +248,58 @@ export default {
     // 关闭登录注册弹框
     LognClose(){
       this.passwordPorp=false
+      this.publicPorp=false
       this.unEdit=true
+      this.nocticePorp=false
     },
     handleClose() {
       this.checkpop = false
     },
+
+    handleClick(e){
+      console.log(e.name);
+      this.state = e.name
+      this.activeName = e.name
+      this.pageNotify(this.pageNum,e.name)
+    },
+
+    // 获取通知消息列表
+    pageNotify(pageNum,state){
+      this.$post('get',this.baseUrl + '/order/pageNotify',{
+        pageNum,
+        pageSize:10,
+        state
+      }).then((res) => {
+        if (res.code == 200) {
+          this.Notifylist = res.data.rows
+          this.total = res.data.total
+          this.handlePlayAudio()
+        }
+      })
+    },
+
+    // 点击分页
+    handleCurrentChange(val){
+      this.pageNum = val
+      this.pageNotify(val,this.state)
+    },
+
+    // 标记已读
+    readNotify(id){
+      let arr = [id]
+      this.$post('post',this.baseUrl + '/order/readNotify',{
+        ids:arr
+      }).then((res) => {
+        if (res.code == 200) {
+          this.pageNotify(this.pageNum,this.state)
+        }
+
+        
+      })
+
+    },
+
+
   }
 }
 </script>
@@ -242,7 +393,6 @@ export default {
     max-width: 460px;
     max-height: 420px;
 
-
     h2{
       font-size: 24px;
       color: #333;
@@ -290,5 +440,89 @@ export default {
       }
     }
 
+  }
+
+  // 通知消息
+  .nocticePoro{
+    background: #fff;
+    overflow: hidden;
+    width: 685px;
+    height: 72%;
+    .title{
+      padding: 0 24px;
+      height: 10%;
+      background: #F9F7F7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h3{
+        font-size: 16px;
+        color: #000;
+      }
+      i{
+        color: #999999;
+        font-size: 26px;
+        cursor: pointer;
+        display: inline-block;
+      }
+
+    }
+
+    .contentBox{
+      padding: 0 24px;
+      height: 90%;
+
+      .el-tabs{
+        height: 91%;
+      }
+      .el-tab-pane{
+        height: 100%;
+      }
+    }
+
+    ul{
+      overflow-y: scroll;
+      height: 100%;
+      li{
+        border-bottom: 1px solid #F2F3F8;
+        display: flex;
+        padding: 16px 0;
+        cursor: pointer;
+        .state{
+          width: 32px;
+        }
+        i{
+           display: inline-block;
+        }
+        .weiDu{
+          width: 8px;
+          height: 8px;
+          background: #FF3333;
+          border-radius: 50%;
+        }
+        .yiDu{
+          font-size: 12px;
+          color: #999;
+        }
+        .cont{
+          flex: 1;
+
+          span{
+            color: #999;
+          }
+          p{
+            font-size: 16px;
+            margin-top: 8px;
+          }
+        }
+      }
+    }
+  }
+  // 页码定位
+  .pageblock{
+    .el-pagination{
+      text-align: center;
+    }
   }
 </style>

@@ -156,8 +156,8 @@
         </div>
         <div class="btnBox">
             <div class="btn">
-                <span @click="downOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id,0)" class="downOrder" v-if="info.status!=1">再来一单</span>
-                <span @click="editOrder(info.orderSkus[0].skuId,info.orderSkus[0].skuName,info.id,1)" class="bianji" v-if="info.status==1">编辑订单</span>
+                <span @click="downOrder(info.orderAttr.skuId,info.orderAttr.skuName,info.id,0)" class="downOrder" v-if="info.status!=1">再来一单</span>
+                <span @click="editOrder(info.orderAttr.skuId,info.orderAttr.skuName,info.id,1)" class="bianji" v-if="info.status==1">编辑订单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==0">退单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==2">退单</span>
                 <span @click="orderCancel" class="tuidan" v-if="info.status==3">退单</span>
@@ -250,7 +250,6 @@ export default {
       if (data.length < 1) {
         return  // 检测是否有文件拖拽到页面
       }
-      console.log(data)
         for (let i = 0; i < data.length; i++) {
             let info = data[i]
             this.uploadCredentialImage(info)
@@ -316,6 +315,10 @@ export default {
     },
     // 编辑订单
     editOrder(id,name,orderId,type){
+        console.log(name);
+        console.log(orderId);
+        console.log(id);
+        console.log(type);
         this.confirm_pop("是否对该订单进行编辑？").then(res=>{
             let path
             if(id==2){
@@ -464,7 +467,7 @@ export default {
     },
     // 跳转
     pathIndex(){
-      console.log(111)
+
       this.$router.go(-1)
     },
     // 复制单号

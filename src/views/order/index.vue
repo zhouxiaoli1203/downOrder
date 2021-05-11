@@ -73,10 +73,12 @@
               </div>
               <div class="footer">
                 <div class="xinxi">
-                  <span class="fl status red" v-if="item.orderAttr.goodsName=='条幅'">{{item.orderAttr.goodsName}}</span>
-                  <span class="fl status blue" v-if="item.orderAttr.goodsName=='打印'">{{item.orderAttr.goodsName}}</span>
-                  <span class="fl status bluehui" v-if="item.orderAttr.goodsName=='通用'">{{item.orderAttr.goodsName}}</span>
-                  <span class="fl status oranges" v-if="item.orderAttr.goodsName=='旗帜'">{{item.orderAttr.goodsName}}</span>
+                  <span class="fl status red" v-if="item.orderAttr.skuName=='条幅'">{{item.orderAttr.skuName}}</span>
+                  <span class="fl status caise" v-if="item.orderAttr.skuName=='彩色条幅'">{{item.orderAttr.goodsName}} - {{item.orderAttr.skuName}}</span>
+                  <span class="fl status red" v-if="item.orderAttr.skuName=='红色条幅'">{{item.orderAttr.goodsName}} - {{item.orderAttr.skuName}}</span>
+                  <span class="fl status blue" v-if="item.orderAttr.skuName=='打印'">{{item.orderAttr.skuName}}</span>
+                  <span class="fl status bluehui" v-if="item.orderAttr.skuName=='通用下单'">{{item.orderAttr.skuName}}</span>
+                  <span class="fl status oranges" v-if="item.orderAttr.skuName=='旗帜'">{{item.orderAttr.skuName}}</span>
                   <p class="chicun">{{(item.orderSkus[0].attributes.width/1000)}}*{{(item.orderSkus[0].attributes.height/1000)}}m</p>
                   <p class="yanse" v-if="item.orderSkus[0].attributes.fontColor!=undefined">{{item.orderSkus[0].attributes.fontColor}}</p>
                 </div>
@@ -459,6 +461,8 @@ export default {
           background:#35A3DF;
         }
 
+        
+
         .spanRed{
           background:#FF3333;
         }
@@ -551,7 +555,7 @@ export default {
       }
     }
     .status{
-      width: 64px;
+        width: 112px;
         height: 25px;
         line-height: 25px;
         border-radius: 4px;
@@ -571,6 +575,11 @@ export default {
         &.red{
             color:#FF3333;
             background-color:rgba(255,51,51,0.09);
+        }
+
+        &.caise{
+          color:#FD58BA;
+          background: linear-gradient(136deg, #f7ff913d 0%, #fd58ba52 100%);
         }
       }
   }

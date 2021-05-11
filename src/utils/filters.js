@@ -1,7 +1,6 @@
 import constant from './constant'
 const filters = {
     yhc_status(n){
-        console.log(n)
         let status =  constant.receiveStatus.filter((item,i)=>{
             return n == item.value;
         });
