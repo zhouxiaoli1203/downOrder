@@ -23,7 +23,7 @@
         </div> -->
         <div class="img cursor_p" @click="nocticePorpclick">
           <img :src="headNoctice" alt="">
-          <span>40</span>
+          <span v-if="weiDutotal!=0">{{weiDutotal}}</span>
         </div>
         <div class="info">
           <p @click="passwordPorpclick">{{info.nickname}} &nbsp/</p>
@@ -67,7 +67,7 @@
             :name="item.name"
           >
             {{item.content}}
-            <ul class="">
+            <ul class="" v-if="Notifylist!=''">
               <li v-for="item in Notifylist" @click="readNotify(item.id)">
                 <div class="state">
                   <i class="weiDu" v-if="item.state == 0"></i>
@@ -79,9 +79,13 @@
                 </div>
               </li>
             </ul>
+            <div v-else class="noXiaoxi">
+              <img src="@/assets/img/xiaoxi.png" alt="">
+              <p>暂无任何系统消息</p>
+            </div>
           </el-tab-pane>
         </el-tabs>
-        <div class="pageblock">
+        <div class="pageblock" v-if="Notifylist!=''">
           <el-pagination
             background
             :current-page.sync="pageNum"
@@ -160,16 +164,20 @@ export default {
       },
       totalChange: '',
       timer: null,
+      weiDutotal:0,
     }
   },
   created(){
     this.userInfo()
-    this.pageNotify(this.pageNum,this.state)
+    // this.pageNotify(this.pageNum,this.state)
+    this.tipsPageNotify();
+    this.weiDuPageNotify() //未读
   },
   mounted() {
-    // this.timer = setInterval(() => {
-    //   this.tipsPageNotify();
-    // }, 5000)
+    this.timer = setInterval(() => {
+      this.tipsPageNotify();
+      this.weiDuPageNotify() //未读
+    }, 5000)
   },
   methods: {
     // 点击喇叭图标, 开始播放音频
@@ -260,12 +268,9 @@ export default {
       this.nocticePorp=false
 
       this.activeName ='2'
-    
       this.pageNum = 1
       this.state = 2
 
-
-      
     },
     handleClose() {
       this.checkpop = false
@@ -275,6 +280,7 @@ export default {
       console.log(e.name);
       this.state = e.name
       this.activeName = e.name
+      this.pageNum = 1
       this.pageNotify(1,e.name)
     },
 
@@ -301,6 +307,19 @@ export default {
       }).then((res) => {
         if (res.code == 200) {
           this.totalChange = res.data.total 
+        }
+      })
+    },
+
+    // 获取未读消息的总条数
+    weiDuPageNotify(){
+      this.$post('post',this.baseUrl + '/order/pageNotify',{
+        pageNum:1,
+        pageSize:10,
+        state:0
+      }).then((res) => {
+        if (res.code == 200) {
+          this.weiDutotal = res.data.total 
         }
       })
     },
@@ -335,7 +354,11 @@ export default {
         }
       },
     },
-  }
+  },
+  beforeDestroy() {
+    clearInterval(this.timer)
+    this.timer = null
+  },
 }
 </script>
 
@@ -558,6 +581,20 @@ export default {
   .pageblock{
     .el-pagination{
       text-align: center;
+    }
+  }
+
+  .noXiaoxi{
+    text-align: center;
+        margin-top: 25%;
+    img{
+      width: 36px;
+      height: 36px;
+    }
+    p{
+      color: #3551DF;
+      font-size: 16px;
+      margin-top: 16px;
     }
   }
 </style>
