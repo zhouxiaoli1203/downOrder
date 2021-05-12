@@ -84,6 +84,7 @@
         <div class="pageblock">
           <el-pagination
             background
+            :current-page.sync="pageNum"
             @current-change="handleCurrentChange"
             layout="prev, pager, next"
             :page-size="10"
@@ -114,6 +115,7 @@ export default {
   name: 'navhead',
   data () {
     return {
+
       headOrder:require('../assets/img/headOrder.png'),
       headNoctice:require('../assets/img/headNoctice.png'),
       ruleForm: {
@@ -156,25 +158,29 @@ export default {
       resData: {
         questionAudio: 'https://api.gundongyongheng.com/clock.mp3', // 音频
       },
+      totalChange: '',
+      timer: null,
     }
   },
   created(){
     this.userInfo()
     this.pageNotify(this.pageNum,this.state)
   },
+  mounted() {
+    // this.timer = setInterval(() => {
+    //   this.tipsPageNotify();
+    // }, 5000)
+  },
   methods: {
     // 点击喇叭图标, 开始播放音频
 		handlePlayAudio() {
-	      console.log(111)
-        console.log(this.$refs.audio);
-        console.log(this.$refs);
-	      this.$refs.audio.play() // 这里使用了audio的原生开始播放事件,同样不加on, 并使用ref获取dom
+	    this.$refs.audio.play() // 这里使用了audio的原生开始播放事件,同样不加on, 并使用ref获取dom
 
-	    },
-	    // 音频停止后, 把喇叭置灰
-	    audioEnd() {
-	      console.log(1111)
-	    },
+	  },
+    // 音频停止后, 把喇叭置灰
+    audioEnd() {
+      console.log(1111)
+    },
     // 点击修改密码
     passwordPorpclick(){
       this.publicPorp=true
@@ -186,6 +192,7 @@ export default {
     nocticePorpclick(){
       this.publicPorp=true
       this.nocticePorp=true
+      this.pageNotify(this.pageNum,this.state)
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -251,6 +258,14 @@ export default {
       this.publicPorp=false
       this.unEdit=true
       this.nocticePorp=false
+
+      this.activeName ='2'
+    
+      this.pageNum = 1
+      this.state = 2
+
+
+      
     },
     handleClose() {
       this.checkpop = false
@@ -260,12 +275,12 @@ export default {
       console.log(e.name);
       this.state = e.name
       this.activeName = e.name
-      this.pageNotify(this.pageNum,e.name)
+      this.pageNotify(1,e.name)
     },
 
     // 获取通知消息列表
     pageNotify(pageNum,state){
-      this.$post('get',this.baseUrl + '/order/pageNotify',{
+      this.$post('post',this.baseUrl + '/order/pageNotify',{
         pageNum,
         pageSize:10,
         state
@@ -273,7 +288,19 @@ export default {
         if (res.code == 200) {
           this.Notifylist = res.data.rows
           this.total = res.data.total
-          this.handlePlayAudio()
+        }
+      })
+    },
+
+    // 提示音的总条数
+    tipsPageNotify(){
+      this.$post('post',this.baseUrl + '/order/pageNotify',{
+        pageNum:1,
+        pageSize:10,
+        state:2
+      }).then((res) => {
+        if (res.code == 200) {
+          this.totalChange = res.data.total 
         }
       })
     },
@@ -293,13 +320,21 @@ export default {
         if (res.code == 200) {
           this.pageNotify(this.pageNum,this.state)
         }
-
         
       })
 
     },
 
 
+  },
+  watch:{
+    totalChange: {
+      handler: function (val, oldval) {
+        if (oldval !== '' && val != oldval) {
+            this.handlePlayAudio()
+        }
+      },
+    },
   }
 }
 </script>
