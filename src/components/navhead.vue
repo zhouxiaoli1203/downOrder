@@ -102,12 +102,9 @@
 
     <audio
       ref="audio"
-  
       @ended="audioEnd"
-      
     >
-      <source type="audio/ogg"
-      :src="resData.questionAudio">
+      <source type="audio/ogg"  :src="resData.questionAudio">
     </audio>
 
     <div class="mask" @click="LognClose" v-show="publicPorp"></div>
@@ -193,7 +190,6 @@ export default {
     passwordPorpclick(){
       this.publicPorp=true
       this.passwordPorp=true
-
     },
 
     // 点击通知

@@ -289,21 +289,8 @@ export default {
     // 再来一单
     downOrder(id,name,orderId,type){
         this.confirm_pop("是否再一次下单").then(res=>{
-            let path
-            if(id==2){
-                path='/index/downOrder'
-            }
-            if(id==7){
-                path='/index/downOrderAll'
-            }
-            if(id==5){
-                path='/index/downOrderColor'
-            }
-            if(id==6){
-                path='/index/downOrderCraft'
-            }
             this.$router.push({
-                path: path, //跳转的路径
+                path: '/index/downOrder', //跳转的路径
                 query: {
                     id:id,
                     name:name,
@@ -320,21 +307,8 @@ export default {
         console.log(id);
         console.log(type);
         this.confirm_pop("是否对该订单进行编辑？").then(res=>{
-            let path
-            if(id==2){
-                path='/index/downOrder'
-            }
-            if(id==7){
-                path='/index/downOrderAll'
-            }
-            if(id==5){
-                path='/index/downOrderColor'
-            }
-            if(id==6){
-                path='/index/downOrderCraft'
-            }
             this.$router.push({
-                path: path, //跳转的路径
+                path: '/index/downOrder', //跳转的路径
                 query: {
                     id:id,
                     name:name,

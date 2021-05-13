@@ -29,61 +29,23 @@ export default {
   methods:{
     downOrder(name,id){
       console.log(id)
-      // if(id!=2){
-      //   this.$message({
-      //     message: '该功能正在开发，敬请期待哦！',
-      //     type: 'warning'
-      //   });
-
-      //   return false
-      // }
-      if(id==2){
-        this.$router.push({  
-            path: '/index/downOrder',   
-            name: 'downOrder',  
-            query: {  
-              name:name,
-              id:id
-            }
-        })  
-      }
-      if(id==5){
-        this.$router.push({  
-          path: '/index/downOrderColor',   
-          name: 'downOrderColor',  
-          query: {  
-            name:name,
-            id:id
-          }
-        })  
+      if(id==3||id==4){
+        this.$message({
+          message: '该功能正在开发，敬请期待哦！',
+          type: 'warning'
+        });
 
         return false
       }
 
-      if(id==6){
-        this.$router.push({  
-          path: '/index/downOrderCraft',   
-          name: 'downOrderCraft',  
-          query: {  
-            name:name,
-            id:id
-          }
-        })  
-
-        return false
-      }
-
-      if(id==7){
-        this.$router.push({  
-            path: '/index/downOrder',   
-            name: 'downOrderAll',  
-            query: {  
-              name:name,
-              id:id
-            }
-        })  
-      }
-
+      this.$router.push({  
+        path: '/index/downOrder',   
+        name: 'downOrder',  
+        query: {  
+          name,
+          id
+        }
+      })  
 
     },
     // 查询主产品和单品列表
