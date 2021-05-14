@@ -75,7 +75,7 @@
                         <span class="lable">产品文件{{index+1}}</span>
                         <div class="info">
                             <input type="text" readonly  v-model="item.attributes.productName" class="p">
-                            <span class="look" @click="lookUrl">查看</span>
+                            <span class="look"  @click="lookBigImg(item.attributes.productImg)">查看</span>
                             <span class="xiazai" @click="downloadUrl(item.attributes.productCode)">下载</span>
                         </div>
                     </li>
@@ -204,15 +204,23 @@
             </div>
         </section>
     </div>
-    
+
+    <!-- 查看大图 -->
+    <el-image-viewer 
+      v-if="showViewer" 
+      :on-close="closeViewer" 
+      :url-list="[showViewerUrl]" />
+
+
   </div>
 </template>
 
 
 <script>
+import ElImageViewer from 'element-ui/packages/image/src/image-viewer'
 export default {
-  name: 'navhead',
-
+  name: '',
+  components: { ElImageViewer },
   data () {
     return {
         info:'',
@@ -230,6 +238,8 @@ export default {
         tips:require('../../assets/img/tips.png'),
         wenben:require('../../assets/img/wenben.png'),
         danhao:'',
+        showViewer:false,// 显示查看器
+        showViewerUrl:'',
     }
   },
   created(){
@@ -264,6 +274,24 @@ export default {
     }
   },
   methods: {
+    // 大图预览
+    lookBigImg(val){
+      if(val){
+        this.showViewer = true
+        this.showViewerUrl = this.baseUrl + val 
+      }else{
+        this.$message({
+          message: '该文件暂不支持预览哦！',
+          type: 'warning'
+        });
+      }
+    },
+
+    // 关闭查看器
+    closeViewer() {
+      this.showViewer = false
+      this.showViewerUrl = ''
+    },
     // 获取订单信息
     getByIdInfo(orderId){
         this.$post('post',this.baseUrl + '/order/getById',{
@@ -431,13 +459,6 @@ export default {
                 window.open(this.baseUrl + res.data);
             }
         })
-    },
-    // 文件查看
-    lookUrl(){
-        this.$message({
-          message: '该功能正在开发，敬请期待哦！',
-          type: 'warning'
-        });
     },
     // 跳转
     pathIndex(){

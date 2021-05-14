@@ -66,7 +66,6 @@
             :label="item.title"
             :name="item.name"
           >
-            {{item.content}}
             <ul class="" v-if="Notifylist!=''">
               <li v-for="item in Notifylist" @click="readNotify(item.id)">
                 <div class="state">
@@ -334,6 +333,7 @@ export default {
       }).then((res) => {
         if (res.code == 200) {
           this.pageNotify(this.pageNum,this.state)
+          this.weiDuPageNotify();
         }
         
       })
