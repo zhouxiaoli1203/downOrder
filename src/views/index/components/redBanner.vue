@@ -276,14 +276,15 @@ export default {
       let { orderForm } = this
       data.forEach((item,index)=>{
         let info ={
-          productCode:item.attributes.productCode,
+          productCode:item.products[0].code,
           height:item.attributes.height/1000,
           num:item.num,
-          remark:item.attributes.remark,
+          remark:item.remark,
           width:item.attributes.width/1000,
-          name:item.attributes.productName,//文件的名字
+          name:item.products[0].name,//文件的名字
           crafts:item.attributes.crafts?item.attributes.crafts:{}
         }
+
 
         if(this.shopSkuId == 2){
           this.$set(info,'fontColor',item.attributes.fontColor)

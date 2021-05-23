@@ -366,12 +366,12 @@ export default {
       crumbsName:'',
       orderForm:{
         skuInfos:[],
-        title:'订单标题',
+        title:'',
         source:'4', //订单来源，
         sourceDisabled:false,
         sourceName:'线下',
-        receiptName:'客户姓名', //客户姓名
-        receiptMobile:'17752560527',
+        receiptName:'', //客户姓名
+        receiptMobile:'',
         deliveryType:'1', //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
         deliveryTypeName:'邮寄',
         waybillCode:'STO', //物流公司
@@ -422,6 +422,7 @@ export default {
     }
   },
   created(){
+    
     this.listExpressCompany()   // 获取物流公司
     let userInfo = this.$store.getters.getUserInfo
     this.customerId = userInfo.id //用户的id
@@ -430,6 +431,11 @@ export default {
     this.crumbsName = this.$route.query.name
     this.typesName = this.$route.query.type  //  0再来一单，1编辑订单
     this.skuIdUrl = 'https://api.gundongyongheng.com/new/?act=get&id='+ this.$route.query.id
+
+    console.log(skuId);
+
+
+
     if (skuId==2 || skuId==5) {
       this.shopInfoComponent = 'RedBanner'
     }
@@ -1048,6 +1054,7 @@ export default {
 
       .infoUL{
         display: flex;
+        flex-wrap: wrap;
         .li{
           width: 100px;
           margin: 0 16px 16px 0;

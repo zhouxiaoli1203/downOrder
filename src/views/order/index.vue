@@ -79,7 +79,7 @@
                   <span class="fl status blue" v-if="item.orderAttr.skuName=='打印'">{{item.orderAttr.skuName}}</span>
                   <span class="fl status bluehui" v-if="item.orderAttr.skuName=='通用下单'">{{item.orderAttr.skuName}}</span>
                   <span class="fl status oranges" v-if="item.orderAttr.skuName=='旗帜'">{{item.orderAttr.skuName}}</span>
-                  <p class="chicun">{{(item.orderSkus[0].attributes.width/1000)}}*{{(item.orderSkus[0].attributes.height/1000)}}m</p>
+                  <p class="chicun" v-if="item.orderSkus[0].attributes.width">{{(item.orderSkus[0].attributes.width/1000)}}*{{(item.orderSkus[0].attributes.height/1000)}}m</p>
                   <p class="yanse" v-if="item.orderSkus[0].attributes.fontColor!=undefined">{{item.orderSkus[0].attributes.fontColor}}</p>
                 </div>
                 <div class="gouwuche" v-if="item.orderSkus.length>1">

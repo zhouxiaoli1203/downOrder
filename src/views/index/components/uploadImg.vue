@@ -15,29 +15,29 @@
             <div class="uploadcont">
             <section class="choicesection" v-if="active==1">
                 <div class="choiceBox tuozhuai">
-                <template v-if="imgMultiple">
-                  <el-upload
-                      class="upload-demo"
-                      action=""
-                      :show-file-list="false"
-                      :before-upload="beforeAvatarUpload"
-                      multiple
-                      >
-                      <img :src="file" alt="">
-                      <p>上传文件</p>
-                  </el-upload>
-                </template>
-                <template v-else>
-                  <el-upload
-                      class="upload-demo"
-                      action=""
-                      :show-file-list="false"
-                      :before-upload="beforeAvatarUpload"
-                      >
-                      <img :src="file" alt="">
-                      <p>上传文件</p>
-                  </el-upload>
-                </template>
+                  <template v-if="imgMultiple">
+                    <el-upload
+                        class="upload-demo"
+                        action=""
+                        :show-file-list="false"
+                        :before-upload="beforeAvatarUpload"
+                        multiple
+                        >
+                        <img :src="file" alt="">
+                        <p>上传文件</p>
+                    </el-upload>
+                  </template>
+                  <template v-else>
+                    <el-upload
+                        class="upload-demo"
+                        action=""
+                        :show-file-list="false"
+                        :before-upload="beforeAvatarUpload"
+                        >
+                        <img :src="file" alt="">
+                        <p>上传文件</p>
+                    </el-upload>
+                  </template>
                 </div>
                 <!-- <div class="choiceBox" @click="shejiqiClick(2)">
                 <img :src="shejiqi" alt="">
@@ -159,7 +159,7 @@ export default {
     },
     // 上传文件请求
     productionUpload(file){
-      let { localList, imgInfo } = this
+      let { localList, imgInfo,imgMore } = this
       let name = file.name
       let param = new FormData(); // 创建form对象
       param.append("file",file);
@@ -170,17 +170,21 @@ export default {
         if (res.code == 200) {
           this.active =2
           this.buzhou = 1
-          localList.push(name)
-          this.wenjianNanme = name 
-          this.wenjianCode  =  res.data  
-          imgInfo.push(
-            {
-              name:name,
-              code:res.data,
-            }
-          )
+          if(imgMore=='more'){
+            localList.push(name)
+            imgInfo.push(
+              {
+                name:name,
+                code:res.data,
+              }
+            )
 
-          
+          }else{
+            this.localList = []
+            this.localList.push(name)
+            this.wenjianNanme = name 
+            this.wenjianCode  =  res.data 
+          }        
         }
       })
     },
@@ -279,6 +283,11 @@ export default {
         h5{
           color: #3551DF;
           margin-bottom: 16px;
+        }
+
+        ul{
+          overflow-x: scroll;
+          height: 217px;
         }
 
         li{

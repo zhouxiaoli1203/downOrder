@@ -50,7 +50,7 @@
                     <li>
                         <span class="lable">订单类型</span>
                         <div class="info">
-                            <p>{{info.orderAttr.goodsName}}</p>
+                            <p>{{info.orderAttr.skuName}}</p>
                         </div>
                     </li>
                     <li v-if="info.status==5">
@@ -80,7 +80,7 @@
                         </div>
                     </li>
                     <li>
-                        <span class="lable">产品数量{{index+1}}</span>
+                        <span class="lable" style="color:red;font-weight: bold;">产品数量{{index+1}}</span>
                         <div class="info">
                             <p>{{item.num}}</p>
                         </div>

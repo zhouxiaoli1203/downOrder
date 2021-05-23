@@ -209,10 +209,10 @@ export default {
     this.weiDuPageNotify() //未读
   },
   mounted() {
-    // this.timer = setInterval(() => {
-    //   this.tipsPageNotify();
-    //   this.weiDuPageNotify() //未读
-    // }, 5000)
+    this.timer = setInterval(() => {
+      this.tipsPageNotify();
+      this.weiDuPageNotify() //未读
+    }, 5000)
   },
   methods: {
     // 点击喇叭图标, 开始播放音频

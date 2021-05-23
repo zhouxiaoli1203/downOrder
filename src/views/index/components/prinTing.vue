@@ -1131,7 +1131,7 @@ export default {
     li{
        margin: 0 24px 16px 0;
     }
-    li:nth-child(2n+3){
+    li:nth-child(3n+3){
       margin-right: 0;
     }
     .fileDiv{
