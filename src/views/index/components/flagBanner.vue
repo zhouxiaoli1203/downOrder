@@ -12,7 +12,9 @@
                       <p>上传文件</p>
                     </div>
                     <div v-if="item.name!=''" class="fileDiv">
-                      <input type="text"  readonly v-model="item.name">
+                      <el-tooltip class="item" effect="dark" :content="item.name" placement="right">
+                        <input type="text"  readonly v-model="item.name">
+                      </el-tooltip>
                       <img :src="delImg" alt="" @click="shanchuFile(index)">
                     </div>
                   </el-col>
@@ -51,19 +53,20 @@
               </el-form-item>
               
               <el-form-item label="产品工艺"  class="productCraft gongyiProduct" >
-                <el-radio-group v-model="item.gongyi">
-                  <div class="li">
-                    <el-radio label="缝筒" @click.native.prevent='handleCancel("缝筒",index)'>缝筒</el-radio>
+                <el-radio-group v-model="item.gongyi" @change="handleCancel($event,index)">
+                  <div class="li" v-for="i in chanpinGongyiList">
+                    <el-radio :label="i">{{i}}</el-radio>
+                    <template v-if="i == '缝筒'">
                       <el-select v-model="item.fengtongVal" placeholder="类型" @change="craftsName($event,index,'缝筒')">
                         <el-option
-                          v-for="item in fengtongOptions"
-                          :key="item"
-                          :label="item"
-                          :value="item">
+                          v-for="x in fengtongOptions"
+                          :key="x"
+                          :label="x"
+                          :value="x">
                         </el-option>
                       </el-select>
+                    </template>
                   </div>
-                  <div class="li"><el-radio label="裁净边" @click.native.prevent='handleCancel("裁净边",index)'>裁净边</el-radio></div>
                 </el-radio-group>
               </el-form-item>
 
@@ -139,6 +142,7 @@ export default {
       },
       delImg:require('@/assets/img/delImg.png'),
       file:require('@/assets/img/file.png'),
+      chanpinGongyiList:['缝筒','裁净边'],
       fengtongOptions:['左缝筒','上缝筒','右缝筒','左右缝筒','上下缝筒','上缝筒左缝吊耳'],
       yanzheng:false
     }
@@ -180,15 +184,12 @@ export default {
     handleCancel(val,index){
       let { orderForm} = this
       orderForm.skuInfos[index].crafts = {}
-      orderForm.skuInfos[index].gongyi = val == orderForm.skuInfos[index].gongyi ? '' : val
-      let tit = orderForm.skuInfos[index].gongyi
-      if(tit){
-        let name
-        if(val=='缝筒'){
-          name = orderForm.skuInfos[index].fengtongVal 
-        }
-        orderForm.skuInfos[index].crafts[val] = name?name:null
+      orderForm.skuInfos[index].gongyi = val 
+      let name
+      if(val=='缝筒'){
+        name = orderForm.skuInfos[index].fengtongVal 
       }
+      orderForm.skuInfos[index].crafts[val] = name?name:null
     },
     firstInfo(){
       this.orderForm.skuInfos = []
@@ -283,6 +284,16 @@ export default {
         if (valid) {
           for (var i in arr) {
             this.yanzheng = false
+
+            if(arr[i].gongyi==''){
+              this.$message({
+                message: '至少选择一种产品工艺',
+                type: 'warning'
+              });
+
+              return false
+            }
+
             if(arr[i].gongyi == '缝筒' && arr[i].fengtongVal=='' || arr[i].gongyi == '缝筒' && arr[i].fengtongVal==undefined){
               this.$message({
                 message: '请选择类型',
@@ -400,6 +411,7 @@ export default {
           line-height: 32px;
           width: 100%;
           height: 100%;
+          cursor: pointer;
         }
         img{
           position: absolute;

@@ -28,16 +28,6 @@ export default {
   },
   methods:{
     downOrder(name,id){
-      console.log(id)
-      if(id==3||id==4){
-        this.$message({
-          message: '该功能正在开发，敬请期待哦！',
-          type: 'warning'
-        });
-
-        return false
-      }
-
       this.$router.push({  
         path: '/index/downOrder',   
         name: 'downOrder',  

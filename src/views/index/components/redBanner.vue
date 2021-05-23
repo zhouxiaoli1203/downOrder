@@ -7,13 +7,20 @@
             <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
                 <el-row type="flex" class="row-bg" justify="space-between">
                 <el-col :span="20" class="uploadBox">
-                    <div class="upFile" @click="fileUpload(index)">
-                    <img :src="file" alt="">
-                    <p>上传文件</p>
+                    <div class="upFile" v-if="orderForm.skuInfos.length>1"  @click="fileUpload(index)">
+                      <img :src="file" alt="">
+                      <p>上传文件</p>
+                    </div>
+                    
+                    <div class="upFile" v-else  @click="fileUpload(index,'more')">
+                      <img :src="file" alt="">
+                      <p>上传文件</p>
                     </div>
                     <div v-if="item.name!=''" class="fileDiv">
-                    <input type="text"  readonly v-model="item.name">
-                    <img :src="delImg" alt="" @click="shanchuFile(index)">
+                        <el-tooltip class="item" effect="dark" :content="item.name" placement="right">
+                          <input type="text"  readonly v-model="item.name">
+                        </el-tooltip>
+                      <img :src="delImg" alt="" @click="shanchuFile(index)">
                     </div>
                 </el-col>
                 <el-col :span="2" class="iconClose" >
@@ -58,31 +65,31 @@
             </el-form-item>
 
             <el-form-item label="产品工艺" class="productCraft gongyiProduct">
-                <el-radio-group v-model="item.gongyi">
-                <div class="li">
-                    <el-radio label="打扣" @click.native.prevent="handleCancel('打扣',index)">打扣</el-radio>
-                    <el-select v-model="item.dakouVal" placeholder="类型" @change="craftsName($event,index,'打扣')">
-                        <el-option
-                        v-for="item in dakouOptions"
-                        :key="item"
-                        :label="item"
-                        :value="item">
-                        </el-option>
-                    </el-select>
-                </div>
-                <div class="li">
-                    <el-radio label="缝吊耳" @click.native.prevent="handleCancel('缝吊耳',index)">缝吊耳</el-radio>
-                    <el-select v-model="item.diaoerVal" placeholder="四角缝吊耳" @change="craftsName($event,index,'缝吊耳')">
-                        <el-option
-                        v-for="item in diaoerOptions"
-                        :key="item"
-                        :label="item"
-                        :value="item">
-                        </el-option>
-                    </el-select>
-                </div>
-                <div class="li"><el-radio label="缝筒" @click.native.prevent='handleCancel("缝筒",index)'>缝筒</el-radio></div>
-                <div class="li"><el-radio label="裁净边" @click.native.prevent='handleCancel("裁净边",index)'>裁净边</el-radio></div>
+                <el-radio-group v-model="item.gongyi"  @change="handleCancel($event,index)">
+                  <div class="li" v-for="i in chanpinGongyiList">
+                      <el-radio :label="i">{{i}}</el-radio>
+                      <template v-if="i == '打扣'">
+                        <el-select v-model="item.dakouVal" placeholder="类型" @change="craftsName($event,index,'打扣')">
+                          <el-option
+                            v-for="item in dakouOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item">
+                          </el-option>
+                        </el-select>
+                      </template>
+
+                      <template v-if="i == '缝吊耳'">
+                        <el-select v-model="item.diaoerVal" placeholder="四角缝吊耳" @change="craftsName($event,index,'缝吊耳')">
+                            <el-option
+                            v-for="item in diaoerOptions"
+                            :key="item"
+                            :label="item"
+                            :value="item">
+                            </el-option>
+                        </el-select>
+                      </template>
+                  </div>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="产品数量">
@@ -179,6 +186,7 @@ export default {
           name:' 0.9米 (实际0.85米)'
         }
       ],
+      chanpinGongyiList:['打扣', '缝吊耳','缝筒','裁净边'],
       dakouOptions:['四角打扣','每隔2米打一个扣'],
       diaoerOptions:['四角缝吊耳'],
       yanzheng:false
@@ -206,7 +214,7 @@ export default {
       }
     },
 
-     craftsName(val,index,lab){
+    craftsName(val,index,lab){
       let { orderForm } = this
       let name = orderForm.skuInfos[index].gongyi //单选的名称
       let valname
@@ -227,21 +235,19 @@ export default {
       let { orderForm} = this
       orderForm.skuInfos[index].crafts = {}
 
-      orderForm.skuInfos[index].gongyi = val == orderForm.skuInfos[index].gongyi ? '' : val
-  
-      let tit = orderForm.skuInfos[index].gongyi
+      orderForm.skuInfos[index].gongyi = val 
 
-      if(tit){
-        let name
-        if(val=='打扣'){
-          name = orderForm.skuInfos[index].dakouVal 
-        }
-
-        if(val=='缝吊耳'){
-          name = orderForm.skuInfos[index].diaoerVal 
-        }
-        orderForm.skuInfos[index].crafts[val] = name?name:null
+      let name
+      if(val=='打扣'){
+        name = orderForm.skuInfos[index].dakouVal 
       }
+
+      if(val=='缝吊耳'){
+        name = orderForm.skuInfos[index].diaoerVal 
+      }
+      orderForm.skuInfos[index].crafts[val] = name?name:null
+
+      console.log(orderForm.skuInfos[index].crafts);
     },
     firstInfo(){
       this.orderForm.skuInfos = []
@@ -348,6 +354,15 @@ export default {
         if (valid) {
           for (var i in arr) {
             this.yanzheng = false
+
+            if(arr[i].gongyi==''){
+              this.$message({
+                message: '至少选择一种产品工艺',
+                type: 'warning'
+              });
+
+              return false
+            }
             if(arr[i].gongyi == '打扣' && arr[i].dakouVal=='' || arr[i].gongyi == '打扣' && arr[i].dakouVal==undefined){
               this.$message({
                 message: '请选择打扣的类型',
@@ -401,14 +416,39 @@ export default {
     },
 
     // 点击上传
-    fileUpload(val){
-      this.$refs.loadImgClick.loadImgonClick(val); //给子组件传递点击事件
+    fileUpload(val,type){
+      console.log(val,type);
+      this.$refs.loadImgClick.loadImgonClick(val,type); //给子组件传递点击事件
     },
 
     // 从子组件获取图片的信息
     getMsgFormSon(info){
-      this.orderForm.skuInfos[info.index].name = info.wenjianNanme
-      this.orderForm.skuInfos[info.index].productCode = info.wenjianCode
+      console.log(info);
+      if(info.imgMore=='more'){
+        this.orderForm.skuInfos = []
+        info.imgInfo.forEach((item, index) => {
+        　　console.log(item, index);
+            let info = {
+              productCode:item.code,
+              height: '',
+              num: 1,
+              remark: '',
+              width: '',
+              name:item.name,
+              crafts:{},
+              gongyi:'', 
+              dakouVal:'',
+              diaoerVal:'',
+            }
+            if(this.shopSkuId == 2){
+              this.$set(info,'fontColor','')
+            }
+            this.orderForm.skuInfos.push(info);
+        })
+      }else{
+        this.orderForm.skuInfos[info.index].name = info.wenjianNanme
+        this.orderForm.skuInfos[info.index].productCode = info.wenjianCode
+      }
     },
     
   },
@@ -484,6 +524,7 @@ export default {
           line-height: 32px;
           width: 100%;
           height: 100%;
+          cursor: pointer;
         }
         img{
           position: absolute;

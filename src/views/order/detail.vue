@@ -62,7 +62,7 @@
                 </ul>
             </section>
 
-            <section class="detailSection chanpininfo">
+            <section class="detailSection chanpininfo" v-if="info.orderAttr.skuId!=4">
                 <h3>产品规格</h3>
                 <ul v-for="(item,index) in info.orderSkus" :key="index">
                     <li>
@@ -71,12 +71,12 @@
                             <p>{{item.attributes.width/1000}}*{{item.attributes.height/1000}}m</p>
                         </div>
                     </li>
-                    <li class="fileBox">
+                    <li class="fileBox" v-for="x in item.products">
                         <span class="lable">产品文件{{index+1}}</span>
                         <div class="info">
-                            <input type="text" readonly  v-model="item.attributes.productName" class="p">
-                            <span class="look"  @click="lookBigImg(item.attributes.productImg)">查看</span>
-                            <span class="xiazai" @click="downloadUrl(item.attributes.productCode)">下载</span>
+                            <input type="text" readonly  v-model="x.name" class="p">
+                            <span class="look"  @click="lookBigImg(x.img)">查看</span>
+                            <span class="xiazai" @click="downloadUrl(x.code)">下载</span>
                         </div>
                     </li>
                     <li>
@@ -101,6 +101,40 @@
                         <span class="lable">产品工艺{{index+1}}</span>
                         <div class="info">
                             <p>{{item.attributes.crafts | yhc_toObj }}</p>
+                        </div>
+                    </li>
+                    <li class="remarkBox">
+                        <span class="lable">产品描述{{index+1}}</span>
+                        <div class="info">
+                            <p>{{item.remark}}</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+             <section class="detailSection chanpininfo" v-else>
+                <h3>文件信息</h3>
+                <ul v-for="(item,index) in info.orderSkus" :key="index">
+                    <li v-for="(i,key) in item.attributes.crafts">
+                        <span class="lable">{{key}}{{index+1}}</span>
+                        <div :class="key!='材料颜色' && key!='封面颜色'?'info':'info color'">
+                            <p v-if="key!='材料颜色' && key!='封面颜色'">{{i}}</p>
+                            <span v-else :style="'background:'+ i"></span>
+                        </div>
+                    </li>
+
+                    <li class="fileBox" v-for="x in item.products">
+                        <span class="lable">产品文件{{index+1}}</span>
+                        <div class="info">
+                            <input type="text" readonly  v-model="x.name" class="p">
+                            <span class="look"  @click="lookBigImg(x.img)">查看</span>
+                            <span class="xiazai" @click="downloadUrl(x.code)">下载</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="lable">打印数量{{index+1}}</span>
+                        <div class="info">
+                            <p>{{item.num}}</p>
                         </div>
                     </li>
                     <li class="remarkBox">
@@ -452,6 +486,7 @@ export default {
     },
      // 文件下载
     downloadUrl(productCode){
+        console.log(productCode);
         this.$post('post', this.baseUrl + '/production/getDownloadUrl',{
             productCode
         }).then((res) => {
@@ -539,6 +574,15 @@ export default {
                         flex: 1;
                     }
                     
+                }
+
+                .color{
+                    background: none;
+                    padding-left: 0;
+                    span{
+                        width: 32px;
+                        height: 32px;
+                    }
                 }
 
                 .lable{

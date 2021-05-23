@@ -26,7 +26,21 @@
           <span v-if="weiDutotal!=0">{{weiDutotal}}</span>
         </div>
         <div class="info">
-          <p @click="passwordPorpclick">{{info.nickname}} &nbsp/</p>
+          <el-popover
+            v-model="reviseBox"
+            placement="bottom"
+            width="200"
+            trigger="click">
+            <div class="reviseBox">
+              <p @click="nickNamePorpclick">修改昵称</p>
+              <p @click="passwordPorpclick">修改密码</p>
+            </div>
+            <p slot="reference">{{info.nickname}} 
+              <i class="el-icon-caret-bottom"></i>
+            &nbsp/</p>
+          </el-popover>
+
+
           <span class="cursor_p" @click="loginOut">&nbsp退出</span>
         </div>
       </div>
@@ -47,6 +61,19 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click.passive="submitForm('ruleForm')" v-button>修改</el-button>
+        </el-form-item>
+      </el-form>
+    </section>
+
+    <!-- 修改昵称 -->
+    <section class="publicPorp passwordPorp nickNamePorp"  v-show="nickNamePorp">
+      <h2>修改昵称</h2>
+      <el-form :model="numberValidateForm" :rules="rulesNickname" ref="numberValidateForm" class="demo-ruleForm" :hide-required-asterisk="true" style="width: 394px;">
+        <el-form-item prop="newNikeName">
+          <el-input v-model="numberValidateForm.newNikeName" placeholder="请输入昵称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.passive="nickNameForm('numberValidateForm')" v-button>修改</el-button>
         </el-form-item>
       </el-form>
     </section>
@@ -115,7 +142,11 @@ export default {
   name: 'navhead',
   data () {
     return {
-
+      numberValidateForm: {
+        newNikeName: ''
+      },
+      reviseBox:false,
+      nickNamePorp:false, //修改昵称
       headOrder:require('../assets/img/headOrder.png'),
       headNoctice:require('../assets/img/headNoctice.png'),
       ruleForm: {
@@ -130,6 +161,14 @@ export default {
           { required: true, message: '请输入新密码', trigger: 'blur' },
         ],
       },
+
+      rulesNickname: {
+        newNikeName: [
+          { required: true, message: '请输入昵称', trigger: 'blur' },
+        ],
+      },
+
+
       passwordPorp: false,
       publicPorp:false,
       nocticePorp:false,
@@ -170,10 +209,10 @@ export default {
     this.weiDuPageNotify() //未读
   },
   mounted() {
-    this.timer = setInterval(() => {
-      this.tipsPageNotify();
-      this.weiDuPageNotify() //未读
-    }, 5000)
+    // this.timer = setInterval(() => {
+    //   this.tipsPageNotify();
+    //   this.weiDuPageNotify() //未读
+    // }, 5000)
   },
   methods: {
     // 点击喇叭图标, 开始播放音频
@@ -187,8 +226,15 @@ export default {
     },
     // 点击修改密码
     passwordPorpclick(){
+      this.reviseBox=false,
       this.publicPorp=true
       this.passwordPorp=true
+    },
+    // 修改昵称
+    nickNamePorpclick(){
+      this.reviseBox=false,
+      this.publicPorp=true
+      this.nickNamePorp=true
     },
 
     // 点击通知
@@ -219,6 +265,31 @@ export default {
       })
     },
 
+    // 修改昵称
+    nickNameForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let data = {
+            newNikeName: this.numberValidateForm.newNikeName,
+          }
+          this.$post('post',this.baseUrl + '/customer/updateNickName',
+            data
+          ).then((res) => {
+            if (res.code == 200) {
+              this.$refs[formName].resetFields();
+              this.$message({
+                message: res.msg,
+                type: 'success'
+              });
+              this.publicPorp=false
+              this.nickNamePorp=false
+              this.userInfo();
+            }
+          })
+        }
+      })
+    },
+
     // 获取用户信息
     userInfo(){
       this.$post('get',this.baseUrl + '/customer/userInfo',
@@ -229,8 +300,6 @@ export default {
         }
       })
     },
-
-   
 
     // 退出登录
     loginOut(){
@@ -261,6 +330,7 @@ export default {
       this.publicPorp=false
       this.unEdit=true
       this.nocticePorp=false
+      this.nickNamePorp=false
 
       this.activeName ='2'
       this.pageNum = 1
@@ -437,6 +507,10 @@ export default {
         span:hover{
           color: #FF3333;
         }
+
+        i{
+          font-size: 20px;
+        }
       }
     }
   }
@@ -591,6 +665,20 @@ export default {
       color: #3551DF;
       font-size: 16px;
       margin-top: 16px;
+    }
+  }
+
+  .reviseBox{
+    p{
+      cursor: pointer;
+      text-align: center;
+      // line-height: 41px;
+      font-size: 16px;
+    }
+    p:first-child{
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #EBEEF5;
     }
   }
 </style>

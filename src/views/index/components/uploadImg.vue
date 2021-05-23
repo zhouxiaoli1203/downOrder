@@ -15,15 +15,29 @@
             <div class="uploadcont">
             <section class="choicesection" v-if="active==1">
                 <div class="choiceBox tuozhuai">
-                <el-upload
-                    class="upload-demo"
-                    action=""
-                    :show-file-list="false"
-                    :before-upload="beforeAvatarUpload"
-                    >
-                    <img :src="file" alt="">
-                    <p>上传文件</p>
-                </el-upload>
+                <template v-if="imgMultiple">
+                  <el-upload
+                      class="upload-demo"
+                      action=""
+                      :show-file-list="false"
+                      :before-upload="beforeAvatarUpload"
+                      multiple
+                      >
+                      <img :src="file" alt="">
+                      <p>上传文件</p>
+                  </el-upload>
+                </template>
+                <template v-else>
+                  <el-upload
+                      class="upload-demo"
+                      action=""
+                      :show-file-list="false"
+                      :before-upload="beforeAvatarUpload"
+                      >
+                      <img :src="file" alt="">
+                      <p>上传文件</p>
+                  </el-upload>
+                </template>
                 </div>
                 <!-- <div class="choiceBox" @click="shejiqiClick(2)">
                 <img :src="shejiqi" alt="">
@@ -88,8 +102,11 @@ export default {
         publicPorp:false, //遮罩层
         localList:[],
         sort:0,
-        wenjianNanme:'',
+        wenjianNanme:'', //文件的名字
         wenjianCode:'',
+        imgInfo:[],
+        imgMore:'', //''单张，'more':多张
+        imgMultiple:''
     }
   },
   created(){
@@ -101,13 +118,19 @@ export default {
     }
     this.$refs.select_frame.ondrop = (e) => {
       e.preventDefault()    // 阻止拖放后的浏览器默认行为
-      const data = e.dataTransfer.files[0]  // 获取文件对象
+      // const data = e.dataTransfer.files[0]  // 获取文件对象
+      const data = e.dataTransfer.files // 获取文件对象
       if (data.length < 1) {
         return  // 检测是否有文件拖拽到页面
       }
-      console.log(data)
-      // this.upload(data)//上传文件的方法
-      this.productionUpload(data)
+
+      console.log(data);
+      for (var k in data) {
+        this.productionUpload(data[k])
+        if (k == data.length-1) {//循环到5那项后，停止循环
+          break;
+        }
+      }
     }
     this.$refs.select_frame.ondragenter = (e) => {
       e.preventDefault()  // 阻止拖入时的浏览器默认行为
@@ -118,31 +141,46 @@ export default {
     }
   },
   methods:{
-    loadImgonClick(param){
+    loadImgonClick(param,type){
+      console.log(param,type);
         this.buzhouPorp = true
+        this.imgMore = type
         this.sort = param
+        if(type!=undefined){
+          this.imgMultiple = 'multiple'
+        }else{
+          this.imgMultiple = ''
+        }
     },
     // 上传文件
     beforeAvatarUpload(file) {
+      console.log(file);
       this.productionUpload(file)
     },
     // 上传文件请求
     productionUpload(file){
-      this.localList = [] //上传之前先清空
+      let { localList, imgInfo } = this
       let name = file.name
-      console.log(name)
       let param = new FormData(); // 创建form对象
       param.append("file",file);
       param.append("name",name); 
+      // return
       this.$post('post',this.baseUrl +'/production/upload',param,'upload'
       ).then((res) => {
         if (res.code == 200) {
-          let { localList } = this
           this.active =2
           this.buzhou = 1
-          this.wenjianNanme = name
           localList.push(name)
-          this.wenjianCode  = res.data
+          this.wenjianNanme = name 
+          this.wenjianCode  =  res.data  
+          imgInfo.push(
+            {
+              name:name,
+              code:res.data,
+            }
+          )
+
+          
         }
       })
     },
@@ -150,19 +188,38 @@ export default {
     next() {this.active++},
     // 完后上传
     finishBtn(){
-      let { sort, wenjianNanme, wenjianCode } = this
-      let imgInfo = {
+      let { sort, wenjianNanme, wenjianCode,imgInfo,imgMore } = this
+      console.log(sort);
+      if(imgMore=='more'){
+        let imgval = {
           index:sort,
-          wenjianNanme,
-          wenjianCode
+          imgMore,
+          imgInfo
+        }
+        this.$emit('func',imgval)
+      }else{
+
+        let imgval = {
+            index:sort,
+            wenjianNanme,
+            wenjianCode,
+            imgMore,
+        }
+
+        this.$emit('func',imgval)
+
       }
-      this.$emit('func',imgInfo)
       this.buzhou = 1 //1.本地上传，2.设计器上传
       this.buzhouPorp = false
       this.publicPorp = false
       this.active = 1
-      this.wenjianNanme=''
-      this.wenjianCode=''
+
+      this.localList = [] //上传之前先清空
+      this.imgInfo = []
+      this.wenjianNanme = ''
+      this.wenjianCode = ''
+      
+
     },
     // 点击设计器
     shejiqiClick(val){
@@ -180,6 +237,10 @@ export default {
     },
     // 上一步
     lastStep(){
+      this.localList = [] //上传之前先清空
+      this.wenjianNanme = ''
+      this.wenjianCode = ''
+      this.imgInfo = []
       this.active--
     },
   },

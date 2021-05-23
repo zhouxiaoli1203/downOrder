@@ -84,6 +84,12 @@
   text-align: center;
   padding: 10px 22px 0 10px;
 }
+.skuInfos .dayinSkuInfosLI .el-radio.is-bordered + .el-radio.is-bordered {
+  margin-left: 0;
+}
+.skuInfos .dayinSkuInfosLI .pubilcRadio .el-radio--medium.is-bordered {
+  margin-bottom: 10px;
+}
 .skuInfos .num .el-input__inner {
   text-align: center;
 }

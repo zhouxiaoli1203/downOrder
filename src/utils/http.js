@@ -145,5 +145,5 @@
  }
  
  // export const baseUrl = window.location.protocol + '//' + window.location.host
-//  export const baseUrl = 'http://ga.timan.vip:8090' //测试环境
-export const baseUrl = 'http://wutuapi.gundongyongheng.com'  //上线
+ export const baseUrl = 'http://ga.timan.vip:8090' //测试环境
+// export const baseUrl = 'http://wutuapi.gundongyongheng.com'  //上线

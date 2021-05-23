@@ -104,46 +104,162 @@
  
      <!-- 确认订单弹框 -->
       <section class="orderTruePorp publicPorp" v-show="orderTruePorp">
-        <h3>商品详情</h3>
-        <ul class="orderTrue" v-for="item in orderForm.skuInfos">
-          <li>
-            <span class="tit">产品文件</span>
-            <div  class="info">
-              <span class="titname">{{item.name}}</span>
+        <template v-if="skuId!=4">
+          <h3>商品详情</h3>
+          <ul class="orderTrue" v-for="item in orderForm.skuInfos">
+            <li>
+              <span class="tit">产品文件</span>
+              <div  class="info">
+                <span class="titname">{{item.name}}</span>
+              </div>
+            </li>
+            <li v-if="item.fontColor">
+              <span class="tit">字体颜色</span>
+              <div class="info">
+                <span class="name">{{item.fontColor}}</span>
+              </div>
+            </li>
+            <li v-if="item.paper">
+              <span class="tit">材料选择</span>
+              <div class="info">
+                <span class="name">{{item.paper}}</span>
+              </div>
+            </li>
+            <li>
+              <span class="tit">产品尺寸</span>
+              <div class="info">
+                <span class="name">长度{{item.width}}m*宽度{{item.height}}m</span>
+                <p>{{item.remark}}</p>
+              </div>
+            </li>
+            <li v-if="JSON.stringify(item.crafts)!='{}' && item.crafts!=undefined">
+              <span class="tit">产品工艺</span>
+              <div class="info">
+                <span class="name">{{item.crafts | yhc_toObj }}</span>
+              </div>
+            </li>
+            <li>
+              <span class="tit">产品数量</span>
+              <div class="info">
+                <span class="name">{{item.num}}</span>
+              </div>
+            </li>
+          </ul>
+        </template>
+        <template v-else>
+          <div  v-for="(item,index) in orderForm.skuInfos" :key="index">
+            <div class="ullist">
+              <h3>文件信息{{index+1}}</h3>
+              <ul class="orderTrue">
+                <li>
+                  <span class="tit">产品文件{{index+1}}</span>
+                  <div class="info infoUL">
+                    <template v-if="item.name.length>1">
+                      <div v-for="i in item.name" class="li">
+                             <el-tooltip class="item" effect="dark" :content="i.val" placement="bottom-start">
+                              <span class="titname">{{i.val}}</span>
+                            </el-tooltip>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <span class="titname" v-for="i in item.name">{{i.val}}</span>
+                    </template>
+                  </div>
+                </li>
+                <li v-if="item.dayinStyle">
+                  <span class="tit">打印风格{{index+1}}</span>
+                  <div class="info">
+                    <span class="name">{{item.dayinStyle}}</span>
+                  </div>
+                </li>
+                <li v-if="item.dayinNum">
+                  <span class="tit">打印面数{{index+1}}</span>
+                  <div class="info">
+                    <span class="name">{{item.dayinNum}}</span>
+                  </div>
+                </li>
+                <li v-if="item.dayinSize">
+                  <span class="tit">打印尺寸{{index+1}}</span>
+                  <div class="info">
+                    <span class="name">{{item.dayinSize}}</span>
+                  </div>
+                </li>
+                <li v-if="item.dayinCailiao">
+                  <span class="tit">打印材料{{index+1}}</span>
+                  <div class="info">
+                    <span class="name" v-if="item.dayinCailiao == '彩色复印纸'">{{item.caiseFuyin}}</span>
+                    <span class="name" v-if="item.dayinCailiao == '铜版纸'">{{item.tongbanzhi}}</span>
+                    <span class="name" v-if="item.dayinCailiao == '白卡纸'">{{item.baikazhi}}</span>
+
+                    <span class="name" v-if="item.dayinCailiao != '白卡纸' && item.dayinCailiao != '铜版纸' && item.dayinCailiao != '彩色复印纸'">{{item.dayinCailiao}}</span>
+                  </div>
+                </li>
+                <li v-if="item.dayinCailiao == '彩色复印纸'">
+                  <span class="tit">材料颜色{{index+1}}</span>
+                  <div class="info color">
+                    <span class="name" :style="'background:'+ item.cailiaoyanse"></span>
+                  </div>
+                </li>
+                <li v-if="item.zhaungding">
+                  <span class="tit">装订方式{{index+1}}</span>
+                  <div class="info">
+                    <span class="name">{{item.zhaungding}}</span>
+                  </div>
+                </li>
+              </ul>
             </div>
-          </li>
-          <li v-if="item.fontColor">
-            <span class="tit">字体颜色</span>
-            <div class="info">
-              <span class="name">{{item.fontColor}}</span>
+
+            <div class="ullist" v-if="item.zhaungding!='无' && item.zhaungding!=''">
+              <h3>封面信息{{index+1}}</h3>
+              <ul class="orderTrue">
+                <li v-if="item.fengmianCailiao">
+                  <span class="tit">封面材料{{index+1}}</span>
+                  <div class="info">
+                    <span class="name" v-if="item.fengmianCailiao!='铜版纸'">{{item.fengmianCailiao}}</span>
+                    <span class="name" v-else>{{item.fengmianTongbanzhi}}</span>
+                  </div>
+                </li>
+                <li v-if="item.fengmianGongyi">
+                  <span class="tit">封面工艺{{index+1}}</span>
+                  <div class="info">
+                    <span class="name">{{item.fengmianGongyi}}</span>
+                  </div>
+                </li>
+                <li v-if="item.fengmianCailiao == '平面皮纹纸' || item.fengmianCailiao == '凹凸皮纹纸' ">
+                  <span class="tit">封面颜色{{index+1}}</span>
+                  <div class="info color">
+                    <span class="name" :style="'background:'+ item.yanse"></span>
+                  </div>
+                </li>
+              </ul>
             </div>
-          </li>
-          <li v-if="item.paper">
-            <span class="tit">材料选择</span>
-            <div class="info">
-              <span class="name">{{item.paper}}</span>
+
+            <div class="ullist">
+              <h3>订单数量{{index+1}}</h3>
+              <ul class="orderTrue">
+                <li>
+                  <span class="tit">产品数量{{index+1}}</span>
+                  <div class="info">
+                    <span class="name">{{item.num}}</span>
+                  </div>
+                </li>
+                <li>
+                  <span class="tit">备注信息{{index+1}}</span>
+                  <div class="info">
+                    <p>{{item.remark}}</p>
+                  </div>
+                </li>
+              </ul>
             </div>
-          </li>
-          <li>
-            <span class="tit">产品尺寸</span>
-            <div class="info">
-              <span class="name">长度{{item.width}}m*宽度{{item.height}}m</span>
-              <p>{{item.remark}}</p>
-            </div>
-          </li>
-          <li v-if="JSON.stringify(item.crafts)!='{}' && item.crafts!=undefined">
-            <span class="tit">产品工艺</span>
-            <div class="info">
-              <span class="name">{{item.crafts | yhc_toObj }}</span>
-            </div>
-          </li>
-          <li>
-            <span class="tit">产品数量</span>
-            <div class="info">
-              <span class="name">{{item.num}}</span>
-            </div>
-          </li>
-        </ul>
+          </div>
+        </template>
+        
+
+        
+
+
+
+
         <ul class="orderTrue">
           <li>
             <span class="tit">订单标题</span>
@@ -216,6 +332,7 @@
 import RedBanner from './components/redBanner' //条幅
 import FlagBanner from './components/flagBanner' //旗帜
 import AllOrder from './components/allOrder' //通用下单
+import PrinTing from './components/prinTing' //打印
 import AddressParse from 'zh-address-parse'
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
@@ -223,7 +340,8 @@ export default {
   components: {
     RedBanner,
     FlagBanner,
-    AllOrder
+    AllOrder,
+    PrinTing
   },
   data () {
     var receiptMobileRule = (rule, value, callback) => {
@@ -248,12 +366,12 @@ export default {
       crumbsName:'',
       orderForm:{
         skuInfos:[],
-        title:'',
+        title:'订单标题',
         source:'4', //订单来源，
         sourceDisabled:false,
         sourceName:'线下',
-        receiptName:'', //客户姓名
-        receiptMobile:'',
+        receiptName:'客户姓名', //客户姓名
+        receiptMobile:'17752560527',
         deliveryType:'1', //如果是邮寄和同城配送的话，要选择收货地址等，如果是自提需要选择自提门店
         deliveryTypeName:'邮寄',
         waybillCode:'STO', //物流公司
@@ -322,6 +440,10 @@ export default {
 
     if (skuId==7) {
       this.shopInfoComponent = 'AllOrder'
+    }
+
+    if (skuId==4) {
+      this.shopInfoComponent = 'PrinTing'
     }
   },
   mounted(){
@@ -591,6 +713,7 @@ export default {
       this.$refs[formName].validate((valid,obj) => {
         if (valid) {
           let skuInfos = this.$refs.sonMethod.orderForm.skuInfos  //子组件验证通过  获取产品信息的值
+          console.log(skuInfos);
           this.orderForm.skuInfos = skuInfos
           this.orderTruePorp = true
           this.publicPorp = true//遮罩层
@@ -640,11 +763,16 @@ export default {
        for (var i in arr) {
         let info = {
           crafts:arr[i].crafts,
-          height:arr[i].height*1000,
-          width:arr[i].width*1000,
           num:arr[i].num,
-          productCode:arr[i].productCode,
           remark:arr[i].remark,
+        }
+
+        if(skuId!=4){
+          this.$set(info,'height',arr[i].height*1000) 
+          this.$set(info,'width',arr[i].width*1000)  
+          this.$set(info,'productCode',arr[i].productCode)    
+        }else{
+          this.$set(info,'productCodes',arr[i].productCodes)    
         }
 
         if (skuId==2) {          
@@ -688,6 +816,7 @@ export default {
       }
       console.log(url)
       console.log(data)
+  
       this.$post('post',this.baseUrl + url,data
       ).then((res) => {
         if (res.code == 200) {
@@ -856,6 +985,12 @@ export default {
       font-size: 16px;
     }
 
+    .ullist{
+      h3{
+        margin-top: 16px;
+      }
+    }
+
     .orderTrue{
       padding-top: 24px;
       border-bottom: 1px solid #CBCFE3;
@@ -871,6 +1006,7 @@ export default {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          flex: 1;
         }
         .tit{
           color: #666;
@@ -881,10 +1017,21 @@ export default {
           flex: 1;
           overflow: hidden;
         }
+        
 
         .name{
           margin-bottom: 8px;
           display: inline-block;
+        }
+
+        .color{
+          .name{
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 1px solid #FFFFFF;
+          }
         }
         .ziti{
           color: #3551DF;
@@ -896,6 +1043,14 @@ export default {
           padding: 8px;
           color: #666;
           line-height: 20px;
+        }
+      }
+
+      .infoUL{
+        display: flex;
+        .li{
+          width: 100px;
+          margin: 0 16px 16px 0;
         }
       }
     }
