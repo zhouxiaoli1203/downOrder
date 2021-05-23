@@ -238,7 +238,7 @@
               <h3>订单数量{{index+1}}</h3>
               <ul class="orderTrue">
                 <li>
-                  <span class="tit">产品数量{{index+1}}</span>
+                  <span class="tit">订单数量{{index+1}}</span>
                   <div class="info">
                     <span class="name">{{item.num}}</span>
                   </div>

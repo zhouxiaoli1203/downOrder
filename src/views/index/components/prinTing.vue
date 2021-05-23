@@ -7,7 +7,7 @@
                 <el-row >
                     <h3>文件信息</h3>
                     <el-col class="skuInfosLI">                    
-                       <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
+                       <el-form-item label="打印文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
                             <el-row type="flex" class="row-bg" justify="space-between">
                                 <el-col :span="20" class="uploadBox">
                                     <div class="upFile" @click="fileUpload(index,'more')">
@@ -179,7 +179,7 @@
                 <el-row >
                     <h3>订单数量</h3>
                     <el-col class="skuInfosLI">                        
-                        <el-form-item label="产品数量">
+                        <el-form-item label="打印数量">
                             <el-col :span="4" class="num">
                             <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
                             </el-col>
