@@ -64,8 +64,9 @@
                 </section>
                 <section class="cont" v-if="buzhou==1">
                 <ul>
-                    <li v-for="item in localList">
-                    <span>{{item}}</span>
+                    <li v-for="(item,index) in localList" :key="index">
+                      <p>{{index+1}}</p>
+                      <span>{{item}}</span>
                     </li>
                 </ul>
                 </section>
@@ -89,6 +90,8 @@
 </template>
 
 <script>
+import { Loading } from 'element-ui';
+// let loading;
 export default {
   data () {
     return {
@@ -141,6 +144,7 @@ export default {
     }
   },
   methods:{
+
     loadImgonClick(param,type){
       console.log(param,type);
         this.buzhouPorp = true
@@ -164,9 +168,14 @@ export default {
       let param = new FormData(); // 创建form对象
       param.append("file",file);
       param.append("name",name); 
-      // return
+
+      this.openFullScreen(); //调用加载中
+
       this.$post('post',this.baseUrl +'/production/upload',param,'upload'
       ).then((res) => {
+
+        this.closeFullScreen(this.openFullScreen()); //关闭加载框
+        
         if (res.code == 200) {
           this.active =2
           this.buzhou = 1
@@ -294,13 +303,24 @@ export default {
           display: flex;
           align-items: center;
           margin-bottom: 16px;
+          background: #E7E8F4;
+          border-radius: 4px;
+          p{
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            text-align: center;
+            line-height: 13px;
+            font-size: 12px;
+            margin-left: 10px;
+          }
           span{
             height: 32px;
             background: #E7E8F4;
-            border-radius: 4px;
             line-height: 32px;
             flex: 1;
-            padding: 0 16px;
+            padding: 0 16px 0 10px;
             display: block;
             white-space: nowrap;
             overflow: hidden;

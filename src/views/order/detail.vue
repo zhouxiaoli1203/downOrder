@@ -82,7 +82,7 @@
                     <li>
                         <span class="lable" style="color:red;font-weight: bold;">产品数量{{index+1}}</span>
                         <div class="info">
-                            <p>{{item.num}}</p>
+                            <p style="color:red;font-weight: bold;">{{item.num}}</p>
                         </div>
                     </li>
                     <li v-if="item.skuId==2">
@@ -132,9 +132,9 @@
                         </div>
                     </li>
                     <li>
-                        <span class="lable">打印数量{{index+1}}</span>
+                        <span class="lable" style="color:red;font-weight: bold;">打印数量{{index+1}}</span>
                         <div class="info">
-                            <p>{{item.num}}</p>
+                            <p style="color:red;font-weight: bold;">{{item.num}}</p>
                         </div>
                     </li>
                     <li class="remarkBox">
@@ -310,6 +310,7 @@ export default {
   methods: {
     // 大图预览
     lookBigImg(val){
+      console.log(val);
       if(val){
         this.showViewer = true
         this.showViewerUrl = this.baseUrl + val 
@@ -346,6 +347,7 @@ export default {
                     
                 }
             }
+
         })
     },
     // 再来一单
@@ -439,8 +441,14 @@ export default {
         let param = new FormData(); // 创建form对象
         param.append("file",file);
         param.append("orderId",this.orderId); 
+
+        this.openFullScreen(); //调用加载中
+
         this.$post('post',this.baseUrl +'/backOrder/uploadCredentialImage',param,'upload'
         ).then((res) => {
+
+            this.closeFullScreen(this.openFullScreen()); //关闭加载框
+
             if (res.code == 200) {
                 let data = {
                     name: File.name,

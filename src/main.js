@@ -18,6 +18,7 @@ import './assets/css/public.css';
 //全局公用函数
 import Fns from './utils/common'
 Object.keys(Fns).forEach(key => {
+  console.log(key);
     Vue.prototype[key] = Fns[key]
 })
 

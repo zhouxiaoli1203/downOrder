@@ -4,99 +4,100 @@
         <div class="skuInfos">
           <el-row v-if="orderForm.skuInfos">
             <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="skuInfosLI">
-            <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
-                <el-row type="flex" class="row-bg" justify="space-between">
-                <el-col :span="20" class="uploadBox">
-                    <div class="upFile" v-if="orderForm.skuInfos.length>1"  @click="fileUpload(index)">
-                      <img :src="file" alt="">
-                      <p>上传文件</p>
-                    </div>
-                    
-                    <div class="upFile" v-else  @click="fileUpload(index,'more')">
-                      <img :src="file" alt="">
-                      <p>上传文件</p>
-                    </div>
-                    <div v-if="item.name!=''" class="fileDiv">
-                        <el-tooltip class="item" effect="dark" :content="item.name" placement="right">
-                          <input type="text"  readonly v-model="item.name">
-                        </el-tooltip>
-                      <img :src="delImg" alt="" @click="shanchuFile(index)">
-                    </div>
-                </el-col>
-                <el-col :span="2" class="iconClose" >
-                    <i class="el-icon-close" v-if="index!=0"  @click="deleteLadder(index)"></i>
-                </el-col>
-                </el-row>
-            </el-form-item>
-            <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" class="pubilcRadio" v-if="shopSkuId==2">
-                <el-radio-group v-model="item.fontColor" size="medium">
-                <el-radio border label="白色">白色</el-radio>
-                <el-radio border label="黄色">黄色</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="产品尺寸" required>
-                <el-row>
-                <el-col :span="8">
-                    <el-form-item :prop="`skuInfos.${index}.width`" :rules="skuInfosGroupRules.infowidth">
-                    <el-input v-model="item.width" placeholder="长度（m）"></el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col class="line" :span="2">X</el-col>
-                <el-col :span="8" class="inputSelect">
-                    <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
-                        <el-select v-model="item.height" placeholder="请选择">
-                        <el-option
-                        v-for="item in restaurants"
-                        :key="item.value"
-                        :label="item.name"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
-                    </el-form-item>
-                </el-col>
-                </el-row>
-                <el-row class="remark">
-                <el-col>
-                    <el-form-item :prop="`skuInfos.${index}.remark`" :rules="skuInfosGroupRules.inforemark">
-                    <el-input  type="textarea" v-model="item.remark" placeholder="请输入订单具体信息"></el-input>
-                    </el-form-item>
-                </el-col>
-                </el-row>
-            </el-form-item>
-
-            <el-form-item label="产品工艺" class="productCraft gongyiProduct">
-                <el-radio-group v-model="item.gongyi"  @change="handleCancel($event,index)">
-                  <div class="li" v-for="i in chanpinGongyiList">
-                      <el-radio :label="i">{{i}}</el-radio>
-                      <template v-if="i == '打扣'">
-                        <el-select v-model="item.dakouVal" placeholder="类型" @change="craftsName($event,index,'打扣')">
+              <p class="jiaobiao">文件{{index+1}}</p>
+              <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
+                  <el-row type="flex" class="row-bg" justify="space-between">
+                  <el-col :span="20" class="uploadBox">
+                      <div class="upFile" v-if="orderForm.skuInfos.length>1"  @click="fileUpload(index)">
+                        <img :src="file" alt="">
+                        <p>上传文件</p>
+                      </div>
+                      
+                      <div class="upFile" v-else  @click="fileUpload(index,'more')">
+                        <img :src="file" alt="">
+                        <p>上传文件</p>
+                      </div>
+                      <div v-if="item.name!=''" class="fileDiv">
+                          <el-tooltip class="item" effect="dark" :content="item.name" placement="right">
+                            <input type="text"  readonly v-model="item.name">
+                          </el-tooltip>
+                        <img :src="delImg" alt="" @click="shanchuFile(index)">
+                      </div>
+                  </el-col>
+                  <el-col :span="2" class="iconClose" >
+                      <i class="el-icon-close" v-if="index!=0"  @click="deleteLadder(index)"></i>
+                  </el-col>
+                  </el-row>
+              </el-form-item>
+              <el-form-item label="字体颜色" :prop="`skuInfos.${index}.fontColor`" :rules="skuInfosGroupRules.infofontColor" class="pubilcRadio" v-if="shopSkuId==2">
+                  <el-radio-group v-model="item.fontColor" size="medium">
+                  <el-radio border label="白色">白色</el-radio>
+                  <el-radio border label="黄色">黄色</el-radio>
+                  </el-radio-group>
+              </el-form-item>
+              <el-form-item label="产品尺寸" required>
+                  <el-row>
+                  <el-col :span="8">
+                      <el-form-item :prop="`skuInfos.${index}.width`" :rules="skuInfosGroupRules.infowidth">
+                      <el-input v-model="item.width" placeholder="长度（m）"></el-input>
+                      </el-form-item>
+                  </el-col>
+                  <el-col class="line" :span="2">X</el-col>
+                  <el-col :span="8" class="inputSelect">
+                      <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
+                          <el-select v-model="item.height" placeholder="请选择">
                           <el-option
-                            v-for="item in dakouOptions"
-                            :key="item"
-                            :label="item"
-                            :value="item">
+                          v-for="item in restaurants"
+                          :key="item.value"
+                          :label="item.name"
+                          :value="item.value">
                           </el-option>
-                        </el-select>
-                      </template>
+                      </el-select>
+                      </el-form-item>
+                  </el-col>
+                  </el-row>
+                  <el-row class="remark">
+                  <el-col>
+                      <el-form-item :prop="`skuInfos.${index}.remark`" :rules="skuInfosGroupRules.inforemark">
+                      <el-input  type="textarea" v-model="item.remark" placeholder="请输入订单具体信息"></el-input>
+                      </el-form-item>
+                  </el-col>
+                  </el-row>
+              </el-form-item>
 
-                      <template v-if="i == '缝吊耳'">
-                        <el-select v-model="item.diaoerVal" placeholder="四角缝吊耳" @change="craftsName($event,index,'缝吊耳')">
+              <el-form-item label="产品工艺" class="productCraft gongyiProduct">
+                  <el-radio-group v-model="item.gongyi"  @change="handleCancel($event,index)">
+                    <div class="li" v-for="i in chanpinGongyiList">
+                        <el-radio :label="i">{{i}}</el-radio>
+                        <template v-if="i == '打扣'">
+                          <el-select v-model="item.dakouVal" placeholder="类型" @change="craftsName($event,index,'打扣')">
                             <el-option
-                            v-for="item in diaoerOptions"
-                            :key="item"
-                            :label="item"
-                            :value="item">
+                              v-for="item in dakouOptions"
+                              :key="item"
+                              :label="item"
+                              :value="item">
                             </el-option>
-                        </el-select>
-                      </template>
-                  </div>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="产品数量">
-                <el-col :span="4" class="num">
-                <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
-                </el-col>
-            </el-form-item>
+                          </el-select>
+                        </template>
+
+                        <template v-if="i == '缝吊耳'">
+                          <el-select v-model="item.diaoerVal" placeholder="四角缝吊耳" @change="craftsName($event,index,'缝吊耳')">
+                              <el-option
+                              v-for="item in diaoerOptions"
+                              :key="item"
+                              :label="item"
+                              :value="item">
+                              </el-option>
+                          </el-select>
+                        </template>
+                    </div>
+                  </el-radio-group>
+              </el-form-item>
+              <el-form-item label="产品数量">
+                  <el-col :span="4" class="num">
+                  <el-input-number v-model="item.num" @change="handleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
+                  </el-col>
+              </el-form-item>
             </el-col>
           </el-row>
         </div>
@@ -456,6 +457,7 @@ export default {
   watch:{
     skuInfos: {
       handler (newValue, oldValue) {
+        console.log(11111111111111111111);
         console.log(JSON.stringify(newValue) + ' = == === newValue')
         console.log(JSON.stringify(oldValue) + ' = == === oldValue');
         if(newValue!=''){
@@ -473,10 +475,25 @@ export default {
 <style lang="less" scoped>
   .skuInfos{
     .skuInfosLI{
+      position: relative;
       margin-bottom: 24px;
       padding: 24px !important;
       background: #F5F6F9;
       border-radius: 10px;
+
+      .jiaobiao{
+        position: absolute;
+        background: #ff6b16;
+        color: #fff;
+        width: 58px;
+        height: 28px;
+        text-align: center;
+        line-height: 28px;
+        font-size: 13px;
+        border-radius: 0 10px 0 10px ;
+        top: -14px;
+        left: -14px;
+      }
     }
 
     .uploadBox {

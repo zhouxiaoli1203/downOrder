@@ -4,8 +4,9 @@
         <div class="skuInfos">
           <el-row v-if="orderForm.skuInfos">
             <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="dayinSkuInfosLI">
+                <p class="jiaobiao">文件{{index+1}}</p>
                 <el-row >
-                    <h3>文件信息</h3>
+                    <h3 class="wenjianH3">文件信息</h3>
                     <el-col class="skuInfosLI">                    
                        <el-form-item label="打印文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
                             <el-row type="flex" class="row-bg" justify="space-between">
@@ -997,8 +998,22 @@ export default {
   .dayinSkuInfosLI{
     background: #F5F6F9;
     border-radius: 10px;
-    overflow: hidden;
+    // overflow: hidden;
     margin-bottom: 24px;
+    position: relative;
+    .jiaobiao{
+      position: absolute;
+      background: #ff6b16;
+      color: #fff;
+      width: 58px;
+      height: 28px;
+      text-align: center;
+      line-height: 28px;
+      font-size: 13px;
+      border-radius: 0 10px 0 10px ;
+      top: -19px;
+      left: -14px;
+    }
       h3{
           background: rgba(53,81,223,0.09);
           color: #333;
@@ -1006,6 +1021,9 @@ export default {
           height: 40px;
           line-height: 40px;
           padding-left: 23px;
+      }
+      .wenjianH3{
+        border-radius: 10px 10px 0 0;
       }
 
       .colorCard{
@@ -1019,6 +1037,7 @@ export default {
         cursor: pointer;
       }
   }
+
 
    .fengmianyanse{
        display: flex;

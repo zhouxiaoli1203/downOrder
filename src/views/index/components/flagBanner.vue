@@ -4,6 +4,7 @@
         <div class="skuInfos">
           <el-row v-if="orderForm.skuInfos">
             <el-col v-for="(item,index) in orderForm.skuInfos" :key="index" class="skuInfosLI">
+              <p class="jiaobiao">文件{{index+1}}</p>
               <el-form-item label="产品文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
                 <el-row type="flex" class="row-bg" justify="space-between">
                   <el-col :span="20" class="uploadBox">
@@ -372,6 +373,21 @@ export default {
       padding: 24px !important;
       background: #F5F6F9;
       border-radius: 10px;
+      position: relative;
+
+      .jiaobiao{
+        position: absolute;
+        background: #ff6b16;
+        color: #fff;
+        width: 58px;
+        height: 28px;
+        text-align: center;
+        line-height: 28px;
+        font-size: 13px;
+        border-radius: 0 10px 0 10px ;
+        top: -14px;
+        left: -14px;
+      }
     }
 
     .uploadBox {
