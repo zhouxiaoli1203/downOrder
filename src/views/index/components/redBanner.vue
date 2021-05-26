@@ -187,7 +187,7 @@ export default {
           name:' 0.9米 (实际0.85米)'
         }
       ],
-      chanpinGongyiList:['打扣', '缝吊耳','缝筒','裁净边'],
+      chanpinGongyiList:['打扣', '缝吊耳','缝筒','裁净边','条幅绑带'],
       dakouOptions:['四角打扣','每隔2米打一个扣'],
       diaoerOptions:['四角缝吊耳'],
       yanzheng:false

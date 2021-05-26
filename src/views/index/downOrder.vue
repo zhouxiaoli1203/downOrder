@@ -544,9 +544,11 @@ export default {
               orderForm.receiptDetailAddress = data.orderAttr.receiptDetailAddress// 详细地址
 
               let dizhi = data.orderAttr.receiptAddress
-              var reg = /.+?(省|市|自治区|自治州|县|区)/g;
 
+              var reg = /.+?(省|市|自治区|自治州|县|区|旗|城|会)/g;
               let addressInfo  = dizhi.match(reg)
+
+              console.log(addressInfo);
 
               let prov = TextToCode[addressInfo[0]]
               let provCode = prov.code
@@ -556,6 +558,8 @@ export default {
   
           
               if(addressInfo[0]==addressInfo[1]){
+
+                console.log(11111111111);
                 let city = TextToCode[addressInfo[0]] ['市辖区']
                 cityCode = city.code
 
@@ -564,6 +568,7 @@ export default {
 
 
               }else{
+                console.log(222222222222);
                 let city = TextToCode[addressInfo[0]] [addressInfo[1]]
                 cityCode = city.code
 
