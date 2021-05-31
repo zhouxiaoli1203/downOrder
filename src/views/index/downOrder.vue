@@ -9,7 +9,7 @@
       <div class="center">
         <div class="orderContBox">
           <section class="orderCont">
-            <component :is="shopInfoComponent" ref="sonMethod" :skuInfos="shopInfo"></component>
+            <component :is="shopInfoComponent" ref="sonMethod" :skuInfos="shopInfo" @detailChange="attrDetails"></component>
             <el-form :model="orderForm" :rules="orderFormRules" ref="orderForm" label-width="80px" class="demo-ruleForm"  @submit.native.prevent>         
               <el-form-item label="订单标题" prop="title" class="orderTitle">
                 <el-input v-model="orderForm.title" placeholder="请输入订单标题"  maxlength="200" show-word-limit></el-input>
@@ -78,20 +78,20 @@
           </section>
           <section class="lookCont">
             <div class="imgbannerBox">
-              <div class="imgbanner">
+              <div class="imgbanner" v-if="skuId==2 || skuId==5">
                 <el-carousel :interval="5000" arrow="always" indicator-position="none" height="228px" :autoplay="false">
-                  <el-carousel-item v-for="item in 4" :key="item">
-                    <img src="" alt="">
-                  </el-carousel-item>
+                    <el-carousel-item  v-for="(item,index) in orderForm.skuInfos" :key="index" >
+                      <img :src="item.img" alt="">
+                          <div class="magnifier"  @click="lookBigImg(item.img)">
+                            <i class="el-icon-search"></i>
+                          </div>
+                    </el-carousel-item>
                 </el-carousel>
-                <div class="magnifier">
-                  <i class="el-icon-search"></i>
-                </div>
               </div>
-              <ul>
-                <li v-for="item in 4">
-                  <img src="" alt="">
-                  <p>禁止烧麦秸…</p>
+              <ul v-if="skuId==2 || skuId==5">
+                <li v-for="(item,index) in orderForm.skuInfos" :key="index" >
+                  <img :src="item.img" alt="">
+                  <p>{{item.name}}</p>
                 </li>
               </ul>
             </div>
@@ -325,10 +325,20 @@
 
       </section>
       <div class="mask" v-show="publicPorp"></div>
+
+
+      <!-- 查看大图 -->
+      <el-image-viewer 
+        v-if="showViewer" 
+        :on-close="closeViewer" 
+        :url-list="[showViewerUrl]" />
+
+
   </div>
 </template>
 
 <script>
+import ElImageViewer from 'element-ui/packages/image/src/image-viewer'
 import RedBanner from './components/redBanner' //条幅
 import FlagBanner from './components/flagBanner' //旗帜
 import AllOrder from './components/allOrder' //通用下单
@@ -341,7 +351,8 @@ export default {
     RedBanner,
     FlagBanner,
     AllOrder,
-    PrinTing
+    PrinTing,
+    ElImageViewer
   },
   data () {
     var receiptMobileRule = (rule, value, callback) => {
@@ -419,6 +430,8 @@ export default {
       skuIdUrl:'',
       shopInfo:[],
       shopInfoComponent:'',
+      showViewer:false,// 显示查看器
+      showViewerUrl:'',
     }
   },
   created(){
@@ -455,6 +468,30 @@ export default {
   mounted(){
   },
   methods:{
+       // 大图预览
+    lookBigImg(val){
+      console.log(val);
+      if(val){
+        this.showViewer = true
+        this.showViewerUrl = val 
+      }else{
+        this.$message({
+          message: '该文件暂不支持预览哦！',
+          type: 'warning'
+        });
+      }
+    },
+
+    // 关闭查看器
+    closeViewer() {
+      this.showViewer = false
+      this.showViewerUrl = ''
+    },
+
+    attrDetails: function (val) {
+      this.orderForm.skuInfos=val
+    },
+
     // 获取物流
     listExpressCompany(){
       this.$post('get',this.baseUrl + '/order/listExpressCompany',
@@ -507,10 +544,8 @@ export default {
 
               let wuliuCode = data.orderAttr.waybillCode
               orderForm.waybillCode = wuliuCode// 物流的code
-              console.log(this.wuliuList)
               this.wuliuList.forEach((item,index)=>{
                 if(wuliuCode==item.code){
-                  console.log(item.name)
                    orderForm.waybillCodeName= item.name   // 物流的名字
                 }
               })
@@ -548,7 +583,6 @@ export default {
               var reg = /.+?(省|市|自治区|自治州|县|区|旗|城|会)/g;
               let addressInfo  = dizhi.match(reg)
 
-              console.log(addressInfo);
 
               let prov = TextToCode[addressInfo[0]]
               let provCode = prov.code
@@ -559,7 +593,6 @@ export default {
           
               if(addressInfo[0]==addressInfo[1]){
 
-                console.log(11111111111);
                 let city = TextToCode[addressInfo[0]] ['市辖区']
                 cityCode = city.code
 
@@ -568,7 +601,6 @@ export default {
 
 
               }else{
-                console.log(222222222222);
                 let city = TextToCode[addressInfo[0]] [addressInfo[1]]
                 cityCode = city.code
 
@@ -716,6 +748,8 @@ export default {
     },
     // 订单提交验证
     submitForm(formName){
+      let skuInfos = this.$refs.sonMethod.orderForm.skuInfos  //子组件验证通过  获取产品信息的值
+          console.log(skuInfos);
       this.$refs.sonMethod.onClick(true); //给子组件传递点击事件
       let yanzheng = this.$refs.sonMethod.yanzheng  //获取子组件验证是否通过  false 未通过， true 通过    
       if(yanzheng==false){
@@ -943,6 +977,10 @@ export default {
         p{
           font-size: 12px;
           margin-top: 8px;
+          width: 76px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
         }
       }
     }

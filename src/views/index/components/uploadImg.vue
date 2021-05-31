@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="mask" ref='select_frame' ondragstart="return false" v-show="buzhouPorp">
+      <template v-for="i in dataList"><img :src="i.content"  alt=""></template>
         <section class="uploadSection publicPorp">
             <div class="close" @click="Close">
             <i class="el-icon-close"></i>
@@ -90,11 +91,11 @@
 </template>
 
 <script>
-import { Loading } from 'element-ui';
-// let loading;
+import JSZip from 'jszip'
 export default {
   data () {
     return {
+      imgResult:"",
         radio:'1',
         active: 1,
         file:require('@/assets/img/file.png'),
@@ -107,9 +108,12 @@ export default {
         sort:0,
         wenjianNanme:'', //文件的名字
         wenjianCode:'',
+        wenjianImg:'', //文件的图片
         imgInfo:[],
         imgMore:'', //''单张，'more':多张
-        imgMultiple:''
+        imgMultiple:'',
+        dataList:[],
+        product:'',
     }
   },
   created(){
@@ -129,7 +133,14 @@ export default {
 
       console.log(data);
       for (var k in data) {
-        this.productionUpload(data[k])
+
+        let yanzheng = /^[\s\S]*cdr$/;   //判断后三位是否为cdr
+
+        if(!yanzheng.test(data[k].name)){
+          this.productionUpload(data[k],'')
+        }else{
+          this.cdrLook(data[k]);  
+        }
         if (k == data.length-1) {//循环到5那项后，停止循环
           break;
         }
@@ -145,11 +156,12 @@ export default {
   },
   methods:{
 
-    loadImgonClick(param,type){
-      console.log(param,type);
+    loadImgonClick(param,type,product){
+      console.log(param,type,product);
         this.buzhouPorp = true
         this.imgMore = type
         this.sort = param
+        this.product = product
         if(type!=undefined){
           this.imgMultiple = 'multiple'
         }else{
@@ -157,13 +169,44 @@ export default {
         }
     },
     // 上传文件
-    beforeAvatarUpload(file) {
-      console.log(file);
-      this.productionUpload(file)
+    beforeAvatarUpload(zipFile) {
+      console.log(zipFile);
+      let yanzheng = /^[\s\S]*cdr$/;   //判断后三位是否为cdr
+
+      if(!yanzheng.test(zipFile.name)){
+        this.productionUpload(zipFile,'')
+        return
+      }
+      this.cdrLook(zipFile);  
     },
+
+
+    // cdr文件提取预览图
+    cdrLook(zipFile){
+      const jszip = new JSZip()
+      jszip.loadAsync(zipFile).then((zip) => { // 读取zip
+        for (let key in zip.files) { 
+            if (!zip.files[key].dir) {  // 判断是否是目录
+                if (/\.(png|jpg|jpeg|gif|bmp)$/.test(zip.files[key].name)) { // 判断是否是图片格式
+                  let mc = zip.files[key].name
+                  let mcName = mc.includes("page")
+                  if(mcName==false){
+                    console.log(111);
+                    let base = zip.file(zip.files[key].name).async('base64') // 将图片转化为base64格式
+                    base.then(res => {
+                      let img =  `data:image/png;base64,${res}`
+                      this.productionUpload(zipFile,'cdr',img)
+                    })
+                  }
+                }
+            }
+        }
+      })
+    },
+
     // 上传文件请求
-    productionUpload(file){
-      let { localList, imgInfo,imgMore } = this
+    productionUpload(file,type,img){
+      let {product} = this
       let name = file.name
       let param = new FormData(); // 创建form对象
       param.append("file",file);
@@ -173,35 +216,93 @@ export default {
 
       this.$post('post',this.baseUrl +'/production/upload',param,'upload'
       ).then((res) => {
-
         this.closeFullScreen(this.openFullScreen()); //关闭加载框
-        
         if (res.code == 200) {
           this.active =2
           this.buzhou = 1
-          if(imgMore=='more'){
-            localList.push(name)
-            imgInfo.push(
-              {
-                name:name,
-                code:res.data,
-              }
-            )
-
+          if(type=='cdr'){
+            this.imgInfoFunction(name,res.data,img)
           }else{
-            this.localList = []
-            this.localList.push(name)
-            this.wenjianNanme = name 
-            this.wenjianCode  =  res.data 
-          }        
+            if(!product){
+              this.imgInfoFunction(name,res.data)
+              return
+            }
+            this.getFile(file,name,res.data);
+          }     
         }
       })
     },
+
+    // 文件赋值
+    imgInfoFunction(name,code,img){
+      let {localList,imgMore,imgInfo} = this
+      if(imgMore=='more'){
+        localList.push(name)
+        imgInfo.push(
+          {
+            name:name,
+            code:code,
+            img
+          }
+        )
+      }else{
+        this.localList = []
+        this.localList.push(name)
+        this.wenjianNanme = name 
+        this.wenjianCode  =  code 
+        this.wenjianImg  =  img
+      }       
+    },
+
+
+    getBase64(file) {
+      return new Promise(function(resolve, reject) {
+        let imgResult = ''
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function() {
+            imgResult = reader.result;
+        };
+        reader.onerror = function(error) {
+            reject(error);
+        };
+        reader.onloadend = function() {
+            resolve(imgResult);
+        };
+      });
+    },
+
+    // 上传wenjia 
+    getFile(file, name,code) {
+      this.getBase64(file).then(res => {
+        // console.log(111);
+        // if(imgMore=='more'){
+        //   localList.push(name)
+        //   imgInfo.push(
+        //     {
+        //       name:name,
+        //       code:code,
+        //       img:res
+        //     }
+        //   )
+        //   console.log(this.imgInfo); 
+        // }else{
+        //   this.localList = []
+        //   this.localList.push(name)
+        //   this.wenjianNanme = name 
+        //   this.wenjianCode  = code
+        //   this.wenjianImg  =  res
+        // }
+
+        this.imgInfoFunction(name,code,res)
+      });
+    },
+
     // 下一步
     next() {this.active++},
     // 完后上传
     finishBtn(){
-      let { sort, wenjianNanme, wenjianCode,imgInfo,imgMore } = this
+      let { sort, wenjianNanme, wenjianCode,imgInfo,imgMore,wenjianImg } = this
       console.log(sort);
       if(imgMore=='more'){
         let imgval = {
@@ -216,6 +317,7 @@ export default {
             index:sort,
             wenjianNanme,
             wenjianCode,
+            wenjianImg,
             imgMore,
         }
 
@@ -231,6 +333,7 @@ export default {
       this.imgInfo = []
       this.wenjianNanme = ''
       this.wenjianCode = ''
+      this.wenjianImg = ''
       
 
     },
@@ -253,6 +356,7 @@ export default {
       this.localList = [] //上传之前先清空
       this.wenjianNanme = ''
       this.wenjianCode = ''
+      this.wenjianImg = ''
       this.imgInfo = []
       this.active--
     },

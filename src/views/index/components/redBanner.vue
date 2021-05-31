@@ -259,6 +259,7 @@ export default {
         remark: '',
         width: '',
         name:'',
+        img:'', //文件的图片
         crafts:{},
         gongyi:'', 
         dakouVal:'',
@@ -272,7 +273,6 @@ export default {
     },
     // 获取订单信息
     getByIdInfo(data){
-      console.log(data);
       this.orderForm.skuInfos = []
       let { orderForm } = this
       data.forEach((item,index)=>{
@@ -285,6 +285,11 @@ export default {
           name:item.products[0].name,//文件的名字
           crafts:item.attributes.crafts?item.attributes.crafts:{}
         }
+
+
+        item.products.forEach((i,key)=>{
+          this.$set(info,'img',this.baseUrl + i.img)
+        })
 
 
         if(this.shopSkuId == 2){
@@ -311,8 +316,10 @@ export default {
           info['diaoerVal'] = ''
         }  
         orderForm.skuInfos.push(info)
-        console.log(this.orderForm.skuInfos);
       })
+
+      this.$emit("detailChange",this.orderForm.skuInfos);
+      console.log(this.orderForm.skuInfos);
     },
      
     // 移除整个产品
@@ -322,13 +329,16 @@ export default {
           this.orderForm.skuInfos.splice(index,1);
         }
       })
+      this.$emit("detailChange",this.orderForm.skuInfos);
     },
     // 删除某个产品中的文件
     shanchuFile(val){
       this.confirm_pop("确定删除该文件吗？").then(res=>{
         this.orderForm.skuInfos[val].name = ''
         this.orderForm.skuInfos[val].productCode = ''
+        this.orderForm.skuInfos[val].img = ''
       })
+      this.$emit("detailChange",this.orderForm.skuInfos);
     },
     // 添加产品
     addLadder(){
@@ -339,6 +349,7 @@ export default {
         remark: '',
         width: '',
         name:'',
+        img:'', //文件的图片
         crafts:{},
         gongyi:'', 
         dakouVal:'',
@@ -400,6 +411,7 @@ export default {
         remark: '',
         width: '',
         name:'',
+        img:'', //文件的图片
         crafts:{},
         gongyi:'', 
         dakouVal:'',
@@ -410,6 +422,7 @@ export default {
         this.$set(info,'fontColor','')
       }
       this.orderForm.skuInfos.push(info);
+      this.$emit("detailChange",this.orderForm.skuInfos);
     },
    
     // 数量计步器
@@ -420,7 +433,7 @@ export default {
     // 点击上传
     fileUpload(val,type){
       console.log(val,type);
-      this.$refs.loadImgClick.loadImgonClick(val,type); //给子组件传递点击事件
+      this.$refs.loadImgClick.loadImgonClick(val,type,'tiaofu'); //给子组件传递点击事件
     },
 
     // 从子组件获取图片的信息
@@ -437,6 +450,7 @@ export default {
               remark: '',
               width: '',
               name:item.name,
+              img:item.img,
               crafts:{},
               gongyi:'', 
               dakouVal:'',
@@ -446,10 +460,16 @@ export default {
               this.$set(info,'fontColor','')
             }
             this.orderForm.skuInfos.push(info);
+            this.$emit("detailChange",this.orderForm.skuInfos);
+             console.log(this.orderForm.skuInfos);
         })
       }else{
         this.orderForm.skuInfos[info.index].name = info.wenjianNanme
         this.orderForm.skuInfos[info.index].productCode = info.wenjianCode
+        this.orderForm.skuInfos[info.index].img = info.wenjianImg
+        this.$emit("detailChange",this.orderForm.skuInfos);
+        console.log(this.orderForm.skuInfos);
+
       }
     },
     
@@ -466,6 +486,8 @@ export default {
           this.firstInfo()
         }
       },
+      // immediate:true,
+      //     deep:true
     }
   }
 }

@@ -70,6 +70,7 @@ export default {
       display: flex;
       align-items: center;
       padding: 24px;
+      flex-wrap: wrap;
 
       li{
         text-align: center;
@@ -78,6 +79,7 @@ export default {
         background: #F5F6FA;
         border-radius: 10px;
         margin-right: 48px;
+        margin-bottom: 24px;
         .img{
           text-align: center;
           margin-bottom: 16px;
@@ -88,7 +90,7 @@ export default {
           }
         }
         span{
-          width: 68px;
+          width: 89px;
           height: 28px;
           background: #3551DF;
           border-radius: 16px;

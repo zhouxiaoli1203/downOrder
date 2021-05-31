@@ -161,9 +161,10 @@ export default {
           productCode:item.attributes.productCode,
           height:item.attributes.height/1000,
           num:item.num,
-          remark:item.attributes.remark,
+          remark:item.remark,
           width:item.attributes.width/1000,
-          name:item.attributes.productName,//文件的名字
+          // name:item.attributes.productName,//文件的名字
+          name:item.products[0].name,//文件的名字
         }
         orderForm.skuInfos.push(info)
       })
