@@ -44,7 +44,7 @@
                   </el-col>
                   <el-col class="line" :span="2">X</el-col>
                   <el-col :span="8" class="inputSelect">
-                      <el-form-item :prop="`skuInfos.${index}.height`" :rules="skuInfosGroupRules.infoheight">
+                      <el-form-item>
                           <el-select v-model="item.height" placeholder="请选择">
                           <el-option
                           v-for="item in restaurants"
@@ -173,20 +173,7 @@ export default {
       delImg:require('@/assets/img/delImg.png'),
       file:require('@/assets/img/file.png'),
       shopSkuId:0,
-      restaurants: [
-        {
-          value:'0.5',
-          name:'0.5米 (实际0.45米)'
-        },
-        {
-          value:'0.7',
-          name:' 0.7米 (实际0.65米)'
-        },
-        {
-          value:'0.9',
-          name:' 0.9米 (实际0.85米)'
-        }
-      ],
+      restaurants: [],
       chanpinGongyiList:['打扣', '缝吊耳','缝筒','裁净边','条幅绑带'],
       dakouOptions:['四角打扣','每隔2米打一个扣'],
       diaoerOptions:['四角缝吊耳'],
@@ -200,7 +187,12 @@ export default {
       this.getByIdInfo(this.$props.skuInfos);
     }else{
       this.firstInfo()
-    }  
+    }
+    if(shopSkuId == 2){
+      this.restaurants = this.cost.restaurants2
+    }else{
+      this.restaurants = this.cost.restaurants1
+    }
   },
   mounted(){
   },

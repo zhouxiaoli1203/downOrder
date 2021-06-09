@@ -7,8 +7,32 @@
                 <p class="jiaobiao">文件{{index+1}}</p>
                 <el-row >
                     <h3 class="wenjianH3">文件信息</h3>
-                    <el-col class="skuInfosLI">                    
-                       <el-form-item label="打印文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
+                    <el-col class="skuInfosLI">
+                      <el-form-item label="打印文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
+                          <el-row type="flex" class="row-bg" justify="space-between">
+                          <el-col :span="20" class="uploadBox">
+                              <div class="upFile" v-if="orderForm.skuInfos.length>1"  @click="fileUpload(index)">
+                                <img :src="file" alt="">
+                                <p>上传文件</p>
+                              </div>
+                              
+                              <div class="upFile" v-else  @click="fileUpload(index,'more')">
+                                <img :src="file" alt="">
+                                <p>上传文件</p>
+                              </div>
+                              <div v-if="item.name!=''" class="fileDiv">
+                                  <el-tooltip class="item" effect="dark" :content="item.name" placement="right">
+                                    <input type="text"  readonly v-model="item.name">
+                                  </el-tooltip>
+                                <img :src="delImg" alt="" @click="shanchuFile(index)">
+                              </div>
+                          </el-col>
+                          <el-col :span="2" class="iconClose" >
+                              <i class="el-icon-close" v-if="index!=0"  @click="deleteLadder(index)"></i>
+                          </el-col>
+                          </el-row>
+                      </el-form-item>                    
+                       <!-- <el-form-item label="打印文件" :prop="`skuInfos.${index}.name`" :rules="skuInfosGroupRules.infoname">
                             <el-row type="flex" class="row-bg" justify="space-between">
                                 <el-col :span="20" class="uploadBox">
                                     <div class="upFile" @click="fileUpload(index,'more')">
@@ -49,7 +73,7 @@
                                     <i class="el-icon-close" v-if="index!=0"  @click="deleteLadder(index)"></i>
                                 </el-col>
                             </el-row>
-                        </el-form-item>
+                        </el-form-item> -->
                         <el-form-item label="打印风格" :prop="`skuInfos.${index}.dayinStyle`" :rules="skuInfosGroupRules.infodayinStyle" class="pubilcRadio">
                             <el-radio-group v-model="item.dayinStyle" size="medium">
                             <el-radio border label="黑白打印">黑白打印</el-radio>
@@ -406,8 +430,8 @@ export default {
     firstInfo(){
       this.orderForm.skuInfos = []
       let info = {
-        productCodes:[],
-        name:[],
+        productCode:'',
+        name:'',
         dayinStyle:'',
         dayinNum:'',
         dayinSize:'',
@@ -435,6 +459,8 @@ export default {
       let { orderForm } = this
       data.forEach((item,index)=>{
         let info ={
+          productCode:item.products[0].code,
+          name:item.products[0].name,//文件的名字
           num:item.num,
           remark:item.remark,
           crafts:item.attributes.crafts?item.attributes.crafts:{},
@@ -448,26 +474,28 @@ export default {
           fengmianTongbanzhi:'',
         }
 
-        let imgName = item.products
+  
 
-        let codes = []
-        let vals = []
+        // let imgName = item.products
 
-        imgName.forEach((i,index)=>{
+        // let codes = []
+        // let vals = []
 
-          codes.push(i.code);
+        // imgName.forEach((i,index)=>{
 
-          this.$set(info,'productCodes',codes)
+        //   codes.push(i.code);
 
-          vals.push(
-            {
-              val:i.name
-            }
-          )
+        //   this.$set(info,'productCode',codes)
 
-          this.$set(info,'name',vals)
+        //   vals.push(
+        //     {
+        //       val:i.name
+        //     }
+        //   )
 
-        })
+        //   this.$set(info,'name',vals)
+
+        // })
         // return
 
 
@@ -546,15 +574,22 @@ export default {
       })
     },
     // 删除某个产品中的文件
-    shanchuFile(val,index){
-      console.log(val,index);
-      this.orderForm.skuInfos[val].name.splice(index,1);
-      this.orderForm.skuInfos[val].productCodes.splice(index,1);
+    // shanchuFile(val,index){
+    //   console.log(val,index);
+    //   this.orderForm.skuInfos[val].name.splice(index,1);
+    //   this.orderForm.skuInfos[val].productCode.splice(index,1);
+    // },
+
+    shanchuFile(val){
+      this.confirm_pop("确定删除该文件吗？").then(res=>{
+        this.orderForm.skuInfos[val].name = ''
+        this.orderForm.skuInfos[val].productCode = ''
+      })
     },
     // 添加产品
     addLadder(){
       let info = {
-        productCodes:[],
+        productCode:'',
         dayinStyle:'',
         dayinNum:'',
         dayinSize:'',
@@ -566,7 +601,7 @@ export default {
         yanse:'#C23247',
         num: 1,
         remark: '',
-        name:[],
+        name:'',
         crafts:{},
         caiseFuyin:'', //彩色复印纸
         tongbanzhi:'', //铜版纸
@@ -687,7 +722,7 @@ export default {
       this.$refs.orderForm.resetFields();
       this.orderForm.skuInfos = []
       let info = {
-        productCodes:[],
+        productCode:'',
         dayinStyle:'',
         dayinNum:'',
         dayinSize:'',
@@ -699,7 +734,7 @@ export default {
         yanse:'#C23247',
         num: 1,
         remark: '',
-        name:[],
+        name:'',
         crafts:{},
         caiseFuyin:'', //彩色复印纸
         tongbanzhi:'', //铜版纸
@@ -724,14 +759,57 @@ export default {
     },
 
     // 从子组件获取图片的信息
+    // getMsgFormSon(info){
+    //   console.log(info);
+    //   info.imgInfo.forEach((item)=>{
+    //     this.orderForm.skuInfos[info.index].name.push({
+    //       val:item.name
+    //     })
+    //     this.orderForm.skuInfos[info.index].productCodes.push(item.code)
+    //   })
+    // },
+
+    // 从子组件获取图片的信息
     getMsgFormSon(info){
       console.log(info);
-      info.imgInfo.forEach((item)=>{
-        this.orderForm.skuInfos[info.index].name.push({
-          val:item.name
+      if(info.imgMore=='more'){
+        this.orderForm.skuInfos = []
+        info.imgInfo.forEach((item, index) => {
+        　　console.log(item, index);
+            let info = {
+              // productCodes:[],
+              productCode:item.code,
+              dayinStyle:'',
+              dayinNum:'',
+              dayinSize:'',
+              dayinCailiao:'',
+              cailiaoyanse:'#C23247',
+              zhaungding:'',
+              fengmianCailiao:'',
+              fengmianGongyi:'',
+              yanse:'#C23247',
+              num: 1,
+              remark: '',
+              // name:[],
+              name:item.name,
+              crafts:{},
+              caiseFuyin:'', //彩色复印纸
+              tongbanzhi:'', //铜版纸
+              baikazhi:'', //白卡纸
+              fengmianTongbanzhi:'',
+            }
+            this.orderForm.skuInfos.push(info);
+            this.$emit("detailChange",this.orderForm.skuInfos);
+             console.log(this.orderForm.skuInfos);
         })
-        this.orderForm.skuInfos[info.index].productCodes.push(item.code)
-      })
+      }else{
+        this.orderForm.skuInfos[info.index].name = info.wenjianNanme
+        this.orderForm.skuInfos[info.index].productCode = info.wenjianCode
+        this.orderForm.skuInfos[info.index].img = info.wenjianImg
+        this.$emit("detailChange",this.orderForm.skuInfos);
+        console.log(this.orderForm.skuInfos);
+
+      }
     },
     
   },
@@ -788,7 +866,7 @@ export default {
 
       .fileDiv{
         line-height: normal;
-        width: 88px;
+        // width: 88px;
         height: 32px;
         background: #E7E8F4;
         border-radius: 10px;

@@ -31,11 +31,15 @@
                   </el-col>
                 </el-row>
               </el-form-item>
-                <el-form-item label="材料选择" :prop="`skuInfos.${index}.paper`" :rules="skuInfosGroupRules.infofontPaper" class="pubilcRadio">
-                <el-radio-group v-model="item.paper" size="medium">
-                  <el-radio border label="双透彩旗">双透彩旗</el-radio>
-                  <el-radio border label="贡缎布">贡缎布</el-radio>
-                </el-radio-group>
+              <el-form-item label="材料选择" :prop="`skuInfos.${index}.paper`" :rules="skuInfosGroupRules.infofontPaper" class="pubilcRadio">
+                <el-select v-model="item.paper" placeholder="请选择材料" @change="cailiaoChang($event,index)">
+                    <el-option
+                      v-for="x in cost.jingpenCailiaoList"
+                      :key="x.name"
+                      :label="x.name"
+                      :value="x.name">
+                    </el-option>
+                  </el-select>
               </el-form-item>
               <el-form-item label="产品尺寸" required>
                 <el-row>
@@ -60,30 +64,13 @@
                 </el-row>
               </el-form-item>
               
-              <el-form-item label="产品工艺"  class="productCraft gongyiProduct" >
+              <el-form-item label="产品工艺"  class="productCraft gongyiProduct xiezhengongyi" >
                 <el-radio-group v-model="item.gongyi" @change="handleCancel($event,index)">
-                  <div class="li" v-for="i in chanpinGongyiList">
-                    <el-radio :label="i">{{i}}</el-radio>
-                    <template v-if="i == '缝筒'">
-                      <el-select v-model="item.fengtongVal" placeholder="类型" @change="craftsName($event,index,'缝筒')">
-                        <el-option
-                          v-for="x in fengtongOptions"
-                          :key="x"
-                          :label="x"
-                          :value="x">
-                        </el-option>
-                      </el-select>
-                    </template>
-                     <template v-if="i == '打扣'">
-                          <el-select v-model="item.dakouVal" placeholder="类型" @change="craftsName($event,index,'打扣')">
-                            <el-option
-                              v-for="item in dakouOptions"
-                              :key="item"
-                              :label="item"
-                              :value="item">
-                            </el-option>
-                          </el-select>
-                        </template>
+                  
+                  <div class="li" v-for="i in item.chanpinGongyiList.list">
+                    <el-radio :label="i.name">{{i.name}} 
+                      <span>{{i.tip}}</span>
+                    </el-radio>
                   </div>
                 </el-radio-group>
               </el-form-item>
@@ -160,19 +147,15 @@ export default {
       },
       delImg:require('@/assets/img/delImg.png'),
       file:require('@/assets/img/file.png'),
-      chanpinGongyiList:['缝筒','裁净边','打扣'],
-      fengtongOptions:['左缝筒','上缝筒','右缝筒','左右缝筒','上下缝筒','上缝筒左缝吊耳'],
-      dakouOptions:['四角打扣','每隔2米打一个扣'],
       yanzheng:false
     }
   },
   created(){
-    console.log(this.$props.skuInfos + '---------------------507');
     if(this.$props.skuInfos!=''){
       this.getByIdInfo(this.$props.skuInfos);
     }else{
       this.firstInfo()
-    }  
+    }
   },
   mounted(){
   },
@@ -187,39 +170,52 @@ export default {
       }
     },
 
-    craftsName(val,index,lab){
-      console.log(val);
-      let { orderForm } = this
-      let name = orderForm.skuInfos[index].gongyi //单选的名称
-      let valname
-      if(lab=='缝筒'){
-        valname = orderForm.skuInfos[index].fengtongVal 
-      }
-       if(lab=='打扣'){
-        valname = orderForm.skuInfos[index].dakouVal 
-      }
-      if(name == lab){
-        orderForm.skuInfos[index].crafts[name] = valname
-      }
-    },
-    // 取消单选
+    // 产品工艺单选
     handleCancel(val,index){
+      console.log(val,index);
       let { orderForm} = this
       orderForm.skuInfos[index].crafts = {}
       orderForm.skuInfos[index].gongyi = val 
-      let name
-      if(val=='缝筒'){
-        name = orderForm.skuInfos[index].fengtongVal 
-      }
-      if(val=='打扣'){
-        name = orderForm.skuInfos[index].dakouVal 
+      orderForm.skuInfos[index].crafts[val] = null
+    },
+    
+    // 材料选择
+    cailiaoChang(e,index){
+      console.log(e,index);
+      let { orderForm} = this
+      let obj = {};
+      obj = this.cost.jingpenCailiaoList.find((item)=>{//这里的userList就是上面遍历的数据源
+        return item.name === e;//筛选出匹配数据
+      });
+      let xuhao =  orderForm.skuInfos[index].chanpinGongyiList
+      if(obj.val!=xuhao){
+        orderForm.skuInfos[index].crafts = {}
+        orderForm.skuInfos[index].gongyi = ''
       }
 
-      orderForm.skuInfos[index].crafts[val] = name?name:null
+      this.gongyiFuzhi(obj.val,index)
+
     },
+
+
+    // 给工艺赋值
+    gongyiFuzhi(val,index){
+      console.log(val,index);
+       let { orderForm} = this
+      if(val==1){
+        orderForm.skuInfos[index].chanpinGongyiList = this.cost.jingpenGongyiList1
+      }
+
+      if(val==2){
+        orderForm.skuInfos[index].chanpinGongyiList =  this.cost.huneigongyiList2
+      }
+    },
+
+
     firstInfo(){
       this.orderForm.skuInfos = []
       let info = {
+        chanpinGongyiList:this.cost.jingpenGongyiList1,
         productCode:'',
         height: '',
         num: 1,
@@ -228,8 +224,7 @@ export default {
         crafts:{},
         name:'',
         gongyi:'', 
-        fengtongVal:'',
-        dakouVal:'',
+        gongyiOrder:'',
         paper:'',
       }
       this.orderForm.skuInfos.push(info);
@@ -239,18 +234,19 @@ export default {
       this.orderForm.skuInfos = []
       let { orderForm } = this
       data.forEach((item,index)=>{
+        console.log(item.products[0].name);
         let info ={
+          chanpinGongyiList:[],
           productCode:item.products[0].code,
           paper:item.attributes.paper,
           height:item.attributes.height/1000,
           num:item.num,
           remark:item.remark,
           width:item.attributes.width/1000,
-          // name:item.attributes.productName,//文件的名字
-           name:item.products[0].name,//文件的名字
+          name:item.products[0].name,//文件的名字
           crafts:item.attributes.crafts?item.attributes.crafts:{}
         }
-
+        
         let crafts = item.attributes.crafts
         if(JSON.stringify(item.attributes.crafts)!='{}'){    
           for(let i in crafts){
@@ -258,23 +254,23 @@ export default {
             console.log(crafts[i]);
             
             this.$set(info,'gongyi',i)
-
-            info['gongyi'] = i
-            if(i=='打扣'){
-              info['dakouVal'] = crafts[i]?crafts[i]:''
-            }
-
-            if(i=='缝筒'){
-              info['fengtongVal'] = crafts[i]
-            }
           }
         }else{
           info['gongyi'] = ''
-          info['fengtongVal'] = ''
-          info['dakouVal'] = ''
         }  
 
         orderForm.skuInfos.push(info)
+        let paperName = item.attributes.paper
+        console.log(paperName);
+
+        let obj = {};
+        obj = this.cost.jingpenCailiaoList.find((i)=>{//这里的userList就是上面遍历的数据源
+        console.log(i);
+          return i.name === paperName;//筛选出匹配数据
+        });
+
+        this.gongyiFuzhi(obj.val,index)
+
       })
 
 
@@ -298,6 +294,7 @@ export default {
     // 添加产品
     addLadder(){
       let info = {
+        chanpinGongyiList:this.cost.jingpenGongyiList1,
         productCode:'',
         height: '',
         num: 1,
@@ -358,6 +355,7 @@ export default {
       this.$refs.orderForm.resetFields();
       this.orderForm.skuInfos = []
       let info = {
+        chanpinGongyiList:this.cost.jingpenGongyiList1,
         productCode:'',
         height: '',
         num: 1,
@@ -393,6 +391,7 @@ export default {
         info.imgInfo.forEach((item, index) => {
         　　console.log(item, index);
             let info = {
+              chanpinGongyiList:this.cost.jingpenGongyiList1,
               productCode:item.code,
               height: '',
               num: 1,
@@ -555,6 +554,13 @@ export default {
       color: #fff;
       font-size: 20px;
       margin-right: 19px;
+    }
+  }
+
+  .productCraft{
+    span{
+      color: #FF3B30;
+      font-size: 12px;
     }
   }
 

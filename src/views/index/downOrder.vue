@@ -152,6 +152,12 @@
               <h3>文件信息{{index+1}}</h3>
               <ul class="orderTrue">
                 <li>
+                  <span class="tit">产品文件</span>
+                  <div  class="info">
+                    <span class="titname">{{item.name}}</span>
+                  </div>
+                </li>
+                <!-- <li>
                   <span class="tit">产品文件{{index+1}}</span>
                   <div class="info infoUL">
                     <template v-if="item.name.length>1">
@@ -165,7 +171,7 @@
                       <span class="titname" v-for="i in item.name">{{i.val}}</span>
                     </template>
                   </div>
-                </li>
+                </li> -->
                 <li v-if="item.dayinStyle">
                   <span class="tit">打印风格{{index+1}}</span>
                   <div class="info">
@@ -343,7 +349,11 @@ import RedBanner from './components/redBanner' //条幅
 import FlagBanner from './components/flagBanner' //旗帜
 import AllOrder from './components/allOrder' //通用下单
 import PrinTing from './components/prinTing' //打印
-import AddressParse from 'zh-address-parse'
+import huwaiXiezhen from './components/huwaiXiezhen' //户外写真
+import huneiXiezhen from './components/huneiXiezhen' //户内写真
+import huwaiJingpen from './components/huwaiJingpen' //户外精喷
+import penhui from './components/penhui' //喷绘
+import AddressParse, {AREA, Utils} from 'address-parse' 
 import { provinceAndCityData, regionData, provinceAndCityDataPlus, regionDataPlus, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
   name: 'downOrder',
@@ -352,7 +362,11 @@ export default {
     FlagBanner,
     AllOrder,
     PrinTing,
-    ElImageViewer
+    ElImageViewer,
+    huwaiXiezhen,
+    huneiXiezhen,
+    huwaiJingpen,
+    penhui
   },
   data () {
     var receiptMobileRule = (rule, value, callback) => {
@@ -464,11 +478,29 @@ export default {
     if (skuId==4) {
       this.shopInfoComponent = 'PrinTing'
     }
+
+    if (skuId==8) {
+      this.shopInfoComponent = 'penhui'
+    }
+
+    if (skuId==9) {
+      this.shopInfoComponent = 'huwaiXiezhen'
+    }
+
+    if (skuId==10) {
+      this.shopInfoComponent = 'huneiXiezhen'
+    }
+
+    if (skuId==11) {
+      this.shopInfoComponent = 'huwaiJingpen'
+    }
+    
+
   },
   mounted(){
   },
   methods:{
-       // 大图预览
+    // 大图预览
     lookBigImg(val){
       console.log(val);
       if(val){
@@ -580,33 +612,15 @@ export default {
 
               let dizhi = data.orderAttr.receiptAddress
 
-              var reg = /.+?(省|市|自治区|自治州|县|区|旗|城|会)/g;
-              let addressInfo  = dizhi.match(reg)
+              const [info] = AddressParse.parse(dizhi,true);
 
+              console.log(info);
+              const [province, city] = Utils.getTargetAreaListByCode('province', info.code, true);  //根据区码获取省与市
 
-              let prov = TextToCode[addressInfo[0]]
-              let provCode = prov.code
-
-              let cityCode 
-              let distCode 
-  
-          
-              if(addressInfo[0]==addressInfo[1]){
-
-                let city = TextToCode[addressInfo[0]] ['市辖区']
-                cityCode = city.code
-
-                let dist = TextToCode[addressInfo[0]] ['市辖区'] [addressInfo[2]]
-                distCode = dist.code
-
-
-              }else{
-                let city = TextToCode[addressInfo[0]] [addressInfo[1]]
-                cityCode = city.code
-
-                let dist = TextToCode[addressInfo[0]] [addressInfo[1]] [addressInfo[2]]
-                distCode = dist.code
-              }
+              let provCode = province.code
+              let cityCode = city.code
+              let distCode = info.code
+      
   
               orderForm.receiptAddress= [provCode, cityCode, distCode]// 省市区码
               
@@ -627,49 +641,44 @@ export default {
       this.pasteAddress(this.orderForm.textarea)
     },
     pasteAddress(val){
+
       let { orderForm } = this
-      const info = AddressParse(val)
+
+      const [info] = AddressParse.parse(val,true);
+
       console.log(info);
-      if(JSON.stringify(info)=='{}'){
+      if(info==undefined){
         return false
       }
-      orderForm.receiptName = info.name?info.name:orderForm.receiptName //姓名
-      orderForm.receiptMobile = info.phone?info.phone:orderForm.receiptMobile //手机号
 
+      const [province, city] = Utils.getTargetAreaListByCode('province', info.code, true);  //根据区码获取省与市
+      console.log(province, city);
+
+
+      orderForm.receiptName = info.name?info.name:orderForm.receiptName //姓名
+      orderForm.receiptMobile = info.mobile?info.mobile:orderForm.receiptMobile //手机号
+    
       if(orderForm.deliveryType!=3){
         let provCode
         let cityCode
         let distCode
-        
-        if(info.province){
-          let prov = TextToCode[info.province]
-          if (prov) {
-            provCode = prov.code
-          }
-        }
+      
+        if(info.area!=''){
+          provCode = province.code
+          cityCode = city.code
+          distCode = info.code
+        }else{
 
-        if (info.city) {
-          if(info.city==info.province){
-            let city = TextToCode[info.province] ['市辖区']
-            cityCode = city.code
-          }else{
-            let city = TextToCode[info.province] [info.city]
-            cityCode = city.code
-          }
-        }
+          const list = Utils.getTargetAreaListByCode('area', info.code); //获得所有区域
 
-        if (info.area) {
-          if(info.city==info.province){
-            let dist = TextToCode[info.province] ['市辖区'] [info.area]
-            distCode = dist.code  
-          }else{
-            let dist = TextToCode[info.province] [info.city] [info.area]
-            distCode = dist.code  
-          }
+          provCode = province.code
+          cityCode = city.code
+          distCode = list[0].code
+
         }
         orderForm.receiptAddress = [provCode, cityCode, distCode]  //收货人的地址 （省＋市＋区） //这是是省市区的码
         orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
-        orderForm.receiptDetailAddress = info.detail //收货人详情地址
+        orderForm.receiptDetailAddress = info.details //收货人详情地址
       }
 
       this.publicPorp=false
@@ -783,8 +792,12 @@ export default {
       })
     },
     cityChange(val){ //选择收货地址
-      console.log(val);
-      this.orderForm.Address = this.CodeToText[val[0]] + this.CodeToText[val[1]] + this.CodeToText[val[2]]
+      if(val[2]!=undefined){
+        this.orderForm.Address = this.CodeToText[val[0]] + this.CodeToText[val[1]] + this.CodeToText[val[2]]
+      }else{
+        this.orderForm.Address = this.CodeToText[val[0]] + this.CodeToText[val[1]]
+      }
+      
     }, 
 
     // 关闭确认订单弹框
@@ -817,14 +830,15 @@ export default {
           this.$set(info,'width',arr[i].width*1000)  
           this.$set(info,'productCode',arr[i].productCode)    
         }else{
-          this.$set(info,'productCodes',arr[i].productCodes)    
+          // this.$set(info,'productCodes',arr[i].productCodes)  
+          this.$set(info,'productCode',arr[i].productCode)      
         }
 
         if (skuId==2) {          
           this.$set(info,'fontColor',arr[i].fontColor)  //红色条幅带颜色
         }
 
-        if (skuId==6) {          
+        if (skuId==6 || skuId==8 || skuId==9 || skuId==10 || skuId==11) {          
           this.$set(info,'paper',arr[i].paper)  //旗帜材料
         }
 

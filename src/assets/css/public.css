@@ -155,6 +155,17 @@
   display: flex;
   align-items: center;
 }
+.xiezhengongyi {
+  display: flex;
+  align-items: center;
+}
+.xiezhengongyi .el-form-item__content {
+  margin-left: 0 !important;
+  flex: 1;
+}
+.xiezhengongyi .li {
+  margin: 2px 15px 2px 0 !important;
+}
 .deliveryType .el-radio.is-bordered {
   background: #F0F0F0;
 }
