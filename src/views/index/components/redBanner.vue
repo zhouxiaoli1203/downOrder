@@ -207,41 +207,50 @@ export default {
       }
     },
 
+
+    // 下拉选择
     craftsName(val,index,lab){
+      console.log(val,index,lab);
       let { orderForm } = this
       let name = orderForm.skuInfos[index].gongyi //单选的名称
-      let valname
-      if(lab=='打扣'){
-        valname = orderForm.skuInfos[index].dakouVal 
+      if(name==lab){
+        orderForm.skuInfos[index].crafts['产品工艺'] = lab + ':' + val
       }
-      if(lab=='缝吊耳'){
-        valname = orderForm.skuInfos[index].diaoerVal 
-      }
-      if(name == lab){
-        orderForm.skuInfos[index].crafts[name] = valname
-      }
+      console.log(orderForm.skuInfos[index].crafts);
     },
-    // 取消单选
+
+    // 单选
     handleCancel(val,index){
       console.log(val);
       console.log(index);
-      let { orderForm} = this
-      orderForm.skuInfos[index].crafts = {}
 
-      orderForm.skuInfos[index].gongyi = val 
+      let { orderForm } = this
+      orderForm.skuInfos[index].crafts['产品工艺'] = ''
 
-      let name
-      if(val=='打扣'){
-        name = orderForm.skuInfos[index].dakouVal 
+      let valname
+      if(val == '打扣'){
+          valname = orderForm.skuInfos[index].dakouVal 
+          if(valname){
+            orderForm.skuInfos[index].crafts['产品工艺'] = val + ':' + valname
+          }
+          console.log(orderForm.skuInfos[index].crafts);
+          return
       }
 
-      if(val=='缝吊耳'){
-        name = orderForm.skuInfos[index].diaoerVal 
+      if(val == '缝吊耳'){
+          valname = orderForm.skuInfos[index].diaoerVal
+          if(valname){
+            orderForm.skuInfos[index].crafts['产品工艺'] = val + ':' + valname
+          }
+          console.log(orderForm.skuInfos[index].crafts);
+          return
       }
-      orderForm.skuInfos[index].crafts[val] = name?name:null
 
+      orderForm.skuInfos[index].crafts['产品工艺'] = val
       console.log(orderForm.skuInfos[index].crafts);
+
     },
+
     firstInfo(){
       this.orderForm.skuInfos = []
       let info = {
@@ -290,23 +299,24 @@ export default {
 
 
         let crafts = item.attributes.crafts
-        if(JSON.stringify(item.attributes.crafts)!='{}'){    
-          for(let i in crafts){
-            this.$set(info,'gongyi',i)
+        for(let i in crafts){
+          console.log(i);
+          console.log(crafts[i]);
 
-            if(i=='打扣'){
-              info['dakouVal'] = crafts[i]?crafts[i]:''
+          
+          if(i=='产品工艺'){
+            let val = crafts[i].split(':')
+            console.log(val);
+            info['gongyi'] = val[0]
+            if(val[0] == '打扣'){
+              info['dakouVal'] = val[1]
             }
 
-            if(i=='缝吊耳'){
-              info['diaoerVal'] = crafts[i]?crafts[i]:''
+            if(val[0] == '缝吊耳'){
+              info['diaoerVal'] = val[1]
             }
           }
-        }else{
-          info['gongyi'] = ''
-          info['dakouVal'] = ''
-          info['diaoerVal'] = ''
-        }  
+        }
         orderForm.skuInfos.push(info)
       })
 

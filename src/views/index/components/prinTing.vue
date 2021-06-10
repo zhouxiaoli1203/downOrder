@@ -404,29 +404,7 @@ export default {
       }
       console.log(orderForm.skuInfos[index].crafts);
     },
-    // 取消单选
-    handleCancel(val,index){
-      console.log(val);
-      console.log(index);
-      let { orderForm} = this
-      orderForm.skuInfos[index].crafts = {}
 
-      orderForm.skuInfos[index].gongyi = val == orderForm.skuInfos[index].gongyi ? '' : val
-  
-      let tit = orderForm.skuInfos[index].gongyi
-
-      if(tit){
-        let name
-        if(val=='打扣'){
-          name = orderForm.skuInfos[index].dakouVal 
-        }
-
-        if(val=='缝吊耳'){
-          name = orderForm.skuInfos[index].diaoerVal 
-        }
-        orderForm.skuInfos[index].crafts[val] = name?name:null
-      }
-    },
     firstInfo(){
       this.orderForm.skuInfos = []
       let info = {
@@ -474,36 +452,9 @@ export default {
           fengmianTongbanzhi:'',
         }
 
-  
-
-        // let imgName = item.products
-
-        // let codes = []
-        // let vals = []
-
-        // imgName.forEach((i,index)=>{
-
-        //   codes.push(i.code);
-
-        //   this.$set(info,'productCode',codes)
-
-        //   vals.push(
-        //     {
-        //       val:i.name
-        //     }
-        //   )
-
-        //   this.$set(info,'name',vals)
-
-        // })
-        // return
-
 
         let crafts = item.attributes.crafts
         for(let i in crafts){
-          console.log(i,crafts[i]);
-          this.$set(info,'gongyi',i)
-
           if(i=='打印风格'){
             info['dayinStyle'] = crafts[i]?crafts[i]:''
           }

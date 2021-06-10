@@ -133,25 +133,13 @@
               </div>
             </li>
 
-            <template v-if="skuId==2 || skuId==5 || skuId==6">
-              <li v-if="JSON.stringify(item.crafts)!='{}' && item.crafts!=undefined">
-                <span class="tit">产品工艺</span>
-                <div class="info">
-                  <span class="name">{{item.crafts | yhc_toObj }}</span>
-                </div>
-              </li>   
-            </template>
+            <li v-for="(i,key) in item.crafts" > 
 
-            <template v-else>
-              <li v-for="(i,key) in item.crafts" > 
-
-                <span class="tit">{{key}}{{index+1}}</span>
-                <div class="info">
-                  <span class="name">{{i}}</span>
-                </div>
-              </li>      
-          </template>
-
+              <span class="tit">{{key}}{{index+1}}</span>
+              <div class="info">
+                <span class="name">{{i}}</span>
+              </div>
+            </li>   
             <li>
               <span class="tit">产品数量</span>
               <div class="info">

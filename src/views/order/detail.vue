@@ -97,36 +97,21 @@
                             <p>{{item.attributes.paper}}</p>
                         </div>
                     </li>
-                    <template v-if="info.orderAttr.skuId==2 || info.orderAttr.skuId==5 || info.orderAttr.skuId==6">
-                        <li v-if="JSON.stringify(item.attributes.crafts)!='{}' && item.attributes.crafts!=undefined">
-                            <span class="lable">产品工艺{{index+1}}</span>
-                            <div class="info">
-                                <p>{{item.attributes.crafts | yhc_toObj }}</p>
-                            </div>
-                        </li>      
-                    </template>
-
-                     <template v-else>
-                        <li v-for="(i,key) in item.attributes.crafts">
-                            <span class="lable" v-if="key=='款数'" style="color:#FF8F1C;font-weight: bold;">{{key}}{{index+1}}</span>
-                            <span class="lable" v-else>{{key}}{{index+1}}</span>
-                            <div class="info">
-                                <p v-if="key=='款数'" style="color:#FF8F1C;font-weight: bold;">{{i}}</p>
-                                <p v-else>{{i}}</p>
-                            </div>
-                        </li>      
-                    </template>
-
-                  
+                    <li v-for="(i,key) in item.attributes.crafts">
+                        <span class="lable" v-if="key=='款数'" style="color:#FF8F1C;font-weight: bold;">{{key}}{{index+1}}</span>
+                        <span class="lable" v-else>{{key}}{{index+1}}</span>
+                        <div class="info">
+                            <p v-if="key=='款数'" style="color:#FF8F1C;font-weight: bold;">{{i}}</p>
+                            <p v-else>{{i}}</p>
+                        </div>
+                    </li>      
+              
                     <li class="remarkBox">
                         <span class="lable">产品描述{{index+1}}</span>
                         <div class="info">
                             <p>{{item.remark}}</p>
                         </div>
-                    </li>
-
-
-                    
+                    </li>                
                 </ul>
             </section>
 
