@@ -44,7 +44,7 @@
  // yhcmessage = isApp || isWechat ? Toast : "错误";
  yhcmessage = Message.error;
  // 请求超时时间
- axios.defaults.timeout = 15000;
+ axios.defaults.timeout = 300000;
  
  
  // post请求头

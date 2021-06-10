@@ -188,16 +188,22 @@ export default {
         for (let key in zip.files) { 
             if (!zip.files[key].dir) {  // 判断是否是目录
                 if (/\.(png|jpg|jpeg|gif|bmp)$/.test(zip.files[key].name)) { // 判断是否是图片格式
-                  let mc = zip.files[key].name
-                  let mcName = mc.includes("page")
-                  if(mcName==false){
-                    console.log(111);
-                    let base = zip.file(zip.files[key].name).async('base64') // 将图片转化为base64格式
-                    base.then(res => {
-                      let img =  `data:image/png;base64,${res}`
-                      this.productionUpload(zipFile,'cdr',img)
-                    })
+
+                  let wenjianjia = zip.files[key].name.split('/')
+                  if(wenjianjia[0]=='previews'){
+                    let mc = zip.files[key].name
+                    let mcName = mc.includes("page")
+                    if(mcName==false){
+                      console.log(111);
+                      let base = zip.file(zip.files[key].name).async('base64') // 将图片转化为base64格式
+                      base.then(res => {
+                        let img =  `data:image/png;base64,${res}`
+                        this.productionUpload(zipFile,'cdr',img)
+                      })
+                    }
+
                   }
+                             
                 }
             }
         }

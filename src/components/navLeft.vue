@@ -41,18 +41,13 @@ export default {
       this.$post('get',this.baseUrl + '/order/listExpressCompany',
       ).then((res) => {
         if (res.code == 200) {
-          console.log(1522)
+    
           this.$store.commit('setExpCompany',res.data)
         }
       })
     },
 
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
-    },
+
     handleSelect(index) {
       this.activeIndex = index;
       this.$store.state.currentIndex = index; //导航高亮
@@ -69,7 +64,6 @@ export default {
     getPath () {  //解决浏览器后退导航高亮问题
       let href = this.$route.path
       let hrefUrl =  href.split('/')[1]
-      console.log(hrefUrl)
       this.activeIndex = '/'+ hrefUrl
       this.$store.state.currentIndex = '/'+ hrefUrl
     },

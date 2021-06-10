@@ -46,7 +46,6 @@ export default {
           let info = res.data
           info.forEach((item,index)=>{
             item.skus.forEach((i)=>{
-              console.log(i)
               let data = {
                 name:i.name,
                 img:this.baseUrl + i.url,

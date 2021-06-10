@@ -198,9 +198,7 @@ export default {
       });
       let xuhao =  orderForm.skuInfos[index].chanpinGongyiList
       if(obj.val!=xuhao){
-        // orderForm.skuInfos[index].crafts = {}
         orderForm.skuInfos[index].gongyi = ''
-
         orderForm.skuInfos[index].crafts['产品工艺'] = ''
       }
 
@@ -252,30 +250,32 @@ export default {
         let info ={
           chanpinGongyiList:[],
           productCode:item.products[0].code,
+          kuanshu:1,
           paper:item.attributes.paper,
           height:item.attributes.height/1000,
           num:item.num,
           remark:item.remark,
           width:item.attributes.width/1000,
           name:item.products[0].name,//文件的名字
-          crafts:item.attributes.crafts?item.attributes.crafts:{}
+          crafts:item.attributes.crafts?item.attributes.crafts:{},
+          gongyi:'',
         }
         
         let crafts = item.attributes.crafts
-        if(JSON.stringify(item.attributes.crafts)!='{}'){    
-          for(let i in crafts){
-            console.log(i)
-            console.log(crafts[i]);
-            
-            this.$set(info,'gongyi',i)
+
+        for(let i in crafts){
+          if(i=='款数'){
+            info['kuanshu'] =Number(crafts[i])
           }
-        }else{
-          info['gongyi'] = ''
-        }  
+
+          if(i=='产品工艺'){
+            info['gongyi'] =crafts[i]
+          }
+        }
 
         orderForm.skuInfos.push(info)
+
         let paperName = item.attributes.paper
-        console.log(paperName);
 
         let obj = {};
         obj = this.cost.penyhuiCailiaoList.find((i)=>{//这里的userList就是上面遍历的数据源
@@ -284,6 +284,8 @@ export default {
         });
 
         this.gongyiFuzhi(obj.val,index)
+
+        console.log( orderForm.skuInfos);
 
       })
 
@@ -310,6 +312,7 @@ export default {
       let info = {
         chanpinGongyiList:this.cost.jingpenGongyiList1,
         productCode:'',
+        kuanshu:1,
         height: '',
         num: 1,
         remark: '',
@@ -373,11 +376,14 @@ export default {
       let info = {
         chanpinGongyiList:this.cost.jingpenGongyiList1,
         productCode:'',
+        kuanshu:1,
         height: '',
         num: 1,
         remark: '',
         width: '',
-        crafts:{},
+        crafts:{
+          '款数': 1,
+        },
         name:'',
         gongyi:'', 
         fengtongVal:'',
@@ -416,6 +422,7 @@ export default {
             let info = {
               chanpinGongyiList:this.cost.jingpenGongyiList1,
               productCode:item.code,
+              kuanshu:1,
               height: '',
               num: 1,
               remark: '',

@@ -41,17 +41,14 @@ export default new Vuex.Store({
         console.log(state)
         if (!state.expCompany) {
           let info = JSON.parse(localStorage.getItem('expCompany'))
-          console.log(info)
           state.setExpCompany = info?info:''
         }
         return state.setExpCompany
       },
 
       getOrderInfo(state){ 
-        console.log(state+'51')
         if (!state.orderInfo) {
           let info = JSON.parse(localStorage.getItem('orderInfo'))
-          console.log(info)
           state.orderInfo = info?info:''
         }
         return state.orderInfo

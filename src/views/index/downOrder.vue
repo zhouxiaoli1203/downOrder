@@ -106,7 +106,7 @@
       <section class="orderTruePorp publicPorp" v-show="orderTruePorp">
         <template v-if="skuId!=4">
           <h3>商品详情</h3>
-          <ul class="orderTrue" v-for="item in orderForm.skuInfos">
+          <ul class="orderTrue" v-for="(item,index) in orderForm.skuInfos" :key="index">
             <li>
               <span class="tit">产品文件</span>
               <div  class="info">
@@ -132,12 +132,26 @@
                 <p>{{item.remark}}</p>
               </div>
             </li>
-            <li v-if="JSON.stringify(item.crafts)!='{}' && item.crafts!=undefined">
-              <span class="tit">产品工艺</span>
-              <div class="info">
-                <span class="name">{{item.crafts | yhc_toObj }}</span>
-              </div>
-            </li>
+
+            <template v-if="skuId==2 || skuId==5 || skuId==6">
+              <li v-if="JSON.stringify(item.crafts)!='{}' && item.crafts!=undefined">
+                <span class="tit">产品工艺</span>
+                <div class="info">
+                  <span class="name">{{item.crafts | yhc_toObj }}</span>
+                </div>
+              </li>   
+            </template>
+
+            <template v-else>
+              <li v-for="(i,key) in item.crafts" > 
+
+                <span class="tit">{{key}}{{index+1}}</span>
+                <div class="info">
+                  <span class="name">{{i}}</span>
+                </div>
+              </li>      
+          </template>
+
             <li>
               <span class="tit">产品数量</span>
               <div class="info">
@@ -262,9 +276,6 @@
         
 
         
-
-
-
 
         <ul class="orderTrue">
           <li>

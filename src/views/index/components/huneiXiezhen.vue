@@ -34,7 +34,7 @@
               <el-form-item label="材料选择" :prop="`skuInfos.${index}.paper`" :rules="skuInfosGroupRules.infofontPaper" class="pubilcRadio">
                 <el-select v-model="item.paper" placeholder="请选择材料" @change="cailiaoChang($event,index)">
                     <el-option
-                      v-for="x in cost.cailiaoList"
+                      v-for="x in cost.huneicailiaoList"
                       :key="x.name"
                       :label="x.name"
                       :value="x.name">
@@ -63,6 +63,13 @@
                   </el-col>
                 </el-row>
               </el-form-item>
+
+              <el-form-item label="款数" >
+                <el-col :span="4" class="num">
+                  <el-input-number v-model="item.kuanshu" @change="kuanshuHandleChange($event,index)" :min="1"  label="产品数量"></el-input-number>
+                </el-col>
+              </el-form-item>
+              
               
               <el-form-item label="产品工艺"  class="productCraft gongyiProduct xiezhengongyi" >
                 <el-radio-group v-model="item.gongyi" @change="handleCancel($event,index)">
@@ -174,9 +181,8 @@ export default {
     handleCancel(val,index){
       console.log(val,index);
       let { orderForm} = this
-      orderForm.skuInfos[index].crafts = {}
       orderForm.skuInfos[index].gongyi = val 
-      orderForm.skuInfos[index].crafts[val] = null
+      orderForm.skuInfos[index].crafts['产品工艺'] = val
     },
     
     // 材料选择
@@ -185,12 +191,14 @@ export default {
       let { orderForm} = this
       let obj = {};
       obj = this.cost.huneicailiaoList.find((item)=>{//这里的userList就是上面遍历的数据源
+      console.log(item);
         return item.name === e;//筛选出匹配数据
       });
+      console.log(obj.val);
       let xuhao =  orderForm.skuInfos[index].chanpinGongyiList
       if(obj.val!=xuhao){
-        orderForm.skuInfos[index].crafts = {}
         orderForm.skuInfos[index].gongyi = ''
+        orderForm.skuInfos[index].crafts['产品工艺'] = ''
       }
 
       this.gongyiFuzhi(obj.val,index)
@@ -203,7 +211,7 @@ export default {
       console.log(val,index);
        let { orderForm} = this
       if(val==1){
-        orderForm.skuInfos[index].chanpinGongyiList = this.cost.jingpenGongyiList1
+        orderForm.skuInfos[index].chanpinGongyiList = this.cost.huneigongyiList1
       }
 
       if(val==2){
@@ -215,13 +223,16 @@ export default {
     firstInfo(){
       this.orderForm.skuInfos = []
       let info = {
-        chanpinGongyiList:this.cost.jingpenGongyiList1,
+        chanpinGongyiList:this.cost.huneigongyiList1,
         productCode:'',
+        kuanshu:1,
         height: '',
         num: 1,
         remark: '',
         width: '',
-        crafts:{},
+        crafts:{
+          '款数': 1,
+        },
         name:'',
         gongyi:'', 
         gongyiOrder:'',
@@ -238,26 +249,27 @@ export default {
         let info ={
           chanpinGongyiList:[],
           productCode:item.products[0].code,
+          kuanshu:1,
           paper:item.attributes.paper,
           height:item.attributes.height/1000,
           num:item.num,
           remark:item.remark,
           width:item.attributes.width/1000,
           name:item.products[0].name,//文件的名字
-          crafts:item.attributes.crafts?item.attributes.crafts:{}
+          crafts:item.attributes.crafts?item.attributes.crafts:{},
+          gongyi:'',
         }
         
         let crafts = item.attributes.crafts
-        if(JSON.stringify(item.attributes.crafts)!='{}'){    
-          for(let i in crafts){
-            console.log(i)
-            console.log(crafts[i]);
-            
-            this.$set(info,'gongyi',i)
+        for(let i in crafts){
+          if(i=='款数'){
+            info['kuanshu'] =Number(crafts[i])
           }
-        }else{
-          info['gongyi'] = ''
-        }  
+
+          if(i=='产品工艺'){
+            info['gongyi'] =crafts[i]
+          }
+        }
 
         orderForm.skuInfos.push(info)
         let paperName = item.attributes.paper
@@ -294,13 +306,16 @@ export default {
     // 添加产品
     addLadder(){
       let info = {
-        chanpinGongyiList:this.cost.jingpenGongyiList1,
+        chanpinGongyiList:this.cost.huneigongyiList1,
         productCode:'',
+        kuanshu:1,
         height: '',
         num: 1,
         remark: '',
         width: '',
-        crafts:{},
+        crafts:{
+          '款数': 1,
+        },
         name:'',
         gongyi:'', 
         fengtongVal:'',
@@ -324,25 +339,7 @@ export default {
               });
 
               return false
-            }
-
-            if(arr[i].gongyi == '打扣' && arr[i].dakouVal=='' || arr[i].gongyi == '打扣' && arr[i].dakouVal==undefined){
-              this.$message({
-                message: '请选择打扣的类型',
-                type: 'warning'
-              });
-
-              return false
-            }
-
-            if(arr[i].gongyi == '缝筒' && arr[i].fengtongVal=='' || arr[i].gongyi == '缝筒' && arr[i].fengtongVal==undefined){
-              this.$message({
-                message: '请选择类型',
-                type: 'warning'
-              });
-
-              return false
-            }            
+            }          
           }
           this.yanzheng = true 
         } else {
@@ -355,13 +352,16 @@ export default {
       this.$refs.orderForm.resetFields();
       this.orderForm.skuInfos = []
       let info = {
-        chanpinGongyiList:this.cost.jingpenGongyiList1,
+        chanpinGongyiList:this.cost.huneigongyiList1,
         productCode:'',
+        kuanshu:1,
         height: '',
         num: 1,
         remark: '',
         width: '',
-        crafts:{},
+        crafts:{
+          '款数': 1,
+        },
         name:'',
         gongyi:'', 
         fengtongVal:'',
@@ -375,6 +375,15 @@ export default {
     handleChange(value,index) {
       this.orderForm.skuInfos[index].num=value
     },
+
+    // 款数
+    kuanshuHandleChange(value,index){
+      this.orderForm.skuInfos[index].kuanshu=value
+      this.orderForm.skuInfos[index].crafts['款数'] = value
+      console.log(this.orderForm.skuInfos);
+    },
+
+
     // 点击上传
     fileUpload(val,type){
       console.log(val,type);
@@ -391,13 +400,16 @@ export default {
         info.imgInfo.forEach((item, index) => {
         　　console.log(item, index);
             let info = {
-              chanpinGongyiList:this.cost.jingpenGongyiList1,
+              chanpinGongyiList:this.cost.huneigongyiList1,
               productCode:item.code,
+              kuanshu:1,
               height: '',
               num: 1,
               remark: '',
               width: '',
-              crafts:{},
+              crafts:{
+                '款数': 1,
+              },
               name:item.name,
               // img:item.img,
               gongyi:'', 

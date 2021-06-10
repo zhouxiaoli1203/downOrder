@@ -66,19 +66,15 @@
               </div>
               <div class="content">
                 <h3 :title="item.orderAttr.title">{{item.orderAttr.title}}</h3>
-                <p v-if="item.deliveryTime!=null">
+                <p>
                   <img src="@/assets/img/fahuo.png" alt="">
                   发货：{{item.deliveryTime}}
                 </p>
               </div>
               <div class="footer">
                 <div class="xinxi">
-                  <span class="fl status red" v-if="item.orderAttr.skuName=='条幅'">{{item.orderAttr.skuName}}</span>
-                  <span class="fl status caise" v-if="item.orderAttr.skuName=='彩色条幅'">{{item.orderAttr.goodsName}} - {{item.orderAttr.skuName}}</span>
-                  <span class="fl status red" v-if="item.orderAttr.skuName=='红色条幅'">{{item.orderAttr.goodsName}} - {{item.orderAttr.skuName}}</span>
-                  <span class="fl status blue" v-if="item.orderAttr.skuName=='打印'">{{item.orderAttr.skuName}}</span>
-                  <span class="fl status bluehui" v-if="item.orderAttr.skuName=='通用下单'">{{item.orderAttr.skuName}}</span>
-                  <span class="fl status oranges" v-if="item.orderAttr.skuName=='旗帜'">{{item.orderAttr.skuName}}</span>
+                  <span class="fl status"
+                    :class='{"blue":item.orderAttr.skuName=="打印","bluehui":item.orderAttr.skuName=="通用下单","red":item.orderAttr.skuName=="红色条幅","caise":item.orderAttr.skuName=="彩色条幅","oranges":item.orderAttr.skuName=="旗帜","penhui":item.orderAttr.skuName=="喷绘","jingpen":item.orderAttr.skuName=="户外精喷","xiezhen":(item.orderAttr.skuName=="户外写真" || item.orderAttr.skuName=="户内写真" || item.orderAttr.skuName=="UV卷材写真"),"shoudai":item.orderAttr.skuName=="绶带"}'>{{item.orderAttr.goodsName=="条幅"?(item.orderAttr.goodsName+"-"):""}}{{item.orderAttr.skuName}}</span>
                   <p class="chicun" v-if="item.orderSkus[0].attributes.width">{{(item.orderSkus[0].attributes.width/1000)}}*{{(item.orderSkus[0].attributes.height/1000)}}m</p>
                   <p class="yanse" v-if="item.orderSkus[0].attributes.fontColor!=undefined">{{item.orderSkus[0].attributes.fontColor}}</p>
                 </div>
@@ -143,8 +139,6 @@ export default {
     let {pageSize,orderInfo} = this
 
     let xinxi = this.$store.getters.getOrderInfo
-
-    console.log(xinxi)
  
     if(xinxi){ //存
 
@@ -580,6 +574,25 @@ export default {
         &.caise{
           color:#FD58BA;
           background: linear-gradient(136deg, #f7ff913d 0%, #fd58ba52 100%);
+        }
+
+        &.penhui{
+          color:#D152FF;
+          background-color:rgba(209,82,255,0.04);
+        }
+
+        &.jingpen{
+          color:#29B1F3;
+          background-color:rgba(41,177,243,0.1);
+        }
+
+        &.xiezhen{
+          color:#FF6627;
+          background-color:rgba(255,102,39,0.04);
+        }
+        &.shoudai{
+          color:#FF2525;
+          background-color:rgba(255,37,37,0.04);
         }
       }
   }
