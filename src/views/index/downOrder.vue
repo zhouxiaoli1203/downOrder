@@ -54,6 +54,12 @@
                   <el-form-item  prop="receiptDetailAddress">
                     <el-input v-model="orderForm.receiptDetailAddress" placeholder="请输入详细地址"></el-input>
                   </el-form-item>
+                   <el-form-item>
+                    <div class="jiexiBox">
+                      <el-input  type="textarea" placeholder="请粘贴或输入地址自动识别" v-model="orderForm.textarea"></el-input>
+                      <el-button type="primary" @click.prevent="trueShibie" v-button class="button">解析</el-button>
+                    </div>
+                  </el-form-item>
                 </el-col>
               </el-row>
               <el-row v-else>
@@ -67,7 +73,7 @@
               </el-row>
               <el-row class="orderButton">
                 <el-col style="display:flex;align-items:center;justify-content: center;">
-                  <span class="shibieqi" @click="shibieqiClick">地址识别器</span>
+                  <!-- <span class="shibieqi" @click="shibieqiClick">地址识别器</span> -->
                   <el-form-item>
                     <el-button @click.prevent="resetForm('orderForm')" class="button">清除全部</el-button>
                     <el-button type="primary" @click.prevent="submitForm('orderForm')" class="button">提交订单</el-button>
@@ -318,16 +324,6 @@
         </div>
       </section>
 
-      <!-- 地址识别器弹窗 -->
-      <section class="publicPorp shibieqiPorp" v-show="shibieqiPorp">
-        <div class="textare">
-          <el-input  type="textarea" placeholder="请粘贴或输入地址" v-model="orderForm.textarea"></el-input>
-        </div>
-        <div class="orderButton trueorderButton">
-          <button @click.prevent="Close" class="button">取消</button>
-          <button @click.prevent="trueShibie" v-button class="button">确定</button>
-        </div>
-
       </section>
       <div class="mask" v-show="publicPorp"></div>
 
@@ -439,7 +435,6 @@ export default {
       skuId:0,
       orderId:0,
       typesName:0,
-      shibieqiPorp:false,
       skuIdUrl:'',
       shopInfo:[],
       shopInfoComponent:'',
@@ -630,11 +625,7 @@ export default {
           }
         })
     },
-    // 点击识别器
-    shibieqiClick(){
-      this.publicPorp=true
-      this.shibieqiPorp = true
-    },
+ 
     // 自动识别地址及姓名
     trueShibie(){
       this.pasteAddress(this.orderForm.textarea)
@@ -679,9 +670,6 @@ export default {
         orderForm.Address = info.province +  info.city + info.area  //收货人的地址 文字
         orderForm.receiptDetailAddress = info.details //收货人详情地址
       }
-
-      this.publicPorp=false
-      this.shibieqiPorp = false
     },
     // 点击面包屑
     pathIndex(){
@@ -808,7 +796,6 @@ export default {
   
     Close(){
       this.publicPorp=false
-      this.shibieqiPorp = false
     },
 
 
@@ -1118,6 +1105,8 @@ export default {
       }
     }
   }
+
+
 
  
 </style>

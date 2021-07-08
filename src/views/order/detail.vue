@@ -447,7 +447,7 @@ export default {
 
         this.openFullScreen(); //调用加载中
 
-        this.$post('post',this.baseUrl +'/backOrder/uploadCredentialImage',param,'upload'
+        this.$post('post',this.baseUrl +'/backOrder/uploadCredentialImage',param
         ).then((res) => {
 
             this.closeFullScreen(this.openFullScreen()); //关闭加载框

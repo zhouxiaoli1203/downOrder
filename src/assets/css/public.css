@@ -80,7 +80,7 @@
   color: #fff;
 }
 .skuInfos .pubilcRadio .el-radio--medium.is-bordered {
-  width: 100px;
+  min-width: 100px;
   text-align: center;
   padding: 10px 22px 0 10px;
 }
@@ -383,6 +383,19 @@
   height: 100%;
 }
 .shibieqiPorp .textare .el-textarea textarea {
+  height: 100% !important;
+}
+.jiexiBox {
+  display: flex;
+  align-items: end;
+}
+.jiexiBox .el-textarea {
+  margin-right: 20px;
+}
+.jiexiBox .el-textarea {
+  height: 100px;
+}
+.jiexiBox .el-textarea textarea {
   height: 100% !important;
 }
 .orderButton .el-form-item {

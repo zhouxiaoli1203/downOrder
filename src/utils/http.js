@@ -44,7 +44,9 @@
  // yhcmessage = isApp || isWechat ? Toast : "错误";
  yhcmessage = Message.error;
  // 请求超时时间
- axios.defaults.timeout = 300000;
+ // axios.defaults.timeout = 300000;
+ 
+  axios.defaults.timeout = 3600000;
  
  
  // post请求头
@@ -121,7 +123,7 @@
  /**
   * 请求
   */
- export function yhcReq(methods, url, params,yhc_f_a) {/*  */
+ export function yhcReq(methods, url, params,speed,yhc_f_a) {/*  */
      /*
      yhc_f_a分为两种：
      1.特殊状态码 类型为string 例如'205,206';
@@ -132,7 +134,13 @@
          // params.yhc_f_a = typeof yhc_f_a === 'string' ? yhc_f_a : '';
         //  const r = methods == 'post' ? axios.post(url,yhc_f_a == "upload"?params:JSON.stringify(params)) : axios.get(url, { params: params });
         //  const r = methods == 'post' ? axios.post(url,yhc_f_a == "upload"?params:JSON.stringify(params)) : axios.get(url, { params: params });
-         const r = methods == 'post' ? axios.post(url,params) : axios.get(url, { params: params });
+         const r = methods == 'post' ? axios.post(url,params,speed) : axios.get(url, { params: params });
+        // let r
+        //  if(speed){
+        //      r = methods == 'post' ? axios.post(url,params,speed) : axios.get(url, { params: params });
+        //  }else{
+        //      r = methods == 'post' ? axios.post(url,params) : axios.get(url, { params: params });
+        //  }
          r.then(res => {
              resolve(res.data);
          }).catch(err => {

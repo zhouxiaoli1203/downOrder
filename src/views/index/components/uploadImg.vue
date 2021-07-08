@@ -2,7 +2,8 @@
   <div>
     <div class="mask" ref='select_frame' ondragstart="return false" v-show="buzhouPorp">
       <template v-for="i in dataList"><img :src="i.content"  alt=""></template>
-        <section class="uploadSection publicPorp">
+        <section class="publicPorp">
+          <div class="uploadSection">
             <div class="close" @click="Close">
             <i class="el-icon-close"></i>
             </div>
@@ -85,6 +86,13 @@
                 <button @click.prevent="finishBtn">完成</button>
             </div>
             </div>
+          </div>
+          <div class="jinduBOX"  ref="speedBox" v-if="speedBoxList!=0">
+            <div v-for="item in speedBoxList" class="speed" v-if="item.speed!=100">
+              <el-progress :text-inside="true" :stroke-width="16" :percentage="item.speed"></el-progress>
+              <p>{{item.name}}</p>
+            </div>
+          </div>
         </section>
     </div>
   </div>
@@ -114,6 +122,8 @@ export default {
         imgMultiple:'',
         dataList:[],
         product:'',
+        speedBox:false,
+        speedBoxList:[],
     }
   },
   created(){
@@ -131,7 +141,6 @@ export default {
         return  // 检测是否有文件拖拽到页面
       }
 
-      console.log(data);
       for (var k in data) {
 
         let yanzheng = /^[\s\S]*cdr$/;   //判断后三位是否为cdr
@@ -157,20 +166,19 @@ export default {
   methods:{
 
     loadImgonClick(param,type,product){
-      console.log(param,type,product);
-        this.buzhouPorp = true
-        this.imgMore = type
-        this.sort = param
-        this.product = product
-        if(type!=undefined){
-          this.imgMultiple = 'multiple'
-        }else{
-          this.imgMultiple = ''
-        }
+      this.speedBoxList = []
+      this.buzhouPorp = true
+      this.imgMore = type
+      this.sort = param
+      this.product = product
+      if(type!=undefined){
+        this.imgMultiple = 'multiple'
+      }else{
+        this.imgMultiple = ''
+      }
     },
     // 上传文件
     beforeAvatarUpload(zipFile) {
-      console.log(zipFile);
       let yanzheng = /^[\s\S]*cdr$/;   //判断后三位是否为cdr
 
       if(!yanzheng.test(zipFile.name)){
@@ -194,7 +202,6 @@ export default {
                     let mc = zip.files[key].name
                     let mcName = mc.includes("page")
                     if(mcName==false){
-                      console.log(111);
                       let base = zip.file(zip.files[key].name).async('base64') // 将图片转化为base64格式
                       base.then(res => {
                         let img =  `data:image/png;base64,${res}`
@@ -212,18 +219,52 @@ export default {
 
     // 上传文件请求
     productionUpload(file,type,img){
-      let {product} = this
+      let that = this
+      let {product,speedBoxList} = this
       let name = file.name
       let param = new FormData(); // 创建form对象
       param.append("file",file);
       param.append("name",name); 
 
-      this.openFullScreen(); //调用加载中
+      let info = {
+        name:file.name,
+        speed:0,
+      }
+      speedBoxList.push(info)
 
-      this.$post('post',this.baseUrl +'/production/upload',param,'upload'
+      var config = {
+          onUploadProgress: function (e) {
+            //属性lengthComputable主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
+            //如果lengthComputable为false，就获取不到e.total和e.loaded 
+            if (e.lengthComputable) {
+              var rate = e.loaded / e.total;  //已上传的比例
+              if (rate < 1) {
+                //这里的进度只能表明文件已经上传到后台，但是后台有没有处理完还不知道
+                //因此不能直接显示为100%，不然用户会误以为已经上传完毕，关掉浏览器的话就可能导致上传失败
+                //等响应回来时，再将进度设为100%
+                speedBoxList = speedBoxList.map(function(item, index, arr) {
+                  if(item.name == file.name){
+                    item.speed = Number((rate *100).toFixed(0));
+                  }
+                  return item;
+                })	
+              }
+            }
+          }
+      };
+      this.$post('post',this.baseUrl +'/production/upload',param,config,
       ).then((res) => {
-        this.closeFullScreen(this.openFullScreen()); //关闭加载框
+        // this.closeFullScreen(this.openFullScreen()); //关闭加载框
         if (res.code == 200) {
+
+          speedBoxList = speedBoxList.map(function(item, index, arr) {
+            if(item.name == file.name){
+              item.speed = 100;
+            }
+            return item;
+          })
+
+
           this.active =2
           this.buzhou = 1
           if(type=='cdr'){
@@ -309,7 +350,6 @@ export default {
     // 完后上传
     finishBtn(){
       let { sort, wenjianNanme, wenjianCode,imgInfo,imgMore,wenjianImg } = this
-      console.log(sort);
       if(imgMore=='more'){
         let imgval = {
           index:sort,
@@ -334,6 +374,8 @@ export default {
       this.buzhouPorp = false
       this.publicPorp = false
       this.active = 1
+
+      this.speedBoxList = [] //清空
 
       this.localList = [] //上传之前先清空
       this.imgInfo = []
@@ -360,6 +402,7 @@ export default {
     // 上一步
     lastStep(){
       this.localList = [] //上传之前先清空
+      this.speedBoxList = [] //清空
       this.wenjianNanme = ''
       this.wenjianCode = ''
       this.wenjianImg = ''
@@ -516,6 +559,18 @@ export default {
       .close{
         background: #DBDBDB;
         color: #333;
+      }
+    }
+  }
+
+  .jinduBOX{
+    margin-top: 30px;
+    .speed{
+      margin-bottom: 20px;
+
+      p{
+        color: #fff;
+        margin-top: 10px;
       }
     }
   }

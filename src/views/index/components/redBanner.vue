@@ -90,6 +90,20 @@
                               </el-option>
                           </el-select>
                         </template>
+
+                         <template v-if="i == '绑带'">
+                          <el-select v-model="item.bangdaiVal"  @change="craftsName($event,index,'绑带')">
+                              <el-option
+                              v-for="item in bangdaiOptions"
+                              :key="item"
+                              :label="item"
+                              :value="item">
+                              </el-option>
+                          </el-select>
+                        </template>
+
+
+                        
                     </div>
                   </el-radio-group>
               </el-form-item>
@@ -174,9 +188,10 @@ export default {
       file:require('@/assets/img/file.png'),
       shopSkuId:0,
       restaurants: [],
-      chanpinGongyiList:['打扣', '缝吊耳','缝筒','裁净边','条幅绑带'],
+      chanpinGongyiList:['打扣', '缝吊耳','缝筒','裁净边','条幅绑带','绑带'],
       dakouOptions:['四角打扣','每隔2米打一个扣'],
       diaoerOptions:['四角缝吊耳'],
+      bangdaiOptions:['四角绑带','两角绑带'],
       yanzheng:false
     }
   },
@@ -246,6 +261,15 @@ export default {
           return
       }
 
+      if(val == '绑带'){
+          valname = orderForm.skuInfos[index].bangdaiVal
+          if(valname){
+            orderForm.skuInfos[index].crafts['产品工艺'] = val + ':' + valname
+          }
+          console.log(orderForm.skuInfos[index].crafts);
+          return
+      }
+
       orderForm.skuInfos[index].crafts['产品工艺'] = val
       console.log(orderForm.skuInfos[index].crafts);
 
@@ -265,6 +289,7 @@ export default {
         gongyi:'', 
         dakouVal:'',
         diaoerVal:'',
+        bangdaiVal:'四角绑带'
       }
 
       if(this.shopSkuId == 2){
@@ -284,7 +309,8 @@ export default {
           remark:item.remark,
           width:item.attributes.width/1000,
           name:item.products[0].name,//文件的名字
-          crafts:item.attributes.crafts?item.attributes.crafts:{}
+          crafts:item.attributes.crafts?item.attributes.crafts:{},
+          bangdaiVal:'四角绑带'
         }
 
 
@@ -312,8 +338,13 @@ export default {
               info['dakouVal'] = val[1]
             }
 
+
             if(val[0] == '缝吊耳'){
               info['diaoerVal'] = val[1]
+            }
+
+            if(val[0] == '绑带'){
+              info['bangdaiVal'] = val[1]
             }
           }
         }
@@ -356,6 +387,7 @@ export default {
         gongyi:'', 
         dakouVal:'',
         diaoerVal:'',
+        bangdaiVal:'四角绑带'
       }
       if(this.shopSkuId == 2){
         this.$set(info,'fontColor','')
@@ -418,6 +450,7 @@ export default {
         gongyi:'', 
         dakouVal:'',
         diaoerVal:'',
+        bangdaiVal:'四角绑带'
       }
 
       if(this.shopSkuId == 2){
@@ -457,6 +490,7 @@ export default {
               gongyi:'', 
               dakouVal:'',
               diaoerVal:'',
+              bangdaiVal:'四角绑带'
             }
             if(this.shopSkuId == 2){
               this.$set(info,'fontColor','')

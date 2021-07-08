@@ -91,6 +91,7 @@
                                 <el-radio border label="A3">A3</el-radio>
                                 <el-radio border label="A4">A4</el-radio>
                                 <el-radio border label="A5">A5</el-radio>
+                                <el-radio border label="B5">B5</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="打印材料"  class="productCraft gongyiProduct">
@@ -150,7 +151,8 @@
                                 <el-radio border label="普通装订">普通装订</el-radio>
                                 <el-radio border label="打孔装订">打孔装订</el-radio>
                                 <el-radio border label="骑马钉">骑马钉</el-radio>
-                                <el-radio border label="普通胶装">普通胶装</el-radio>
+                                <el-radio border label="普通胶装（空白）">普通胶装（空白）</el-radio>
+                                <el-radio border label="普通胶装（有字）">普通胶装（有字）</el-radio>
                                 <el-radio border label="彩色精装">彩色精装</el-radio>
                             </el-radio-group>
                         </el-form-item>

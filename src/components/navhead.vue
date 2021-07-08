@@ -204,7 +204,6 @@ export default {
   },
   created(){
     this.userInfo()
-    // this.pageNotify(this.pageNum,this.state)
     this.tipsPageNotify();
     this.weiDuPageNotify() //未读
   },
